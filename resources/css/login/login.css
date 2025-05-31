@@ -1,0 +1,216 @@
+@import url('https://fonts.googleapis.com/css2?family=Raleway:wght@300&display=swap');
+
+/* Importa la fuente 'Raleway' desde Google Fonts con un peso de 300 */
+
+*{
+  margin: 0; /* Elimina el margen de todos los elementos */
+  padding: 0; /* Elimina el relleno (padding) de todos los elementos */
+  box-sizing: border-box; /* Incluye el padding y border dentro del tamaño total del elemento */
+  font-family: 'Raleway', sans-serif; /* Aplica la fuente Raleway a todos los elementos */
+}
+
+html,body{
+  display: grid; /* Usa el sistema de grid */
+  height: 100%; /* Altura completa de la ventana */
+  width: 100%; /* Ancho completo de la ventana */
+  place-items: center; /* Centra el contenido horizontal y verticalmente */
+  background: -webkit-linear-gradient(left, #9896F0,#FBC8D5); /* Fondo con gradiente de izquierda a derecha */
+}
+
+::selection{
+  background: #12e8f0; /* Color de fondo al seleccionar texto */
+  color: #fff; /* Color del texto seleccionado */
+}
+
+.wrapper{
+  overflow: hidden; /* Oculta el desbordamiento del contenido */
+  width: 420px; /* Ancho máximo de 390px */
+  height: 420px;
+  background: #fff; /* Fondo blanco */
+  padding: 30px; /* Relleno interno de 30px */
+  border-radius: 5px; /* Bordes redondeados */
+  box-shadow: 0px 15px 20px rgba(0,0,0,0.1); /* Sombra ligera */
+}
+
+.wrapper .title-text{
+  display: flex; /* Usa flexbox para alinear los textos */
+  width: 200%; /* El doble del ancho del contenedor */
+}
+
+.wrapper .title{
+  width: 50%; /* Cada título ocupa la mitad del contenedor */
+  font-size: 35px; /* Tamaño de fuente */
+  font-weight: 600; /* Grosor de la fuente */
+  text-align: center; /* Centra el texto */
+  transition: all 0.6s cubic-bezier(0.68,-0.55,0.265,1.55); /* Transición suave */
+}
+
+.wrapper .slide-controls{
+  position: relative; /* Posicionamiento relativo para elementos hijos */
+  display: flex; /* Usa flexbox */
+  height: 50px; /* Altura fija */
+  width: 100%; /* Ancho completo */
+  overflow: hidden; /* Oculta contenido desbordado */
+  margin: 30px 0 10px 0; /* Margen arriba y abajo */
+  justify-content: space-between; /* Espacio entre elementos */
+  border: 1px solid rgb(19, 14, 14); /* Borde gris claro */
+  border-radius: 5px; /* Bordes redondeados */
+}
+
+.slide-controls .slide{
+  height: 100%; /* Altura completa del contenedor padre */
+  width: 100%; /* Ancho completo (luego se ajusta con radio button) */
+  color: #030202; /* Texto blanco */
+  font-size: 18px; /* Tamaño de fuente */
+  font-weight: 500; /* Grosor medio */
+  text-align: center; /* Centra el texto */
+  line-height: 48px; /* Altura de línea para centrar verticalmente */
+  /*cursor: pointer; /* Cambia el cursor al pasar */
+  z-index: 1; /* Sobrepone sobre otros elementos */
+  transition: all 0.6s ease; /* Transición suave */
+}
+
+.slide-controls label.signup{
+  color: #7e1616; /* Texto negro por defecto para "signup" */
+}
+
+.slide-controls .slider-tab{
+  position: absolute; /* Posicionamiento absoluto dentro del contenedor */
+  height: 100%; /* Altura completa */
+  width: 50%; /* Mitad del ancho del contenedor */
+  left: 0; /* Inicia desde la izquierda */
+  z-index: 0; /* Detrás de las etiquetas */
+  border-radius: 5px; /* Bordes redondeados */
+  background: -webkit-linear-gradient(left, #FBEE97, #ADEDD5); /* Fondo con gradiente */
+  transition: all 0.6s cubic-bezier(0.68,-0.55,0.265,1.55); /* Transición animada */
+}
+
+input[type="radio"]{
+  display: none; /* Oculta los botones de radio */
+}
+
+#signup:checked ~ .slider-tab{
+  left: 50%; /* Mueve el tab deslizante hacia el lado derecho */
+}
+
+#signup:checked ~ label.signup{
+  color: #0e0b0b; /* Cambia el color del texto a blanco */
+  cursor: default; /* Quita la apariencia de botón */
+  user-select: none; /* No se puede seleccionar el texto */
+}
+
+#signup:checked ~ label.login{
+  color: #000; /* Texto negro para la opción "login" */
+}
+
+#login:checked ~ label.signup{
+  color: #000; /* Texto negro para la opción "signup" */
+}
+
+#login:checked ~ label.login{
+  cursor: default; /* Quita la apariencia de botón */
+  user-select: none; /* No se puede seleccionar el texto */
+}
+
+.wrapper .form-container{
+  width: 100%; /* Ancho completo */
+  overflow: hidden; /* Oculta el contenido que se desborda */
+}
+
+.form-container .form-inner{
+  display: flex; /* Flexbox para alinear los formularios */
+  width: 200%; /* Doble del ancho para mostrar los dos formularios juntos */
+}
+
+.form-container .form-inner form{
+  width: 50%; /* Cada formulario ocupa la mitad del contenedor */
+  transition: all 0.6s cubic-bezier(0.68,-0.55,0.265,1.55); /* Transición suave */
+}
+
+.form-inner form .field{
+  height: 50px; /* Altura del campo */
+  width: 100%; /* Ancho completo */
+  margin-top: 20px; /* Margen superior */
+}
+
+.form-inner form .field input{
+  height: 100%; /* Altura del campo */
+  width: 100%; /* Ancho del campo */
+  outline: none; /* Elimina el borde al enfocar */
+  padding-left: 15px; /* Espaciado interno a la izquierda */
+  border-radius: 5px; /* Bordes redondeados */
+  border: 1px solid lightgrey; /* Borde gris claro */
+  border-bottom-width: 2px; /* Borde inferior más grueso */
+  font-size: 17px; /* Tamaño del texto */
+  transition: all 0.3s ease; /* Transición suave */
+}
+
+.form-inner form .field input:focus{
+  border-color: #12e8f0; /* Color del borde al enfocar */
+}
+
+.form-inner form .field input::placeholder{
+  color: #999; /* Color del texto placeholder */
+  transition: all 0.3s ease; /* Transición suave */
+}
+
+form .field input:focus::placeholder{
+  color: #b3b3b3; /* Cambia el color del placeholder al enfocar */
+}
+
+.form-inner form .pass-link{
+  margin-top: 5px; /* Margen superior para el enlace de contraseña */
+}
+
+.form-inner form .signup-link{
+  text-align: center; /* Centra el texto */
+  margin-top: 30px; /* Margen superior */
+}
+
+.form-inner form .pass-link a,
+.form-inner form .signup-link a{
+  color: #0e45dd; /* Color azul para los enlaces */
+  text-decoration: none; /* Quita subrayado */
+}
+
+.form-inner form .pass-link a:hover,
+.form-inner form .signup-link a:hover{
+  text-decoration: underline; /* Subraya al pasar el mouse */
+}
+
+form .btn{
+  height: 50px; /* Altura del botón */
+  width: 100%; /* Ancho completo */
+  border-radius: 5px; /* Bordes redondeados */
+  position: relative; /* Posición relativa para el layer */
+  overflow: hidden; /* Oculta lo que sobresale */
+}
+
+form .btn .btn-layer{
+  height: 100%; /* Altura completa */
+  width: 300%; /* Tres veces el ancho para efecto de movimiento */
+  position: absolute; /* Posición absoluta dentro del botón */
+  left: -100%; /* Comienza fuera del botón */
+  background: -webkit-linear-gradient(right, #FBEE97, #ADEDD5, #FBEE97, #ADEDD5); /* Gradiente */
+  border-radius: 5px; /* Bordes redondeados */
+  transition: all 0.4s ease; /* Transición suave */
+}
+
+form .btn:hover .btn-layer{
+  left: 0; /* Desliza el fondo hacia adentro al hacer hover */
+}
+
+form .btn input[type="submit"]{
+  height: 100%; /* Altura completa */
+  width: 100%; /* Ancho completo */
+  z-index: 2; /* Sobrepone sobre el fondo animado */
+  position: relative; /* Posición relativa */
+  background: none; /* Sin fondo */
+  border: none; /* Sin borde */
+  color: #fff; /* Texto blanco */
+  padding-left: 0; /* Sin padding izquierdo */
+  border-radius: 10px; /* Bordes más redondeados */
+  font-size: 20px; /* Tamaño del texto */
+  font-weight: 500; /* Peso medio del texto */
+  cursor: pointer; /* Cursor tipo botón */
+}
