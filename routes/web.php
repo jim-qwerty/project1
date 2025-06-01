@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return "ACA SE MOSTRARA ALGO";
+    return view('home');
 });
 
 

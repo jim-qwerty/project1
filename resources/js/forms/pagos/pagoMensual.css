@@ -1,0 +1,89 @@
+/* forms/pagos/formularioPagos.css */
+form {
+  padding: 1rem;
+  font-family: Arial, sans-serif;
+  background-color: #fdfdfd;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  max-width: 600px;
+  margin: auto;
+}
+
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  font-weight: bold;
+}
+
+input,
+select {
+  padding: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #999;
+}
+
+button {
+  padding: 0.6rem 1.2rem;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #388e3c;
+}
+
+.mensaje {
+  margin-top: 1rem;
+  font-weight: bold;
+  color: green;
+}
+
+.lista-coincidencias {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border: 1px solid #ccc;
+  max-height: 150px;
+  overflow-y: auto;
+  background: white;
+  position: absolute;
+  z-index: 10;
+}
+
+.lista-coincidencias li {
+  padding: 5px;
+  cursor: pointer;
+}
+
+.lista-coincidencias li:hover {
+  background-color: #eee;
+}
+
+.campo-alumno {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.lista-coincidencias {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  z-index: 10;
+  background: white;
+  border: 1px solid #ccc;
+  max-height: 150px;
+  overflow-y: auto;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}

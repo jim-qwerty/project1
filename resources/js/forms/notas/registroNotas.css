@@ -1,0 +1,43 @@
+.input-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.input-group label {
+  display: flex;
+  flex-direction: column;
+  width: 150px;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+th, td {
+  border: 1px solid #aaa;
+  text-align: center;
+  padding: 8px;
+}
+.radio-group {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+#listaResultados {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 1px solid #ccc;
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+#listaResultados li {
+  padding: 5px;
+  background: #f9f9f9;
+}
+
+#listaResultados li:hover {
+  background: #e0e0e0;
+}
