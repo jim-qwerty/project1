@@ -1,5 +1,5 @@
-import html from '/forms/profesores/listaProfesores.html?raw';
-import styles from '/forms/profesores/listaProfesores.css?inline';
+import html from './listaProfesores.html?raw';
+import styles from './listaProfesores.css?inline';
 
 class ListaProfesoresForm extends HTMLElement {
   constructor() {
@@ -81,4 +81,4 @@ class ListaProfesoresForm extends HTMLElement {
   }
 }
 
-customElements.define('lista-profesores-form', ListaProfesoresForm);
+customElements.define('lista-profesores', ListaProfesoresForm);

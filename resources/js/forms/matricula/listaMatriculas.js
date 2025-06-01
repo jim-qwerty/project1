@@ -1,5 +1,5 @@
-import html from '/forms/matricula/listaMatriculas.html?raw';
-import styles from '/forms/matricula/listaMatriculas.css?inline';
+import html from './listaMatriculas.html?raw';
+import styles from './listaMatriculas.css?inline';
 
 class ListaMatriculas extends HTMLElement {
   constructor() {

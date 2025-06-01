@@ -1,6 +1,6 @@
 import html from './matricula.html?raw';
 import styles from './matricula.css?inline';
-
+console.log("LLEGADA 2")
 class MatriculaForm extends HTMLElement {
   constructor() {
     super();
@@ -132,3 +132,5 @@ class MatriculaForm extends HTMLElement {
 }
 
 customElements.define('matricula-form', MatriculaForm);
+
+

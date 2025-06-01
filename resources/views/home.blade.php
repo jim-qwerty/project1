@@ -4,6 +4,6 @@
 
 @section('content')
   <section>
-    <div id="form-container"></div>
+    <div id="form-container">XD</div>
   </section>
 @endsection

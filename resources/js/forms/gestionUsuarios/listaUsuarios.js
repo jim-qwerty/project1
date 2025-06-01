@@ -1,5 +1,5 @@
-import html from '/forms/gestionUsuarios/listaUsuarios.html?raw';
-import styles from '/forms/gestionUsuarios/listaUsuarios.css?inline';
+import html from './listaUsuarios.html?raw';
+import styles from './listaUsuarios.css?inline';
 
 class ListaUsuarios extends HTMLElement {
   constructor() {

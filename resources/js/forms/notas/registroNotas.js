@@ -1,5 +1,5 @@
-import html from '/forms/notas/registroNotas.html?raw';
-import styles from '/forms/notas/registroNotas.css?inline';
+import html from './registroNotas.html?raw';
+import styles from './registroNotas.css?inline';
 
 class RegistroNotas extends HTMLElement {
   constructor() {

@@ -28,7 +28,7 @@
 
           <!-- Asistencia -->
           <div class="nav__dropdown">
-            <a href="#" class="nav__link" data-form="indexAsistencia">
+            <a href="#" class="nav__link" >
               <i class='bx bx-calendar-check nav__icon'></i>
               <span class="nav__name">Asistencia</span>
               <i class='bx bx-chevron-down nav__icon nav__dropdown-icon'></i>
@@ -101,8 +101,8 @@
             </a>
             <div class="nav__dropdown-collapse">
               <div class="nav__dropdown-content">
-                <a href="#" class="nav__dropdown-item" data-form="agregar-profesor-form">Agregar</a>
-                <a href="#" class="nav__dropdown-item" data-form="lista-profesores-form">Lista</a>
+                <a href="#" class="nav__dropdown-item" data-form="agregar-profesores">Agregar</a>
+                <a href="#" class="nav__dropdown-item" data-form="lista-profesores">Lista</a>
               </div>
             </div>
           </div>
@@ -116,7 +116,7 @@
             </a>
             <div class="nav__dropdown-collapse">
               <div class="nav__dropdown-content">
-                <a href="#" class="nav__dropdown-item" data-form="crear-usuarios-form">Agregar</a>
+                <a href="#" class="nav__dropdown-item" data-form="crear-usuarios">Agregar</a>
                 <a href="#" class="nav__dropdown-item" data-form="lista-usuarios">Lista</a>
               </div>
             </div>

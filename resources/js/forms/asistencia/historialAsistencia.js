@@ -1,5 +1,5 @@
-import html from '/forms/asistencia/historialAsistencia.html?raw';
-import styles from '/forms/asistencia/historialAsistencia.css?inline';
+import html from './historialAsistencia.html?raw';
+import styles from './historialAsistencia.css?inline';
 
 class historialAsistencia extends HTMLElement {
   constructor() {

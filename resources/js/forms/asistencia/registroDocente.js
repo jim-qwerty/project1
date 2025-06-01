@@ -1,5 +1,5 @@
-import html from '/forms/asistencia/registroDocente.html?raw';
-import styles from '/forms/asistencia/registroDocente.css?inline';
+import html from './registroDocente.html?raw';
+import styles from './registroDocente.css?inline';
 
 class RegistroDocente extends HTMLElement {
   constructor() {

@@ -1,5 +1,5 @@
-import html from '/forms/pagos/historialPagos.html?raw';
-import styles from '/forms/pagos/historialPagos.css?inline';
+import html from './historialPagos.html?raw';
+import styles from './historialPagos.css?inline';
 
 class HistorialPagos extends HTMLElement {
   constructor() {

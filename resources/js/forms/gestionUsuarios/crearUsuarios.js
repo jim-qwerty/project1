@@ -1,5 +1,5 @@
-import html from '/forms/gestionUsuarios/crearUsuarios.html?raw';
-import styles from '/forms/gestionUsuarios/crearUsuarios.css?inline';
+import html from './crearUsuarios.html?raw';
+import styles from './crearUsuarios.css?inline';
 
 class CrearUsuarios extends HTMLElement {
   constructor() {
@@ -104,4 +104,4 @@ class CrearUsuarios extends HTMLElement {
   }
 }
 
-customElements.define('crear-usuarios-form', CrearUsuarios);
+customElements.define('crear-usuarios', CrearUsuarios);

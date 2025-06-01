@@ -1,5 +1,5 @@
-import html from '/forms/notas/listaNotas.html?raw';
-import styles from '/forms/notas/listaNotas.css?inline';
+import html from './listaNotas.html?raw';
+import styles from './listaNotas.css?inline';
 
 class ListaNotas extends HTMLElement {
   constructor() {

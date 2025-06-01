@@ -1,5 +1,5 @@
-import html from '/forms/pagos/pagoMensual.html?raw';
-import styles from '/forms/pagos/pagoMensual.css?inline';
+import html from './pagoMensual.html?raw';
+import styles from './pagoMensual.css?inline';
 
 class PagoMensual extends HTMLElement {
   constructor() {

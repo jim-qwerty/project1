@@ -1,5 +1,5 @@
-import html from '/forms/asistencia/registroAlumnos.html?raw';
-import styles from '/forms/asistencia/registroAlumnos.css?inline';
+import html from './registroAlumnos.html?raw';
+import styles from './registroAlumnos.css?inline';
 
 class RegistroAlumnos extends HTMLElement {
   constructor() {

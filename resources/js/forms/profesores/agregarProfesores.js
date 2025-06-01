@@ -1,5 +1,5 @@
-import html from '/forms/profesores/agregarProfesores.html?raw';
-import styles from '/forms/profesores/agregarProfesores.css?inline';
+import html from './agregarProfesores.html?raw';
+import styles from './agregarProfesores.css?inline';
 
 class ProfesorForm extends HTMLElement {
   constructor() {
@@ -59,4 +59,4 @@ class ProfesorForm extends HTMLElement {
   }
 }
 
-customElements.define('agregar-profesor-form', ProfesorForm);
+customElements.define('agregar-profesores', ProfesorForm);

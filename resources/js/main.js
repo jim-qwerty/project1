@@ -1,29 +1,7 @@
-// Importar Web Components desde rutas relativas (Vite compila desde 'resources/js')
-import './forms/matricula/matricula.js';/*
-import './forms/matricula/listaMatriculas.js';
+console.log("LLEGADA 1");
 
-import './forms/asistencia/registroAlumnos.js';
-import './forms/asistencia/historialAsistencia.js';
-import './forms/asistencia/registroDocente.js';
-
-import './forms/notas/registroNotas.js';
-import './forms/notas/listaNotas.js';
-
-import './forms/pagos/pagoMensual.js';
-import './forms/pagos/historialPagos.js';
-
-import './forms/profesores/agregarProfesores.js';
-import './forms/profesores/listaProfesores.js';
-
-import './forms/gestionUsuarios/crearUsuarios.js';
-import './forms/gestionUsuarios/listaUsuarios.js';*/
-
-// Evento principal DOMContentLoaded
 document.addEventListener("DOMContentLoaded", () => {
-  // Cargar componentes dinámicos HTML
-  cargarComponente('header', '/components/header.html');
-  cargarComponente('sidebar', '/components/sidebar.html');
-  cargarComponente('footer', '/components/footer.html'); // si lo usas
+  inicializarSidebar(); // <--- ¡IMPORTANTE!
 
   // Sidebar hover animación
   const sidebar = document.getElementById("sidebar");
@@ -38,23 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-// Cargar fragmentos HTML (header, sidebar, footer)
-function cargarComponente(id, url) {
-  const contenedor = document.getElementById(id);
-  if (!contenedor) return;
-
-  fetch(url)
-    .then(res => res.text())
-    .then(html => {
-      contenedor.innerHTML = html;
-
-      if (id === 'sidebar') {
-        inicializarSidebar(); // Reactivar eventos del sidebar
-      }
-    });
-}
-
-// Inicializar el sidebar: botón toggle y enlaces data-form
+// Inicializar sidebar y manejar formularios dinámicos
 function inicializarSidebar() {
   const toggleBtn = document.getElementById("header-toggle");
   const nav = document.getElementById("navbar");
@@ -66,18 +28,71 @@ function inicializarSidebar() {
     });
   }
 
-  // Manejo de clic en enlaces con atributo data-form
+  // Botones con atributo data-form
   document.querySelectorAll("[data-form]").forEach(link => {
-    link.addEventListener("click", function (e) {
+    link.addEventListener("click", async function (e) {
       e.preventDefault();
       const formTag = this.getAttribute("data-form"); // Ej: "matricula-form"
       const container = document.getElementById("form-container");
 
       if (container && formTag) {
-        container.innerHTML = "";
-        const formComponent = document.createElement(formTag);
-        container.appendChild(formComponent);
+        container.innerHTML = ""; // Limpia el contenedor
+
+        try {
+          await cargarFormularioJS(formTag); // Carga el archivo .js correspondiente
+          const formComponent = document.createElement(formTag);
+          container.appendChild(formComponent);
+        } catch (error) {
+          console.error(`Error al cargar el formulario ${formTag}:`, error);
+        }
       }
     });
   });
+}
+
+// Función para importar dinámicamente el JS del formulario
+async function cargarFormularioJS(formTag) {
+  switch (formTag) {
+    case "matricula-form":
+      return import('./forms/matricula/matricula.js');
+
+    case "lista-matriculas":
+      return import('./forms/matricula/listaMatriculas.js');
+
+    case "registro-alumnos":
+      return import('./forms/asistencia/registroAlumnos.js');
+
+    case "historial-asistencia":
+      return import('./forms/asistencia/historialAsistencia.js');
+
+    case "registro-docente":
+      return import('./forms/asistencia/registroDocente.js');
+
+    case "registro-notas":
+      return import('./forms/notas/registroNotas.js');
+
+    case "lista-notas":
+      return import('./forms/notas/listaNotas.js');
+
+    case "pago-mensual":
+      return import('./forms/pagos/pagoMensual.js');
+
+    case "historial-pagos":
+      return import('./forms/pagos/historialPagos.js');
+
+    case "agregar-profesores":
+      return import('./forms/profesores/agregarProfesores.js');
+
+    case "lista-profesores":
+      return import('./forms/profesores/listaProfesores.js');
+
+    case "crear-usuarios":
+      return import('./forms/gestionUsuarios/crearUsuarios.js');
+
+    case "lista-usuarios":
+      return import('./forms/gestionUsuarios/listaUsuarios.js');
+
+    default:
+      throw new Error(`No se reconoce el formulario: ${formTag}`);
+  }
 }
