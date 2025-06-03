@@ -1,27 +1,15 @@
-import html from './registroAlumnos.html?raw';
-import styles from './registroAlumnos.css?inline';
+import '/resources/css/forms/asistencia/registroAlumnos.css'; // Asegúrate de que Vite lo procese
 
-class RegistroAlumnos extends HTMLElement {
-  constructor() {
-    super();
-    this.attachShadow({ mode: 'open' });
+export default function initRegistroAlumnos(container = document.querySelector('registro-alumnos')) {
+  if (!container) return;
 
-    const template = document.createElement('template');
-    template.innerHTML = `<style>${styles}</style>${html}`;
-    this.shadowRoot.appendChild(template.content.cloneNode(true));
-  }
+  const fechaInput = container.querySelector('#fechaActual');
 
-  connectedCallback() {
-    // Espera a que el contenido esté cargado
-    const fechaInput = this.shadowRoot.getElementById('fechaActual');
-    if (fechaInput) {
-      const hoy = new Date();
-      const yyyy = hoy.getFullYear();
-      const mm = String(hoy.getMonth() + 1).padStart(2, '0');
-      const dd = String(hoy.getDate()).padStart(2, '0');
-      fechaInput.value = `${yyyy}-${mm}-${dd}`;
-    }
+  if (fechaInput) {
+    const hoy = new Date();
+    const yyyy = hoy.getFullYear();
+    const mm = String(hoy.getMonth() + 1).padStart(2, '0');
+    const dd = String(hoy.getDate()).padStart(2, '0');
+    fechaInput.value = `${yyyy}-${mm}-${dd}`;
   }
 }
-
-customElements.define('registro-alumnos', RegistroAlumnos);

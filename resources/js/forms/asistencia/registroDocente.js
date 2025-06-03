@@ -1,50 +1,41 @@
-import html from './registroDocente.html?raw';
-import styles from './registroDocente.css?inline';
+import '/resources/css/forms/asistencia/registroDocente.css'; // Asegúrate que Vite procese este archivo
 
-class RegistroDocente extends HTMLElement {
-  constructor() {
-    super();
-    this.attachShadow({ mode: 'open' });
+export default function initRegistroDocente(container = document.querySelector('registro-docente')) {
+  if (!container) return;
 
-    const template = document.createElement('template');
-    template.innerHTML = `<style>${styles}</style>${html}`;
-    this.shadowRoot.appendChild(template.content.cloneNode(true));
-  }
+  // Referencias a los elementos
+  const fechaSpan = container.querySelector('#fechaActual');
+  const horaSpan = container.querySelector('#horaActual');
+  const form = container.querySelector('#formRegistroDocente');
+  const mensaje = container.querySelector('#mensajeConfirmacion');
 
-  connectedCallback() {
-    const fechaSpan = this.shadowRoot.getElementById('fechaActual');
-    const horaSpan = this.shadowRoot.getElementById('horaActual');
-    const form = this.shadowRoot.getElementById('formRegistroDocente');
-    const mensaje = this.shadowRoot.getElementById('mensajeConfirmacion');
+  const actualizarFechaHora = () => {
+    const ahora = new Date();
+    const yyyy = ahora.getFullYear();
+    const mm = String(ahora.getMonth() + 1).padStart(2, '0');
+    const dd = String(ahora.getDate()).padStart(2, '0');
+    const hh = String(ahora.getHours()).padStart(2, '0');
+    const min = String(ahora.getMinutes()).padStart(2, '0');
+    const ss = String(ahora.getSeconds()).padStart(2, '0');
 
-    const actualizarFechaHora = () => {
-      const ahora = new Date();
-      const yyyy = ahora.getFullYear();
-      const mm = String(ahora.getMonth() + 1).padStart(2, '0');
-      const dd = String(ahora.getDate()).padStart(2, '0');
-      const hh = String(ahora.getHours()).padStart(2, '0');
-      const min = String(ahora.getMinutes()).padStart(2, '0');
-      const ss = String(ahora.getSeconds()).padStart(2, '0');
+    if (fechaSpan) fechaSpan.textContent = `${yyyy}-${mm}-${dd}`;
+    if (horaSpan) horaSpan.textContent = `${hh}:${min}:${ss}`;
+  };
 
-      fechaSpan.textContent = `${yyyy}-${mm}-${dd}`;
-      horaSpan.textContent = `${hh}:${min}:${ss}`;
-    };
+  // Iniciar la actualización de fecha y hora
+  actualizarFechaHora();
+  setInterval(actualizarFechaHora, 1000);
 
-    // Actualiza cada segundo
-    actualizarFechaHora();
-    setInterval(actualizarFechaHora, 1000);
+  // Manejar el envío del formulario
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const nombre = container.querySelector('#nombre')?.value;
+    const grado = container.querySelector('#grado')?.value;
+    const fecha = fechaSpan?.textContent;
+    const hora = horaSpan?.textContent;
 
-    // Al enviar el formulario
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const nombre = this.shadowRoot.getElementById('nombre').value;
-      const grado = this.shadowRoot.getElementById('grado').value;
-      const fecha = fechaSpan.textContent;
-      const hora = horaSpan.textContent;
-
+    if (mensaje && nombre && grado && fecha && hora) {
       mensaje.textContent = `✅ Asistencia registrada para ${nombre} (${grado}) el ${fecha} a las ${hora}`;
-    });
-  }
+    }
+  });
 }
-
-customElements.define('registro-docente', RegistroDocente);

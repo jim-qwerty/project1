@@ -1,3 +1,4 @@
+<div id="agregar-profesores">
 <form id="formulario-profesor" class="formulario">
   <h2 class="title">Formulario de Registro de Profesor</h2>
 
@@ -81,3 +82,5 @@
     <input type="submit" value="Registrar Profesor">
   </div>
 </form>
+<div id="mensaje"></div> <!-- Agrega este div para mostrar mensajes -->
+</div>

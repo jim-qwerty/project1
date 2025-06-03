@@ -1,22 +1,22 @@
-console.log("LLEGADA 1");
+console.log("MAIN.JS CARGADO");
 
 document.addEventListener("DOMContentLoaded", () => {
-  inicializarSidebar(); // <--- ¡IMPORTANTE!
+  inicializarSidebar();
 
-  // Sidebar hover animación
   const sidebar = document.getElementById("sidebar");
   const container = document.querySelector(".container");
 
-  sidebar?.addEventListener("mouseenter", () => {
-    container?.classList.add("sidebar-expanded");
-  });
+  if (sidebar && container) {
+    sidebar.addEventListener("mouseenter", () => {
+      container.classList.add("sidebar-expanded");
+    });
 
-  sidebar?.addEventListener("mouseleave", () => {
-    container?.classList.remove("sidebar-expanded");
-  });
+    sidebar.addEventListener("mouseleave", () => {
+      container.classList.remove("sidebar-expanded");
+    });
+  }
 });
 
-// Inicializar sidebar y manejar formularios dinámicos
 function inicializarSidebar() {
   const toggleBtn = document.getElementById("header-toggle");
   const nav = document.getElementById("navbar");
@@ -28,71 +28,82 @@ function inicializarSidebar() {
     });
   }
 
-  // Botones con atributo data-form
+  // DE LA DERECHA SON LAS RUTAS .blade.php (vistas) EN CADA CARPETA
+  const rutasFormularios = {
+    "matricula-form": { path: "matricula", file: "matricula" },
+    "lista-matriculas": { path: "matricula", file: "listaMatriculas" },
+
+    "registro-notas": { path: "notas", file: "registroNotas" },
+    "lista-notas": { path: "notas", file: "listaNotas" },
+
+    "historial-asistencia": { path: "asistencia", file: "historialAsistencia" },
+    "registro-alumnos": { path: "asistencia", file: "registroAlumnos" },
+    "registro-docente": { path: "asistencia", file: "registroDocente" },
+
+    "pago-mensual": { path: "pagos", file: "pagoMensual" },
+    "historial-pagos": { path: "pagos", file: "historialPagos" },
+
+    "crear-usuarios": { path: "gestionUsuarios", file: "crearUsuarios" },
+    "lista-usuarios": { path: "gestionUsuarios", file: "listaUsuarios" },
+
+    "agregar-profesores": { path: "profesores", file: "agregarProfesores" },
+    "lista-profesores": { path: "profesores", file: "listaProfesores" },
+
+    "indexMenuPrincipal": { path: "menu", file: "indexMenuPrincipal" },
+  };
+
+  
+
   document.querySelectorAll("[data-form]").forEach(link => {
     link.addEventListener("click", async function (e) {
       e.preventDefault();
-      const formTag = this.getAttribute("data-form"); // Ej: "matricula-form"
+
+      const formTag = this.getAttribute("data-form");
+      const config = rutasFormularios[formTag];
       const container = document.getElementById("form-container");
 
-      if (container && formTag) {
-        container.innerHTML = ""; // Limpia el contenedor
+      if (!config || !container) {
+        console.warn(`Ruta no definida para: ${formTag}`);
+        return;
+      }
 
+      const { path: formType, file: fileName } = config;
+
+      // Visualmente activo
+      document.querySelectorAll("[data-form]").forEach(el => el.classList.remove("active"));
+      this.classList.add("active");
+
+      container.innerHTML = "<p>Cargando formulario...</p>";
+
+
+      
+      try {
+        const response = await fetch(`/forms/${formType}/${fileName}`);
+        if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
+
+        const html = await response.text();
+        container.innerHTML = html;
+
+        
         try {
-          await cargarFormularioJS(formTag); // Carga el archivo .js correspondiente
-          const formComponent = document.createElement(formTag);
-          container.appendChild(formComponent);
-        } catch (error) {
-          console.error(`Error al cargar el formulario ${formTag}:`, error);
+          
+          const modulo = await import(`./forms/${formType}/${fileName}.js`);
+          
+          if (typeof modulo.default === "function") {
+            modulo.default(container);
+            console.log("ERROR")
+          }
+
+
+          
+        } catch (modErr) {
+          console.warn(`No se encontró JS para ${formTag}:`, modErr.message);
         }
+
+      } catch (error) {
+        container.innerHTML = `<p>Error al cargar el formulario: ${formTag}</p>`;
+        console.error(error);
       }
     });
   });
-}
-
-// Función para importar dinámicamente el JS del formulario
-async function cargarFormularioJS(formTag) {
-  switch (formTag) {
-    case "matricula-form":
-      return import('./forms/matricula/matricula.js');
-
-    case "lista-matriculas":
-      return import('./forms/matricula/listaMatriculas.js');
-
-    case "registro-alumnos":
-      return import('./forms/asistencia/registroAlumnos.js');
-
-    case "historial-asistencia":
-      return import('./forms/asistencia/historialAsistencia.js');
-
-    case "registro-docente":
-      return import('./forms/asistencia/registroDocente.js');
-
-    case "registro-notas":
-      return import('./forms/notas/registroNotas.js');
-
-    case "lista-notas":
-      return import('./forms/notas/listaNotas.js');
-
-    case "pago-mensual":
-      return import('./forms/pagos/pagoMensual.js');
-
-    case "historial-pagos":
-      return import('./forms/pagos/historialPagos.js');
-
-    case "agregar-profesores":
-      return import('./forms/profesores/agregarProfesores.js');
-
-    case "lista-profesores":
-      return import('./forms/profesores/listaProfesores.js');
-
-    case "crear-usuarios":
-      return import('./forms/gestionUsuarios/crearUsuarios.js');
-
-    case "lista-usuarios":
-      return import('./forms/gestionUsuarios/listaUsuarios.js');
-
-    default:
-      throw new Error(`No se reconoce el formulario: ${formTag}`);
-  }
 }

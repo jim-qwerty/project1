@@ -1,62 +1,66 @@
-import html from './agregarProfesores.html?raw';
-import styles from './agregarProfesores.css?inline';
+console.log("AGREGAR PROFESORES");
 
-class ProfesorForm extends HTMLElement {
-  constructor() {
-    super();
-    this.attachShadow({ mode: 'open' });
+import '/resources/css/forms/profesores/agregarProfesores.css';
 
-    const template = document.createElement('template');
-    template.innerHTML = `<style>${styles}</style>${html}`;
-    this.shadowRoot.appendChild(template.content.cloneNode(true));
+// Usamos un ID más confiable para seleccionar el contenedor principal
+export default function initAgregarProfesores(container = document.querySelector('#agregar-profesores')) {
+  if (!container) {
+    console.warn("No se encontró el contenedor #agregar-profesores");
+    return;
   }
 
-  connectedCallback() {
-    const form = this.shadowRoot.getElementById('formProfesor');
-    const mensaje = this.shadowRoot.getElementById('mensaje');
+  const form = container.querySelector('#formulario-profesor');
+  const mensaje = container.querySelector('#mensaje'); // Puedes añadir este div si aún no lo tienes
 
-    // 🎯 Script para calcular la edad automáticamente
-    const fechaNacimiento = this.shadowRoot.getElementById('fechaNacimiento');
-    const edadInput = this.shadowRoot.getElementById('edad');
+  const fechaNacimiento = container.querySelector('#fechaNacimiento');
+  const edadInput = container.querySelector('#edad');
 
-    fechaNacimiento.addEventListener('change', () => {
-      const fecha = new Date(fechaNacimiento.value);
-      const hoy = new Date();
-      let edad = hoy.getFullYear() - fecha.getFullYear();
-      const mes = hoy.getMonth() - fecha.getMonth();
+  if (!form || !fechaNacimiento || !edadInput) {
+    console.warn("No se encontraron algunos elementos del formulario.");
+    return;
+  }
 
-      if (mes < 0 || (mes === 0 && hoy.getDate() < fecha.getDate())) {
-        edad--;
-      }
+  // Calcular edad al cambiar la fecha de nacimiento
+  fechaNacimiento.addEventListener('change', () => {
+    const fecha = new Date(fechaNacimiento.value);
+    const hoy = new Date();
+    let edad = hoy.getFullYear() - fecha.getFullYear();
+    const mes = hoy.getMonth() - fecha.getMonth();
 
-      edadInput.value = isNaN(edad) ? '' : `${edad}`;
-    });
+    if (mes < 0 || (mes === 0 && hoy.getDate() < fecha.getDate())) {
+      edad--;
+    }
 
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
+    edadInput.value = isNaN(edad) ? '' : `${edad}`;
+  });
 
-      const profesor = {
-        nombre: form.nombre.value.trim(),
-        apellido: form.apellido.value.trim(),
-        dni: form.dni.value.trim(),
-        correo: form.correo.value.trim(),
-        telefono: form.telefono.value.trim(),
-        grado: form.grado.value,
-        seccion: form.seccion.value,
-        fechaNacimiento: form.fechaNacimiento.value,
-        edad: form.edad.value
-      };
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
 
-      console.log('Profesor registrado:', profesor);
+    const profesor = {
+      nombre: form.querySelector('input[placeholder="Ingrese nombres"]').value.trim(),
+      apellido: form.querySelector('input[placeholder="Ingrese apellidos"]').value.trim(),
+      dni: form.querySelector('input[placeholder="Ingrese DNI"]').value.trim(),
+      correo: form.querySelector('input[type="email"]').value.trim(),
+      telefono: form.querySelector('input[placeholder="Ingrese número"]').value.trim(),
+      grado: form.querySelector('select:nth-of-type(1)').value,
+      seccion: form.querySelector('select:nth-of-type(2)').value,
+      fechaNacimiento: fechaNacimiento.value,
+      edad: edadInput.value
+    };
 
+    console.log('Profesor registrado:', profesor);
+
+    if (mensaje) {
       mensaje.textContent = '✅ Profesor registrado correctamente.';
-      form.reset();
+      mensaje.style.color = 'green';
 
       setTimeout(() => {
         mensaje.textContent = '';
       }, 3000);
-    });
-  }
-}
+    }
 
-customElements.define('agregar-profesores', ProfesorForm);
+    form.reset();
+    edadInput.value = ''; // Limpiar edad manualmente
+  });
+}

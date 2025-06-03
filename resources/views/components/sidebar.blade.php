@@ -1,13 +1,17 @@
 <div class="nav" id="navbar">
   <nav class="nav__container">
     <div>
+      {{-- Logo --}}
       <a href="#" class="nav__link nav__logo">
         <i class='bx bxs-disc nav__icon'></i>
         <span class="nav__logo-name">Bedimcode</span>
       </a>
 
-      <!-- Perfil -->
-      <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+      {{-- Perfil --}}
+      @push('styles')
+        <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+      @endpush
+
       <div class="profile-card">
         <div class="circle">
           <i class='bx bx-user'></i>
@@ -15,20 +19,20 @@
         <div class="role">Administrador</div>
       </div>
 
-      <!-- Menú -->
+      {{-- Menú principal --}}
       <div class="nav__list">
-        <!-- PROFESOR -->
+        {{-- PROFESOR --}}
         <div class="nav__items">
           <h3 class="nav__subtitle">PROFESOR</h3>
 
           <a href="#" class="nav__link active" data-form="indexMenuPrincipal">
             <i class='bx bx-home nav__icon'></i>
-            <span class="nav__name">Menu Principal</span>
+            <span class="nav__name">Menú Principal</span>
           </a>
 
-          <!-- Asistencia -->
+          {{-- Asistencia --}}
           <div class="nav__dropdown">
-            <a href="#" class="nav__link" >
+            <a href="#" class="nav__link">
               <i class='bx bx-calendar-check nav__icon'></i>
               <span class="nav__name">Asistencia</span>
               <i class='bx bx-chevron-down nav__icon nav__dropdown-icon'></i>
@@ -42,9 +46,9 @@
             </div>
           </div>
 
-          <!-- Notas -->
+          {{-- Notas --}}
           <div class="nav__dropdown">
-            <a href="#" class="nav__link" data-form="form2">
+            <a href="#" class="nav__link">
               <i class='bx bx-book-open nav__icon'></i>
               <span class="nav__name">Notas</span>
               <i class='bx bx-chevron-down nav__icon nav__dropdown-icon'></i>
@@ -58,26 +62,26 @@
           </div>
         </div>
 
-        <!-- ADMINISTRADOR -->
+        {{-- ADMINISTRADOR --}}
         <div class="nav__items">
           <h3 class="nav__subtitle">ADMINISTRADOR</h3>
 
-          <!-- Matriculas -->
+          {{-- Matrículas --}}
           <div class="nav__dropdown">
             <a href="#" class="nav__link">
               <i class='bx bx-id-card nav__icon'></i>
-              <span class="nav__name">Matriculas</span>
+              <span class="nav__name">Matrículas</span>
               <i class='bx bx-chevron-down nav__icon nav__dropdown-icon'></i>
             </a>
             <div class="nav__dropdown-collapse">
               <div class="nav__dropdown-content">
-                <a href="#" class="nav__dropdown-item" data-form="matricula-form">Registro de Matricula</a>
+                <a href="#" class="nav__dropdown-item" data-form="matricula-form">Registro de Matrícula</a>
                 <a href="#" class="nav__dropdown-item" data-form="lista-matriculas">Lista de matriculados</a>
               </div>
             </div>
           </div>
 
-          <!-- Pagos -->
+          {{-- Pagos --}}
           <div class="nav__dropdown">
             <a href="#" class="nav__link">
               <i class='bx bx-credit-card nav__icon'></i>
@@ -92,7 +96,7 @@
             </div>
           </div>
 
-          <!-- Profesores -->
+          {{-- Profesores --}}
           <div class="nav__dropdown">
             <a href="#" class="nav__link">
               <i class='bx bx-user nav__icon'></i>
@@ -107,11 +111,11 @@
             </div>
           </div>
 
-          <!-- Gestión de usuarios -->
+          {{-- Gestión de usuarios --}}
           <div class="nav__dropdown">
             <a href="#" class="nav__link">
               <i class='bx bx-user-circle nav__icon'></i>
-              <span class="nav__name">Gestion de usuarios</span>
+              <span class="nav__name">Gestión de usuarios</span>
               <i class='bx bx-chevron-down nav__icon nav__dropdown-icon'></i>
             </a>
             <div class="nav__dropdown-collapse">
@@ -125,6 +129,7 @@
       </div>
     </div>
 
+    {{-- Logout --}}
     <a href="#" class="nav__link nav__logout">
       <i class='bx bx-log-out nav__icon'></i>
       <span class="nav__name">Salir</span>
