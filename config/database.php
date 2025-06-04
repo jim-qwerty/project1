@@ -30,6 +30,7 @@ return [
     */
 
     'connections' => [
+        
 
         'sqlite' => [
             'driver' => 'sqlite',
