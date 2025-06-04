@@ -1,49 +1,48 @@
-body {
-      font-family: 'Poppins', sans-serif;
-      background: #f0f0f0;
-      padding: 30px;
-    }
+.lm-wrapper {
+  font-family: 'Poppins', sans-serif;
+  background: #f0f0f0;
+  padding: 30px;
+}
 
-    h2 {
-      text-align: center;
-      margin-bottom: 20px;
-    }
+.lm-wrapper .lm-form {
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  max-width: 1300px;
+  margin: 0 auto;
+}
 
-    form {
-      background: #ffffff;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      max-width: 1300px;
-      margin: 0 auto;
-    }
+.lm-wrapper .lm-titulo {
+  text-align: center;
+  margin-bottom: 20px;
+}
 
-    .filters {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 20px;
-    }
+.lm-wrapper .lm-filters {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
 
-    .filters input {
+.lm-wrapper .lm-input {
   padding: 10px;
   font-size: 14px;
   border-radius: 5px;
   border: 1px solid #ccc;
-  width: 75%; /* más espacio para el buscador */
+  width: 75%;
 }
 
-#filtro-grado {
+.lm-wrapper .lm-select {
   padding: 10px;
   font-size: 14px;
   border-radius: 5px;
   border: 1px solid #ccc;
-  width: 23%; /* menos espacio para el filtro */
+  width: 23%;
 }
-    
 
-    table {
+.lm-wrapper .lm-tabla {
   width: 100%;
-  table-layout: fixed; /* Fija el ancho de las columnas */
+  table-layout: fixed;
   border-collapse: separate;
   border-spacing: 0 5px;
   background: white;
@@ -52,59 +51,67 @@ body {
   box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 
-    th, td {
+.lm-wrapper .lm-tabla th,
+.lm-wrapper .lm-tabla td {
   padding: 12px;
   text-align: left;
   border-bottom: 1px solid #ddd;
   word-wrap: break-word;
 }
 
-th {
+.lm-wrapper .lm-tabla th {
   background: #4CAF50;
   color: white;
 }
 
-    tr:hover {
-      background-color: #f5f5f5;
-    }
+.lm-wrapper .lm-tabla tr:hover {
+  background-color: #f5f5f5;
+}
 
-    select.estado-select {
-      padding: 5px;
-      font-size: 14px;
-      border-radius: 5px;
-      width: 180px;
-    }
+.lm-wrapper .lm-estado-select {
+  padding: 5px;
+  font-size: 14px;
+  border-radius: 5px;
+  width: 180px;
+}
 
-    #guardar-btn {
-      margin-top: 20px;
-      padding: 10px 20px;
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      font-size: 16px;
-      cursor: pointer;
-      display: block;
-      margin-left: auto;
-      margin-right: auto;
-    }
+.lm-wrapper .lm-btn {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
 
-    #mensaje-confirmacion {
-      display: none;
-      text-align: center;
-      margin-top: 15px;
-      background-color: #d4edda;
-      color: #155724;
-      padding: 10px;
-      border: 1px solid #c3e6cb;
-      border-radius: 5px;
-      max-width: 400px;
-      margin-left: auto;
-      margin-right: auto;
-    }
+.lm-wrapper .lm-confirmacion {
+  display: none;
+  text-align: center;
+  margin-top: 15px;
+  background-color: #d4edda;
+  color: #155724;
+  padding: 10px;
+  border: 1px solid #c3e6cb;
+  border-radius: 5px;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}
 
-    /* Anchos personalizados para columnas */
-th:nth-child(1), td:nth-child(1) { width: 30%; }  /* Nombres */
-th:nth-child(2), td:nth-child(2) { width: 40%; }  /* Apellidos */
-th:nth-child(3), td:nth-child(3) { width: 30%; }  /* Grado */
-th:nth-child(4), td:nth-child(4) { width: 20%; }  /* Estado */
+/* Anchos personalizados para columnas */
+.lm-wrapper .lm-tabla th:nth-child(1),
+.lm-wrapper .lm-tabla td:nth-child(1) { width: 30%; }
+
+.lm-wrapper .lm-tabla th:nth-child(2),
+.lm-wrapper .lm-tabla td:nth-child(2) { width: 40%; }
+
+.lm-wrapper .lm-tabla th:nth-child(3),
+.lm-wrapper .lm-tabla td:nth-child(3) { width: 30%; }
+
+.lm-wrapper .lm-tabla th:nth-child(4),
+.lm-wrapper .lm-tabla td:nth-child(4) { width: 20%; }

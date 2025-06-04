@@ -1,4 +1,4 @@
-form {
+.cu-wrapper .cu-form {
   padding: 1rem;
   font-family: Arial, sans-serif;
   background-color: #fdfdfd;
@@ -7,39 +7,41 @@ form {
   max-width: 650px;
 }
 
-.filtros {
+.cu-wrapper .cu-titulo {
+  margin-bottom: 1rem;
+}
+
+.cu-wrapper .cu-filtros {
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
   margin-bottom: 1rem;
 }
 
-label {
+.cu-wrapper .cu-label {
   font-weight: bold;
   display: flex;
   align-items: center;
-  gap: .5rem;
+  gap: 0.5rem;
 }
 
-input[type="text"],
-input[type="email"],
-input[type="password"],
-select {
-  padding: .3rem .5rem;
+.cu-wrapper .cu-input,
+.cu-wrapper .cu-select {
+  padding: 0.3rem 0.5rem;
   border: 1px solid #ccc;
   border-radius: 4px;
 }
 
-.form-group {
+.cu-wrapper .cu-form-group {
   margin-bottom: 1rem;
 }
 
-.busqueda-wrapper {
+.cu-wrapper .cu-busqueda-wrapper {
   position: relative;
   flex: 1;
 }
 
-.sugerencias {
+.cu-wrapper .cu-sugerencias {
   border: 1px solid #ccc;
   max-height: 150px;
   overflow-y: auto;
@@ -51,17 +53,17 @@ select {
   left: 0;
 }
 
-.sugerencias div {
+.cu-wrapper .cu-sugerencias div {
   padding: 5px;
   cursor: pointer;
 }
 
-.sugerencias div:hover {
+.cu-wrapper .cu-sugerencias div:hover {
   background-color: #eee;
 }
 
-button[type="submit"] {
-  padding: .5rem 1rem;
+.cu-wrapper .cu-btn {
+  padding: 0.5rem 1rem;
   background-color: #28a745;
   color: white;
   border: none;
@@ -69,8 +71,16 @@ button[type="submit"] {
   cursor: pointer;
 }
 
-button[type="submit"]:hover {
+.cu-wrapper .cu-btn:hover {
   background-color: #218838;
 }
 
-.oculto { display: none; }
+.cu-wrapper .cu-oculto {
+  display: none;
+}
+
+.cu-wrapper .cu-mensaje {
+  margin-top: 1rem;
+  color: green;
+  font-weight: bold;
+}

@@ -1,4 +1,4 @@
-#formReporteNotas {
+.ln-wrapper .ln-form {
   font-family: Arial, sans-serif;
   padding: 20px;
   background-color: #f2f2f2;
@@ -7,42 +7,49 @@
   margin: auto;
 }
 
-
-.filtros {
+.ln-wrapper .ln-filtros {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
   margin-bottom: 20px;
 }
 
-.filtros label {
+.ln-wrapper .ln-label {
   display: flex;
   flex-direction: column;
   font-weight: bold;
 }
 
-.tabla {
+.ln-wrapper .ln-select {
+  padding: 8px;
+  font-size: 14px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.ln-wrapper .ln-tabla {
   overflow-x: auto;
 }
 
-table {
+.ln-wrapper .ln-tabla table {
   width: 100%;
   border-collapse: collapse;
   background-color: #fff;
   margin-top: 10px;
 }
 
-th, td {
+.ln-wrapper .ln-tabla th,
+.ln-wrapper .ln-tabla td {
   border: 1px solid #ccc;
   padding: 10px;
   text-align: center;
 }
 
-th {
+.ln-wrapper .ln-tabla th {
   background-color: #e0e0e0;
 }
 
-button {
+.ln-wrapper .ln-btn {
   margin-top: 20px;
   padding: 10px 15px;
   font-size: 16px;
@@ -53,6 +60,6 @@ button {
   cursor: pointer;
 }
 
-button:hover {
+.ln-wrapper .ln-btn:hover {
   background-color: #1565c0;
 }

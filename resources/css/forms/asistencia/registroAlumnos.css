@@ -1,40 +1,49 @@
-body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-    }
-    form {
-      width: 90%;
-      margin: auto;
-      border: 1px solid #ccc;
-      padding: 20px;
-      border-radius: 8px;
-    }
-    .fila-superior {
-      margin-bottom: 20px;
-    }
-    .fila-superior label {
-      margin-right: 15px;
-    }
-    .fila-superior input {
-      padding: 5px;
-      margin-left: 5px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-bottom: 20px;
-    }
-    th, td {
-      padding: 10px;
-      border-bottom: 1px solid #ccc;
-      text-align: center;
-    }
-    .botones {
-      display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-    }
-    .botones button {
-      padding: 10px 20px;
-      cursor: pointer;
-    }
+.ra-wrapper {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+}
+
+.ra-wrapper .ra-form {
+  width: 90%;
+  margin: auto;
+  border: 1px solid #ccc;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.ra-wrapper .ra-fila-superior {
+  margin-bottom: 20px;
+}
+
+.ra-wrapper .ra-fila-superior label {
+  margin-right: 15px;
+}
+
+.ra-wrapper .ra-input {
+  padding: 5px;
+  margin-left: 5px;
+}
+
+.ra-wrapper .ra-tabla {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.ra-wrapper .ra-tabla th,
+.ra-wrapper .ra-tabla td {
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+  text-align: center;
+}
+
+.ra-wrapper .ra-botones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.ra-wrapper .ra-btn {
+  padding: 10px 20px;
+  cursor: pointer;
+}

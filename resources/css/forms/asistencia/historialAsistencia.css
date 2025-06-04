@@ -1,29 +1,31 @@
-form {
+.ha-wrapper .ha-form {
   font-family: Arial, sans-serif;
   padding: 1rem;
   background: #f5f5f5;
   border-radius: 8px;
 }
 
-h2 {
+.ha-wrapper .ha-titulo {
   margin-bottom: 1rem;
 }
 
-.form-group {
+.ha-wrapper .ha-form-group {
   margin-bottom: 1rem;
 }
 
-label {
+.ha-wrapper .ha-label {
   display: block;
   margin-bottom: 0.3rem;
 }
 
-input, select, button {
+.ha-wrapper .ha-input,
+.ha-wrapper .ha-select,
+.ha-wrapper .ha-btn {
   padding: 0.5rem;
   font-size: 1rem;
 }
 
-button {
+.ha-wrapper .ha-btn {
   background-color: #2d89ef;
   color: white;
   border: none;
@@ -31,44 +33,44 @@ button {
   cursor: pointer;
 }
 
-button:hover {
+.ha-wrapper .ha-btn:hover {
   background-color: #1b5fbd;
 }
 
-table {
+.ha-wrapper .ha-tabla-contenedor table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 1rem;
   font-size: 0.9rem;
 }
 
-thead th {
+.ha-wrapper .ha-tabla-contenedor thead th {
   background-color: #eee;
   padding: 6px;
   border: 1px solid #ccc;
   text-align: center;
 }
 
-tbody td {
+.ha-wrapper .ha-tabla-contenedor tbody td {
   border: 1px solid #ccc;
   padding: 5px;
   text-align: center;
 }
 
-tbody td.nombre {
+.ha-wrapper .ha-tabla-contenedor tbody td.nombre {
   text-align: left;
   min-width: 180px;
   font-weight: bold;
 }
 
-td[data-estado="P"] {
+.ha-wrapper .ha-tabla-contenedor td[data-estado="P"] {
   background-color: #c8e6c9; /* verde claro */
 }
 
-td[data-estado="T"] {
+.ha-wrapper .ha-tabla-contenedor td[data-estado="T"] {
   background-color: #fff9c4; /* amarillo claro */
 }
 
-td[data-estado="F"] {
+.ha-wrapper .ha-tabla-contenedor td[data-estado="F"] {
   background-color: #ffcdd2; /* rojo claro */
 }

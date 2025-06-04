@@ -1,8 +1,8 @@
-
-  <form id="formReporteNotas">
-    <div class="filtros">
-      <label>Grado:
-        <select id="gradoSelect" name="grado">
+<div class="ln-wrapper">
+  <form id="formReporteNotas" class="ln-form">
+    <div class="ln-filtros">
+      <label class="ln-label">Grado:
+        <select id="gradoSelect" name="grado" class="ln-select">
           <option value="">--Selecciona--</option>
           <option value="1">1</option>
           <option value="2">2</option>
@@ -10,24 +10,24 @@
         </select>
       </label>
 
-      <label>Sección:
-        <select id="seccionSelect" name="seccion">
+      <label class="ln-label">Sección:
+        <select id="seccionSelect" name="seccion" class="ln-select">
           <option value="">--Selecciona--</option>
           <option value="A">A</option>
           <option value="B">B</option>
         </select>
       </label>
 
-      <label>Curso:
-        <select id="cursoSelect" name="curso">
+      <label class="ln-label">Curso:
+        <select id="cursoSelect" name="curso" class="ln-select">
           <option value="">--Selecciona--</option>
           <option value="Matemática">Matemática</option>
           <option value="Comunicación">Comunicación</option>
         </select>
       </label>
 
-      <label>Bimestre:
-        <select id="bimestreSelect" name="bimestre">
+      <label class="ln-label">Bimestre:
+        <select id="bimestreSelect" name="bimestre" class="ln-select">
           <option value="">--Selecciona--</option>
           <option value="1">1</option>
           <option value="2">2</option>
@@ -37,8 +37,8 @@
       </label>
     </div>
 
-    <div id="tablaNotas" class="tabla"></div>
+    <div id="tablaNotas" class="ln-tabla"></div>
 
-    <button id="btnReporte" type="submit" style="display: none;">📄 Generar Reporte</button>
+    <button id="btnReporte" type="submit" class="ln-btn" style="display: none;">📄 Generar Reporte</button>
   </form>
-
+</div>

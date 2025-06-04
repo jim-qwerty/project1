@@ -1,20 +1,17 @@
- * {
+.m-wrapper * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
   font-family: 'Poppins', sans-serif;
 }
 
-body {
+.m-wrapper {
   min-height: 100vh;
   background: #f0f0f0;
   padding: 30px;
 }
 
-
-
-/* Título centrado */
-.title {
+.m-wrapper .m-title {
   font-size: 28px;
   font-weight: 600;
   margin-bottom: 30px;
@@ -22,16 +19,23 @@ body {
   color: #333;
 }
 
-/* Grid de entradas: 3 columnas adaptables */
-.user-details {
+.m-wrapper .m-formulario {
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  margin: 0 auto 30px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  max-width: 1800px;
+}
+
+.m-wrapper .m-user-details {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 20px;
   margin-bottom: 30px;
 }
 
-/* Título de sección */
-.section-title {
+.m-wrapper .m-section-title {
   grid-column: 1 / -1;
   font-size: 20px;
   font-weight: 600;
@@ -41,21 +45,19 @@ body {
   margin-bottom: 15px;
 }
 
-/* Input con etiqueta */
-.input-box {
+.m-wrapper .m-input-box {
   display: flex;
   flex-direction: column;
 }
 
-.input-box span.details {
+.m-wrapper .m-details {
   font-weight: 500;
   margin-bottom: 5px;
   color: #333;
 }
 
-/* Campos */
-.input-box input,
-.input-box select {
+.m-wrapper .m-input-box input,
+.m-wrapper .m-input-box select {
   width: 100%;
   padding: 10px;
   font-size: 14px;
@@ -64,53 +66,18 @@ body {
   background-color: #fafafa;
 }
 
-.input-box input:focus,
-.input-box select:focus {
+.m-wrapper .m-input-box input:focus,
+.m-wrapper .m-input-box select:focus {
   border-color: #4CAF50;
 }
 
-/* Botón de envío */
-.button {
-  text-align: center;
-  margin-top: 20px;
-}
-
-.button input {
-  padding: 10px 30px;
-  border: none;
-  background: #4CAF50;
-  color: white;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 16px;
-  transition: background 0.3s ease;
-}
-
-.button input:hover {
-  background: #45a049;
-}
-
-.button button {
-  padding: 10px 30px;
-  border: none;
-  background: #4CAF50;
-  color: white;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 16px;
-  transition: background 0.3s ease;
-}
-
-
-
-
-.radio-group {
+.m-wrapper .m-radio-group {
   display: flex;
-  gap: 60px; /* separación entre masculino y femenino */
+  gap: 60px;
   margin-top: 5px;
 }
 
-.radio-group label {
+.m-wrapper .m-radio-group label {
   display: flex;
   align-items: center;
   font-size: 16px;
@@ -118,21 +85,23 @@ body {
   cursor: pointer;
 }
 
-.radio-group input[type="radio"] {
+.m-wrapper .m-radio-group input[type="radio"] {
   margin-right: 5px;
-  transform: scale(1.1); /* hace más visible el botón */
+  transform: scale(1.1);
 }
 
-
-.button-group {
+.m-wrapper .m-button,
+.m-wrapper .m-button-group {
+  text-align: center;
+  margin-top: 20px;
   display: flex;
   justify-content: center;
   gap: 50px;
-  margin-top: 20px;
 }
 
-.button-group input,
-.button-group button {
+.m-wrapper .m-button input,
+.m-wrapper .m-button-group input,
+.m-wrapper .m-button-group button {
   padding: 10px 30px;
   border: none;
   background: #4CAF50;
@@ -143,12 +112,13 @@ body {
   transition: background 0.3s ease;
 }
 
-.button-group input:hover,
-.button-group button:hover {
+.m-wrapper .m-button input:hover,
+.m-wrapper .m-button-group input:hover,
+.m-wrapper .m-button-group button:hover {
   background: #45a049;
 }
 
-.confirmacion {
+.m-wrapper .m-confirmacion {
   position: fixed;
   top: 0; left: 0;
   width: 100%;
@@ -160,7 +130,7 @@ body {
   z-index: 9999;
 }
 
-.confirmacion > div {
+.m-wrapper .m-confirmacion > div {
   background: #fff;
   padding: 30px 40px;
   border-radius: 10px;
@@ -169,19 +139,20 @@ body {
   width: 100%;
 }
 
-.confirmacion p {
+.m-wrapper .m-confirmacion p {
   font-size: 18px;
   margin-bottom: 20px;
   color: #333;
 }
 
-.confirmacion-botones {
+.m-wrapper .m-confirmacion-botones {
   display: flex;
   justify-content: center;
   gap: 20px;
 }
 
-#btn-si, #btn-no {
+.m-wrapper #btn-si,
+.m-wrapper #btn-no {
   padding: 10px 20px;
   border: none;
   border-radius: 5px;
@@ -189,12 +160,12 @@ body {
   cursor: pointer;
 }
 
-#btn-si {
+.m-wrapper #btn-si {
   background-color: #4CAF50;
   color: white;
 }
 
-#btn-no {
+.m-wrapper #btn-no {
   background-color: #e74c3c;
   color: white;
 }

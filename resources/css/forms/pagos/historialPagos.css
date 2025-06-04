@@ -1,4 +1,4 @@
-form {
+.hp-wrapper .hp-form {
   padding: 1rem;
   font-family: Arial, sans-serif;
   background-color: #fdfdfd;
@@ -6,54 +6,45 @@ form {
   border-radius: 8px;
 }
 
-.filtros {
+.hp-wrapper .hp-titulo {
+  margin-bottom: 1rem;
+}
+
+.hp-wrapper .hp-filtros {
   margin-bottom: 1rem;
   display: flex;
   gap: 1rem;
   flex-wrap: wrap;
+  align-items: center;
 }
 
-label {
+.hp-wrapper .hp-label {
   font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
-select {
-  margin-left: 0.5rem;
+.hp-wrapper .hp-select,
+.hp-wrapper .hp-input {
   padding: 0.3rem;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 1rem;
-}
-
-th, td {
+  font-size: 14px;
+  border-radius: 4px;
   border: 1px solid #ccc;
-  padding: 0.5rem;
-  text-align: center;
 }
 
-thead {
-  background-color: #f0f0f0;
-}
-
-.filtros label,
-.filtros .busqueda-wrapper {
+.hp-wrapper .hp-busqueda-wrapper {
+  position: relative;
   display: flex;
   align-items: center;
 }
 
-.busqueda-wrapper {
-  position: relative;
-}
-
-.busqueda-wrapper input {
+.hp-wrapper .hp-busqueda-wrapper input {
   padding: 0.3rem;
   margin-left: 0.5rem;
 }
 
-.sugerencias {
+.hp-wrapper .hp-sugerencias {
   border: 1px solid #ccc;
   max-height: 150px;
   overflow-y: auto;
@@ -65,20 +56,38 @@ thead {
   left: 0;
 }
 
-.sugerencias div {
+.hp-wrapper .hp-sugerencias div {
   padding: 5px;
   cursor: pointer;
 }
 
-.sugerencias div:hover {
+.hp-wrapper .hp-sugerencias div:hover {
   background-color: #eee;
 }
 
-#btnDeudores {
+.hp-wrapper .hp-btn-deudores {
   padding: 0.5rem 1rem;
   background-color: #dc3545;
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
+}
+
+.hp-wrapper .hp-tabla {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  background-color: #fff;
+}
+
+.hp-wrapper .hp-tabla th,
+.hp-wrapper .hp-tabla td {
+  border: 1px solid #ccc;
+  padding: 0.5rem;
+  text-align: center;
+}
+
+.hp-wrapper .hp-tabla thead {
+  background-color: #f0f0f0;
 }
