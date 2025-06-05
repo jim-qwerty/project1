@@ -19,27 +19,31 @@ Route::get('/forms/{carpeta}/{formulario}', function ($carpeta, $formulario) {
 
 
 
-/*
-Route::get('/formulario-historial-asistencia', fn() => view('forms.asistencia.historialAsistencia'));
-Route::get('/formulario-registro-alumnos', fn() => view('forms.asistencia.registroAlumnos'));
-Route::get('/formulario-registro-docente', fn() => view('forms.asistencia.registroDocente'));
 
-Route::get('/formulario-crear-usuarios', fn() => view('forms.gestionUsuarios.crearUsuarios'));
-Route::get('/formulario-lista-usuarios', fn() => view('forms.gestionUsuarios.listaUsuarios'));
+use App\Http\Controllers\GradoController;
+use App\Http\Controllers\SeccionController;
+use App\Http\Controllers\CursoController;
+use App\Http\Controllers\AlumnoController;
+use App\Http\Controllers\ApoderadoController;
+use App\Http\Controllers\MatriculaController;
+use App\Http\Controllers\DocenteController;
+use App\Http\Controllers\UsuarioController;
+use App\Http\Controllers\AsistenciaAlumnoController;
+use App\Http\Controllers\AsistenciaDocenteController;
+use App\Http\Controllers\NotaController;
+use App\Http\Controllers\PagoController;
 
+// Se define cada ruta como recurso RESTful (GET, POST, PUT/PATCH, DELETE)
+Route::apiResource('grados', GradoController::class);
+Route::apiResource('secciones', SeccionController::class);
+Route::apiResource('cursos', CursoController::class);
+Route::apiResource('alumnos', AlumnoController::class);
+Route::apiResource('apoderados', ApoderadoController::class);
+Route::apiResource('matriculas', MatriculaController::class);
+Route::apiResource('docentes', DocenteController::class);
+Route::apiResource('usuarios', UsuarioController::class);
+Route::apiResource('asistencia-alumnos', AsistenciaAlumnoController::class);
+Route::apiResource('asistencia-docentes', AsistenciaDocenteController::class);
+Route::apiResource('notas', NotaController::class);
+Route::apiResource('pagos', PagoController::class);
 
-Route::get('/formulario-lista-matriculas', fn() => view('forms.matricula.listaMatriculas'));
-
-
-
-Route::get('/formulario-lista-notas', fn() => view('forms.notas.listaNotas'));
-Route::get('/formulario-registro-notas', fn() => view('forms.notas.registroNotas'));
-
-
-Route::get('/formulario-historial-pagos', fn() => view('forms.pagos.historialPagos'));
-Route::get('/formulario-pago-mensual', fn() => view('forms.pagos.pagoMensual'));
-
-
-Route::get('/formulario-agregar-profesores', fn() => view('forms.profesores.agregarProfesores'));
-Route::get('/formulario-lista-profesores', fn() => view('forms.profesores.listaProfesores'));
-*/
