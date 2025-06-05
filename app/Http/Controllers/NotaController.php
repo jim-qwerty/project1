@@ -20,13 +20,16 @@ class NotaController extends Controller
         return response()->json($notas);
     }
 
-    public function show($id)
+    public function create()
     {
-        $nota = $this->service->obtener($id);
-        if (! $nota) {
-            return response()->json(['error' => 'No encontrado'], 404);
-        }
-        return response()->json($nota);
+        // Si necesitas listas de alumnos, grados, secciones, cursos o docentes:
+        // $alumnos = app(\App\Services\AlumnoService::class)->listar();
+        // $grados = app(\App\Services\GradoService::class)->listar();
+        // $secciones = app(\App\Services\SeccionService::class)->listar();
+        // $cursos = app(\App\Services\CursoService::class)->listar();
+        // $docentes = app(\App\Services\DocenteService::class)->listar();
+        // return view('notas.create', compact('alumnos','grados','secciones','cursos','docentes'));
+        return view('notas.create');
     }
 
     public function store(Request $request)
@@ -46,6 +49,24 @@ class NotaController extends Controller
 
         $nota = $this->service->crear($datos);
         return response()->json($nota, 201);
+    }
+
+    public function show($id)
+    {
+        $nota = $this->service->obtener($id);
+        if (! $nota) {
+            return response()->json(['error' => 'No encontrado'], 404);
+        }
+        return response()->json($nota);
+    }
+
+    public function edit($id)
+    {
+        $nota = $this->service->obtener($id);
+        if (! $nota) {
+            abort(404);
+        }
+        return view('notas.edit', compact('nota'));
     }
 
     public function update(Request $request, $id)

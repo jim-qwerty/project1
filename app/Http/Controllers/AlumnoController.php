@@ -20,6 +20,35 @@ class AlumnoController extends Controller
         return response()->json($alumnos);
     }
 
+    public function create()
+    {
+        // Si requieres listas de grados/secciones para el formulario:
+        // $grados    = app(\App\Services\GradoService::class)->listar();
+        // $secciones = app(\App\Services\SeccionService::class)->listar();
+        // return view('alumnos.create', compact('grados', 'secciones'));
+        return view('alumnos.create');
+    }
+
+    public function store(Request $request)
+    {
+        $datos = $request->validate([
+            'nombres'          => 'required|string|max:100',
+            'apellidos'        => 'required|string|max:100',
+            'dni'              => 'required|size:8|unique:alumnos,dni',
+            'fecha_nacimiento' => 'required|date',
+            'sexo'             => 'required|in:M,F',
+            'direccion'        => 'nullable|string|max:200',
+            'grado_id'         => 'required|exists:grados,id',
+            'seccion_id'       => 'required|exists:secciones,id',
+            'nivel_educativo'  => 'required|string|max:50',
+            'edad'             => 'nullable|integer',
+            'estado_matricula' => 'in:matriculado,en_proceso,retirado',
+        ]);
+
+        $alumno = $this->service->crear($datos);
+        return response()->json($alumno, 201);
+    }
+
     public function show($id)
     {
         $alumno = $this->service->obtener($id);
@@ -29,40 +58,29 @@ class AlumnoController extends Controller
         return response()->json($alumno);
     }
 
-    public function store(Request $request)
+    public function edit($id)
     {
-        $datos = $request->validate([
-            'nombres'         => 'required|string|max:100',
-            'apellidos'       => 'required|string|max:100',
-            'dni'             => 'required|size:8|unique:alumnos,dni',
-            'fecha_nacimiento'=> 'required|date',
-            'sexo'            => 'required|in:M,F',
-            'direccion'       => 'nullable|string|max:200',
-            'grado_id'        => 'required|exists:grados,id',
-            'seccion_id'      => 'required|exists:secciones,id',
-            'nivel_educativo' => 'required|string|max:50',
-            'edad'            => 'nullable|integer',
-            'estado_matricula'=> 'in:matriculado,en_proceso,retirado',
-        ]);
-
-        $alumno = $this->service->crear($datos);
-        return response()->json($alumno, 201);
+        $alumno = $this->service->obtener($id);
+        if (! $alumno) {
+            abort(404);
+        }
+        return view('alumnos.edit', compact('alumno'));
     }
 
     public function update(Request $request, $id)
     {
         $datos = $request->validate([
-            'nombres'         => 'sometimes|required|string|max:100',
-            'apellidos'       => 'sometimes|required|string|max:100',
-            'dni'             => "sometimes|required|size:8|unique:alumnos,dni,$id",
-            'fecha_nacimiento'=> 'sometimes|required|date',
-            'sexo'            => 'sometimes|required|in:M,F',
-            'direccion'       => 'nullable|string|max:200',
-            'grado_id'        => 'sometimes|required|exists:grados,id',
-            'seccion_id'      => 'sometimes|required|exists:secciones,id',
-            'nivel_educativo' => 'sometimes|required|string|max:50',
-            'edad'            => 'nullable|integer',
-            'estado_matricula'=> 'in:matriculado,en_proceso,retirado',
+            'nombres'          => 'sometimes|required|string|max:100',
+            'apellidos'        => 'sometimes|required|string|max:100',
+            'dni'              => "sometimes|required|size:8|unique:alumnos,dni,$id",
+            'fecha_nacimiento' => 'sometimes|required|date',
+            'sexo'             => 'sometimes|required|in:M,F',
+            'direccion'        => 'nullable|string|max:200',
+            'grado_id'         => 'sometimes|required|exists:grados,id',
+            'seccion_id'       => 'sometimes|required|exists:secciones,id',
+            'nivel_educativo'  => 'sometimes|required|string|max:50',
+            'edad'             => 'nullable|integer',
+            'estado_matricula' => 'in:matriculado,en_proceso,retirado',
         ]);
 
         $ok = $this->service->actualizar($id, $datos);

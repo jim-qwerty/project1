@@ -20,13 +20,9 @@ class CursoController extends Controller
         return response()->json($cursos);
     }
 
-    public function show($id)
+    public function create()
     {
-        $curso = $this->service->obtener($id);
-        if (! $curso) {
-            return response()->json(['error' => 'No encontrado'], 404);
-        }
-        return response()->json($curso);
+        return view('cursos.create');
     }
 
     public function store(Request $request)
@@ -37,6 +33,24 @@ class CursoController extends Controller
 
         $curso = $this->service->crear($datos);
         return response()->json($curso, 201);
+    }
+
+    public function show($id)
+    {
+        $curso = $this->service->obtener($id);
+        if (! $curso) {
+            return response()->json(['error' => 'No encontrado'], 404);
+        }
+        return response()->json($curso);
+    }
+
+    public function edit($id)
+    {
+        $curso = $this->service->obtener($id);
+        if (! $curso) {
+            abort(404);
+        }
+        return view('cursos.edit', compact('curso'));
     }
 
     public function update(Request $request, $id)

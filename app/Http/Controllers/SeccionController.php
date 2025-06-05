@@ -20,13 +20,12 @@ class SeccionController extends Controller
         return response()->json($secciones);
     }
 
-    public function show($id)
+    public function create()
     {
-        $seccion = $this->service->obtener($id);
-        if (! $seccion) {
-            return response()->json(['error' => 'No encontrado'], 404);
-        }
-        return response()->json($seccion);
+        // Si necesitas pasar la lista de grados para el select, obténla aquí:
+        // $grados = app(\App\Services\GradoService::class)->listar();
+        // return view('secciones.create', compact('grados'));
+        return view('secciones.create');
     }
 
     public function store(Request $request)
@@ -38,6 +37,24 @@ class SeccionController extends Controller
 
         $seccion = $this->service->crear($datos);
         return response()->json($seccion, 201);
+    }
+
+    public function show($id)
+    {
+        $seccion = $this->service->obtener($id);
+        if (! $seccion) {
+            return response()->json(['error' => 'No encontrado'], 404);
+        }
+        return response()->json($seccion);
+    }
+
+    public function edit($id)
+    {
+        $seccion = $this->service->obtener($id);
+        if (! $seccion) {
+            abort(404);
+        }
+        return view('secciones.edit', compact('seccion'));
     }
 
     public function update(Request $request, $id)

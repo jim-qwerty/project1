@@ -14,21 +14,20 @@ class GradoController extends Controller
         $this->service = $service;
     }
 
+    // Muestra la lista de grados (JSON o podría retornar vista según tu front-end)
     public function index()
     {
         $grados = $this->service->listar();
         return response()->json($grados);
     }
 
-    public function show($id)
+    // Retorna formulario Blade para crear un nuevo grado
+    public function create()
     {
-        $grado = $this->service->obtener($id);
-        if (! $grado) {
-            return response()->json(['error' => 'No encontrado'], 404);
-        }
-        return response()->json($grado);
+        return view('grados.create');
     }
 
+    // Guarda un nuevo grado en BD
     public function store(Request $request)
     {
         $datos = $request->validate([
@@ -40,6 +39,27 @@ class GradoController extends Controller
         return response()->json($grado, 201);
     }
 
+    // Muestra un solo grado por ID
+    public function show($id)
+    {
+        $grado = $this->service->obtener($id);
+        if (! $grado) {
+            return response()->json(['error' => 'No encontrado'], 404);
+        }
+        return response()->json($grado);
+    }
+
+    // Retorna formulario Blade para editar un grado existente
+    public function edit($id)
+    {
+        $grado = $this->service->obtener($id);
+        if (! $grado) {
+            abort(404);
+        }
+        return view('grados.edit', compact('grado'));
+    }
+
+    // Actualiza un grado existente
     public function update(Request $request, $id)
     {
         $datos = $request->validate([
@@ -54,6 +74,7 @@ class GradoController extends Controller
         return response()->json(['success' => true]);
     }
 
+    // Elimina un grado
     public function destroy($id)
     {
         $ok = $this->service->eliminar($id);

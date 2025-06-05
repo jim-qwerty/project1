@@ -20,13 +20,12 @@ class AsistenciaDocenteController extends Controller
         return response()->json($asistencias);
     }
 
-    public function show($id)
+    public function create()
     {
-        $asistencia = $this->service->obtener($id);
-        if (! $asistencia) {
-            return response()->json(['error' => 'No encontrado'], 404);
-        }
-        return response()->json($asistencia);
+        // Si requieres lista de docentes:
+        // $docentes = app(\App\Services\DocenteService::class)->listar();
+        // return view('asistencia-docentes.create', compact('docentes'));
+        return view('asistencia-docentes.create');
     }
 
     public function store(Request $request)
@@ -40,6 +39,24 @@ class AsistenciaDocenteController extends Controller
 
         $asistencia = $this->service->crear($datos);
         return response()->json($asistencia, 201);
+    }
+
+    public function show($id)
+    {
+        $asistencia = $this->service->obtener($id);
+        if (! $asistencia) {
+            return response()->json(['error' => 'No encontrado'], 404);
+        }
+        return response()->json($asistencia);
+    }
+
+    public function edit($id)
+    {
+        $asistencia = $this->service->obtener($id);
+        if (! $asistencia) {
+            abort(404);
+        }
+        return view('asistencia-docentes.edit', compact('asistencia'));
     }
 
     public function update(Request $request, $id)

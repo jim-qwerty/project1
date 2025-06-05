@@ -20,13 +20,13 @@ class DocenteController extends Controller
         return response()->json($docentes);
     }
 
-    public function show($id)
+    public function create()
     {
-        $docente = $this->service->obtener($id);
-        if (! $docente) {
-            return response()->json(['error' => 'No encontrado'], 404);
-        }
-        return response()->json($docente);
+        // Si requieres listas de grados/secciones:
+        // $grados    = app(\App\Services\GradoService::class)->listar();
+        // $secciones = app(\App\Services\SeccionService::class)->listar();
+        // return view('docentes.create', compact('grados', 'secciones'));
+        return view('docentes.create');
     }
 
     public function store(Request $request)
@@ -48,6 +48,24 @@ class DocenteController extends Controller
 
         $docente = $this->service->crear($datos);
         return response()->json($docente, 201);
+    }
+
+    public function show($id)
+    {
+        $docente = $this->service->obtener($id);
+        if (! $docente) {
+            return response()->json(['error' => 'No encontrado'], 404);
+        }
+        return response()->json($docente);
+    }
+
+    public function edit($id)
+    {
+        $docente = $this->service->obtener($id);
+        if (! $docente) {
+            abort(404);
+        }
+        return view('docentes.edit', compact('docente'));
     }
 
     public function update(Request $request, $id)

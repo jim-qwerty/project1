@@ -20,6 +20,31 @@ class AsistenciaAlumnoController extends Controller
         return response()->json($asistencias);
     }
 
+    public function create()
+    {
+        // Puedes pasar lista de alumnos, grados, secciones si necesitas selects:
+        // $alumnos   = app(\App\Services\AlumnoService::class)->listar();
+        // $grados    = app(\App\Services\GradoService::class)->listar();
+        // $secciones = app(\App\Services\SeccionService::class)->listar();
+        // return view('asistencia-alumnos.create', compact('alumnos','grados','secciones'));
+        return view('asistencia-alumnos.create');
+    }
+
+    public function store(Request $request)
+    {
+        $datos = $request->validate([
+            'alumno_id'    => 'required|exists:alumnos,id',
+            'fecha'        => 'required|date',
+            'estado'       => 'required|in:P,T,F',
+            'hora_registro'=> 'nullable|date_format:H:i:s',
+            'grado_id'     => 'required|exists:grados,id',
+            'seccion_id'   => 'required|exists:secciones,id',
+        ]);
+
+        $asistencia = $this->service->crear($datos);
+        return response()->json($asistencia, 201);
+    }
+
     public function show($id)
     {
         $asistencia = $this->service->obtener($id);
@@ -29,30 +54,24 @@ class AsistenciaAlumnoController extends Controller
         return response()->json($asistencia);
     }
 
-    public function store(Request $request)
+    public function edit($id)
     {
-        $datos = $request->validate([
-            'alumno_id'   => 'required|exists:alumnos,id',
-            'fecha'       => 'required|date',
-            'estado'      => 'required|in:P,T,F',
-            'hora_registro'=> 'nullable|date_format:H:i:s',
-            'grado_id'    => 'required|exists:grados,id',
-            'seccion_id'  => 'required|exists:secciones,id',
-        ]);
-
-        $asistencia = $this->service->crear($datos);
-        return response()->json($asistencia, 201);
+        $asistencia = $this->service->obtener($id);
+        if (! $asistencia) {
+            abort(404);
+        }
+        return view('asistencia-alumnos.edit', compact('asistencia'));
     }
 
     public function update(Request $request, $id)
     {
         $datos = $request->validate([
-            'alumno_id'   => 'sometimes|required|exists:alumnos,id',
-            'fecha'       => 'sometimes|required|date',
-            'estado'      => 'sometimes|required|in:P,T,F',
+            'alumno_id'    => 'sometimes|required|exists:alumnos,id',
+            'fecha'        => 'sometimes|required|date',
+            'estado'       => 'sometimes|required|in:P,T,F',
             'hora_registro'=> 'nullable|date_format:H:i:s',
-            'grado_id'    => 'sometimes|required|exists:grados,id',
-            'seccion_id'  => 'sometimes|required|exists:secciones,id',
+            'grado_id'     => 'sometimes|required|exists:grados,id',
+            'seccion_id'   => 'sometimes|required|exists:secciones,id',
         ]);
 
         $ok = $this->service->actualizar($id, $datos);

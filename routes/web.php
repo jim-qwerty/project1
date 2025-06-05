@@ -34,16 +34,16 @@ use App\Http\Controllers\NotaController;
 use App\Http\Controllers\PagoController;
 
 // Se define cada ruta como recurso RESTful (GET, POST, PUT/PATCH, DELETE)
-Route::apiResource('grados', GradoController::class);
-Route::apiResource('secciones', SeccionController::class);
-Route::apiResource('cursos', CursoController::class);
-Route::apiResource('alumnos', AlumnoController::class);
-Route::apiResource('apoderados', ApoderadoController::class);
-Route::apiResource('matriculas', MatriculaController::class);
-Route::apiResource('docentes', DocenteController::class);
-Route::apiResource('usuarios', UsuarioController::class);
-Route::apiResource('asistencia-alumnos', AsistenciaAlumnoController::class);
-Route::apiResource('asistencia-docentes', AsistenciaDocenteController::class);
-Route::apiResource('notas', NotaController::class);
-Route::apiResource('pagos', PagoController::class);
+Route::resource('grados', GradoController::class);
+Route::resource('secciones', SeccionController::class);
+Route::resource('cursos', CursoController::class);
+Route::resource('alumnos', AlumnoController::class);
+Route::resource('apoderados', ApoderadoController::class);
+Route::resource('matriculas', MatriculaController::class);
+Route::resource('docentes', DocenteController::class);
+Route::resource('usuarios', UsuarioController::class);
+Route::resource('asistencia-alumnos', AsistenciaAlumnoController::class);
+Route::resource('asistencia-docentes', AsistenciaDocenteController::class);
+Route::resource('notas', NotaController::class);
+Route::resource('pagos', PagoController::class);
 

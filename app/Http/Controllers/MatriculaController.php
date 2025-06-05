@@ -20,13 +20,12 @@ class MatriculaController extends Controller
         return response()->json($matriculas);
     }
 
-    public function show($id)
+    public function create()
     {
-        $matricula = $this->service->obtener($id);
-        if (! $matricula) {
-            return response()->json(['error' => 'No encontrado'], 404);
-        }
-        return response()->json($matricula);
+        // Si necesitas listas de alumnos para el select:
+        // $alumnos = app(\App\Services\AlumnoService::class)->listar();
+        // return view('matriculas.create', compact('alumnos'));
+        return view('matriculas.create');
     }
 
     public function store(Request $request)
@@ -43,6 +42,24 @@ class MatriculaController extends Controller
 
         $matricula = $this->service->crear($datos);
         return response()->json($matricula, 201);
+    }
+
+    public function show($id)
+    {
+        $matricula = $this->service->obtener($id);
+        if (! $matricula) {
+            return response()->json(['error' => 'No encontrado'], 404);
+        }
+        return response()->json($matricula);
+    }
+
+    public function edit($id)
+    {
+        $matricula = $this->service->obtener($id);
+        if (! $matricula) {
+            abort(404);
+        }
+        return view('matriculas.edit', compact('matricula'));
     }
 
     public function update(Request $request, $id)

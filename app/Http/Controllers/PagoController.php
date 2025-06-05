@@ -20,13 +20,14 @@ class PagoController extends Controller
         return response()->json($pagos);
     }
 
-    public function show($id)
+    public function create()
     {
-        $pago = $this->service->obtener($id);
-        if (! $pago) {
-            return response()->json(['error' => 'No encontrado'], 404);
-        }
-        return response()->json($pago);
+        // Si necesitas listas de alumnos, grados, secciones:
+        // $alumnos   = app(\App\Services\AlumnoService::class)->listar();
+        // $grados    = app(\App\Services\GradoService::class)->listar();
+        // $secciones = app(\App\Services\SeccionService::class)->listar();
+        // return view('pagos.create', compact('alumnos','grados','secciones'));
+        return view('pagos.create');
     }
 
     public function store(Request $request)
@@ -46,6 +47,24 @@ class PagoController extends Controller
 
         $pago = $this->service->crear($datos);
         return response()->json($pago, 201);
+    }
+
+    public function show($id)
+    {
+        $pago = $this->service->obtener($id);
+        if (! $pago) {
+            return response()->json(['error' => 'No encontrado'], 404);
+        }
+        return response()->json($pago);
+    }
+
+    public function edit($id)
+    {
+        $pago = $this->service->obtener($id);
+        if (! $pago) {
+            abort(404);
+        }
+        return view('pagos.edit', compact('pago'));
     }
 
     public function update(Request $request, $id)

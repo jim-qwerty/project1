@@ -20,13 +20,12 @@ class ApoderadoController extends Controller
         return response()->json($apoderados);
     }
 
-    public function show($id)
+    public function create()
     {
-        $apoderado = $this->service->obtener($id);
-        if (! $apoderado) {
-            return response()->json(['error' => 'No encontrado'], 404);
-        }
-        return response()->json($apoderado);
+        // Si deseas pasar lista de alumnos para el select:
+        // $alumnos = app(\App\Services\AlumnoService::class)->listar();
+        // return view('apoderados.create', compact('alumnos'));
+        return view('apoderados.create');
     }
 
     public function store(Request $request)
@@ -43,6 +42,24 @@ class ApoderadoController extends Controller
 
         $apoderado = $this->service->crear($datos);
         return response()->json($apoderado, 201);
+    }
+
+    public function show($id)
+    {
+        $apoderado = $this->service->obtener($id);
+        if (! $apoderado) {
+            return response()->json(['error' => 'No encontrado'], 404);
+        }
+        return response()->json($apoderado);
+    }
+
+    public function edit($id)
+    {
+        $apoderado = $this->service->obtener($id);
+        if (! $apoderado) {
+            abort(404);
+        }
+        return view('apoderados.edit', compact('apoderado'));
     }
 
     public function update(Request $request, $id)

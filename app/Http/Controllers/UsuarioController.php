@@ -20,13 +20,12 @@ class UsuarioController extends Controller
         return response()->json($usuarios);
     }
 
-    public function show($id)
+    public function create()
     {
-        $usuario = $this->service->obtener($id);
-        if (! $usuario) {
-            return response()->json(['error' => 'No encontrado'], 404);
-        }
-        return response()->json($usuario);
+        // Si quieres un select de docentes:
+        // $docentes = app(\App\Services\DocenteService::class)->listar();
+        // return view('usuarios.create', compact('docentes'));
+        return view('usuarios.create');
     }
 
     public function store(Request $request)
@@ -41,6 +40,24 @@ class UsuarioController extends Controller
 
         $usuario = $this->service->crear($datos);
         return response()->json($usuario, 201);
+    }
+
+    public function show($id)
+    {
+        $usuario = $this->service->obtener($id);
+        if (! $usuario) {
+            return response()->json(['error' => 'No encontrado'], 404);
+        }
+        return response()->json($usuario);
+    }
+
+    public function edit($id)
+    {
+        $usuario = $this->service->obtener($id);
+        if (! $usuario) {
+            abort(404);
+        }
+        return view('usuarios.edit', compact('usuario'));
     }
 
     public function update(Request $request, $id)
