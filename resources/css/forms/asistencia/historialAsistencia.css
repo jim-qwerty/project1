@@ -257,21 +257,33 @@
 }
 
 
-/* Autocomplete suggestions */
+/* Después: */
 .ha-form-group.ha-autocomplete {
   position: relative;
+  /* Asegura que ocupe el mismo espacio que el input de nombre */
+  flex: 0 0 auto;
+  width: 100%;
+  max-width: 400px;    /* igual al max-width de #nombreAlumno */
 }
+
+/* Añade que el input llene todo ese contenedor */
+.ha-form-group.ha-autocomplete .ha-input {
+  width: 100%;
+}
+
 
 .ha-suggestions {
   position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  margin: 2px 0 0;
+  top: calc(100% + 2px);
+  /* Empieza justo tras la etiqueta de 120px + gap de 10px */
+  left: calc(120px + 10px);
+  /* Ancho idéntico al input de 400px */
+  width: 400px;
+  margin: 0;
   padding: 0;
   list-style: none;
-  background: #ffffff;
-  border: 1px solid #cccccc;
+  background: #fff;
+  border: 1px solid #ccc;
   border-radius: 4px;
   max-height: 200px;
   overflow-y: auto;
@@ -287,3 +299,4 @@
 .ha-suggestions li:hover {
   background-color: #F5F5F5;
 }
+

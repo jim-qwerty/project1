@@ -32,9 +32,7 @@
     <hr>
 
     <div id="tablaResumen" class="ha-tabla-contenedor">
-      <!-- La tabla se genera desde JS -->
+      <!-- header + empty tbody se inyecta desde JS -->
     </div>
   </div>
 </div>
-
-
