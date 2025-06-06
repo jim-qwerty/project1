@@ -7,14 +7,16 @@
       <input type="text" id="nombre" name="nombre" class="rd-input" required>
     </div>
 
+    <!-- GRADO ahora es un input de texto -->
     <div class="rd-form-group">
       <label for="grado" class="rd-label">Grado:</label>
-      <select id="grado" name="grado" class="rd-select" required>
-        <option value="">Selecciona un grado</option>
-        <option value="1ro">1ro</option>
-        <option value="2do">2do</option>
-        <option value="3ro">3ro</option>
-      </select>
+      <input type="text" id="grado" name="grado" class="rd-input" placeholder="Ej. 1ro" required>
+    </div>
+
+    <!-- SECCIÓN agregado como input de texto -->
+    <div class="rd-form-group">
+      <label for="seccion" class="rd-label">Sección:</label>
+      <input type="text" id="seccion" name="seccion" class="rd-input" placeholder="Ej. A" required>
     </div>
 
     <p class="rd-fecha-hora"><strong>Fecha:</strong> <span id="fechaActual"></span></p>

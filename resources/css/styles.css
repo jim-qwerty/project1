@@ -443,3 +443,20 @@ html, body {
   margin-left: 200px; /* Ajusta según el ancho del sidebar expandido */
   transition: margin-left 0.3s ease;
 }
+
+
+/* Cuando se cargue la vista “Inicio” y sólo allí queramos centrar la bienvenida: */
+.welcome-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* Ocupa todo el alto disponible dentro de #form-container */
+  height: 100%;
+}
+
+/* Estilo del texto de bienvenida */
+.welcome-text {
+  color: var(--title-color);
+  font-size: 2rem;
+  text-align: center;
+}

@@ -1,55 +1,138 @@
-.rd-wrapper .rd-form {
-  font-family: Arial, sans-serif;
-  padding: 1rem;
-  background-color: #f9f9f9;
-  border-radius: 8px;
-  max-width: 500px;
-}
-
-.rd-wrapper .rd-titulo {
-  margin-bottom: 1rem;
-}
-
-.rd-wrapper .rd-form-group {
-  margin-bottom: 1rem;
-}
-
-.rd-wrapper .rd-label {
-  display: block;
-  margin-bottom: 0.3rem;
-}
-
-.rd-wrapper .rd-input,
-.rd-wrapper .rd-select,
-.rd-wrapper .rd-btn {
-  padding: 0.5rem;
-  font-size: 1rem;
-  width: 100%;
+/*========== Reset y fuente ==========*/
+.rd-wrapper * {
+  margin: 0;
+  padding: 0;
   box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
 }
 
-.rd-wrapper .rd-input[readonly] {
-  background-color: #e0e0e0;
+/*========== Fondo general del contenedor ==========*/
+.rd-wrapper {
+  min-height: 100vh;
+  background: #F4F4F4; /* Gris muy claro */
+  padding: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: start;
 }
 
-.rd-wrapper .rd-btn {
-  background-color: #4caf50;
-  color: white;
-  border: none;
-  cursor: pointer;
+/*========== Contenedor principal del formulario (“rd-form”) ==========*/
+.rd-wrapper .rd-form {
+  background: #FFFFFF; /* Fondo blanco */
+  padding: 20px 30px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  max-width: 500px;
+  width: 100%;
+}
+
+/*========== Título principal del formulario ==========*/
+.rd-wrapper .rd-titulo {
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 25px;
+  text-align: center;
+  color: #6B001F; /* Burdeos oscuro */
+}
+
+/*========== Grupos de campos (“rd-form-group”) ==========*/
+.rd-wrapper .rd-form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+/*========== Etiqueta de cada campo (“rd-label”) ==========*/
+.rd-wrapper .rd-label {
+  font-weight: 500;
+  margin-bottom: 8px;
+  color: #333333; /* Gris oscuro */
+}
+
+/*========== Inputs de texto (“rd-input”) ==========*/
+.rd-wrapper .rd-input {
+  padding: 10px;
+  font-size: 14px;
   border-radius: 5px;
+  border: 1px solid #CCCCCC;
+  background-color: #FAFAFA; /* Gris muy claro de fondo */
+  transition: border-color 0.2s ease;
+}
+
+.rd-wrapper .rd-input:focus {
+  outline: none;
+  border-color: #6B001F; /* Burdeos oscuro al enfocarse */
+}
+
+/*========== Párrafos de fecha y hora (“rd-fecha-hora”) ==========*/
+.rd-wrapper .rd-fecha-hora {
+  font-size: 16px;
+  color: #333333;
+  margin-bottom: 15px;
+}
+
+.rd-wrapper .rd-fecha-hora strong {
+  color: #6B001F; /* Burdeos para resaltar */
+}
+
+/*========== Botón principal (“rd-btn”) ==========*/
+.rd-wrapper .rd-btn {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  text-align: center;
+  background-color: #FFC107; /* Dorado */
+  color: #6B001F;            /* Texto burdeos */
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s ease, color 0.3s ease;
+  margin-top: 10px;
 }
 
 .rd-wrapper .rd-btn:hover {
-  background-color: #45a049;
+  background-color: #6B001F; /* Burdeos oscuro en hover */
+  color: #FFFFFF;            /* Texto blanco en hover */
 }
 
-.rd-wrapper .rd-fecha-hora {
-  margin: 0.5rem 0;
-}
-
+/*========== Mensaje de confirmación (“rd-mensaje”) ==========*/
 .rd-wrapper .rd-mensaje {
-  margin-top: 1rem;
-  font-weight: bold;
-  color: green;
+  margin-top: 20px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #228B22; /* Verde para confirmar éxito */
+}
+
+/*========== Responsive (móvil ≤ 480px) ==========*/
+@media screen and (max-width: 480px) {
+  .rd-wrapper {
+    padding: 20px;
+  }
+  .rd-wrapper .rd-form {
+    padding: 15px 20px;
+  }
+  .rd-wrapper .rd-titulo {
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+  .rd-wrapper .rd-form-group {
+    margin-bottom: 15px;
+  }
+  .rd-wrapper .rd-input {
+    font-size: 13px;
+    padding: 8px;
+  }
+  .rd-wrapper .rd-btn {
+    font-size: 15px;
+    padding: 10px;
+  }
+  .rd-wrapper .rd-fecha-hora {
+    font-size: 14px;
+    margin-bottom: 10px;
+  }
+  .rd-wrapper .rd-mensaje {
+    font-size: 15px;
+  }
 }

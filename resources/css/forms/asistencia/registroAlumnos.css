@@ -1,49 +1,120 @@
+/*========== Reset y fuente ==========*/
+.ra-wrapper * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
+
+/*========== Fondo general del contenedor ==========*/
 .ra-wrapper {
-  font-family: Arial, sans-serif;
-  padding: 20px;
+  background: #F4F4F4; /* Gris muy claro */
+  padding: 30px;
 }
 
+/*========== Contenedor principal del formulario ==========*/
 .ra-wrapper .ra-form {
+  background: #FFFFFF; /* Fondo blanco */
   width: 90%;
-  margin: auto;
-  border: 1px solid #ccc;
-  padding: 20px;
+  max-width: 1800px;    /* Para pantallas muy grandes, no exceder 800px */
+  margin: 0 auto;
+  border: 1px solid #CCCCCC;
   border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 
+/*========== Fila superior (filtros / inputs) ==========*/
 .ra-wrapper .ra-fila-superior {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
   margin-bottom: 20px;
 }
 
+/* Cada label/input en esa fila */
 .ra-wrapper .ra-fila-superior label {
-  margin-right: 15px;
+  font-weight: 500;
+  color: #333333;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
 }
 
+/* Inputs de esa fila */
 .ra-wrapper .ra-input {
-  padding: 5px;
-  margin-left: 5px;
+  padding: 8px 10px;
+  font-size: 14px;
+  border-radius: 5px;
+  border: 1px solid #CCCCCC;
+  background-color: #FAFAFA;
+  transition: border-color 0.2s ease;
 }
 
+.ra-wrapper .ra-input:focus {
+  outline: none;
+  border-color: #6B001F; /* Burdeos oscuro en foco */
+}
+
+/*========== Estilo de la tabla ==========*/
 .ra-wrapper .ra-tabla {
   width: 100%;
   border-collapse: collapse;
   margin-bottom: 20px;
 }
 
+/* Celdas de encabezado y cuerpo */
 .ra-wrapper .ra-tabla th,
 .ra-wrapper .ra-tabla td {
-  padding: 10px;
-  border-bottom: 1px solid #ccc;
+  padding: 8px 10px; /* Ajustado para compacidad */
+  border-bottom: 1px solid #CCC;
   text-align: center;
+  background-color: #FFFFFF;
 }
 
+/* Encabezado de la tabla (fondo burdeos, texto blanco) */
+.ra-wrapper .ra-tabla thead th {
+  background-color: #6B001F; /* Burdeos oscuro */
+  color: #FFFFFF;
+  font-weight: 600;
+}
+
+/* Hover en filas de la tabla */
+.ra-wrapper .ra-tabla tbody tr:hover {
+  background-color: #F5F5F5; /* Gris muy claro */
+}
+
+/* Si hay alguna columna “nombre” que quieras alinear a la izquierda, podrías hacer: */
+/* 
+.ra-wrapper .ra-tabla tbody td.nombre {
+  text-align: left;
+  font-weight: 500;
+  color: #333333;
+} 
+*/
+
+/*========== Botones al pie del formulario ==========*/
 .ra-wrapper .ra-botones {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
 }
 
+/* Botón principal */
 .ra-wrapper .ra-btn {
   padding: 10px 20px;
+  background-color: #FFC107; /* Dorado */
+  color: #6B001F;            /* Texto burdeos */
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  font-weight: 600;
   cursor: pointer;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+.ra-wrapper .ra-btn:hover {
+  background-color: #6B001F; /* Burdeos oscuro en hover */
+  color: #FFFFFF;            /* Texto blanco en hover */
 }

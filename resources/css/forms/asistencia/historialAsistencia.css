@@ -1,76 +1,289 @@
+/*========== Reset y fuente ==========*/
+.ha-wrapper * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
+
+/*========== Fondo general del contenedor ==========*/
+.ha-wrapper {
+  min-height: 100vh;
+  background: #F4F4F4; /* Gris muy claro */
+  padding: 30px;
+}
+
+/*========== Contenedor principal del formulario (“ha-form”) ==========*/
 .ha-wrapper .ha-form {
-  font-family: Arial, sans-serif;
-  padding: 1rem;
-  background: #f5f5f5;
+  background: #FFFFFF; /* Fondo blanco */
+  padding: 20px;
   border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  max-width: 1800px;    /* Ancho máximo razonable */
+  margin: 0 auto 30px; /* Centrado y espacio inferior */
+  
+  /* Hacemos que los grupos de campo y el botón estén en fila */
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 20px;
 }
 
+/*========== Título principal encima del formulario ==========*/
 .ha-wrapper .ha-titulo {
-  margin-bottom: 1rem;
+  width: 100%;           /* Ocupa toda la línea */
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  text-align: center;
+  color: #6B001F;        /* Burdeos oscuro */
 }
 
+/*========== Grupos de campos (“ha-form-group”) ==========*/
 .ha-wrapper .ha-form-group {
-  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;             /* Espacio entre label y control */
+  margin-bottom: 0;      /* Ya no hay margen inferior porque están en fila */
 }
 
+/*========== Etiquetas de campo (“ha-label”) ==========*/
 .ha-wrapper .ha-label {
-  display: block;
-  margin-bottom: 0.3rem;
+  flex: 0 0 120px;       /* Etiqueta de ancho fijo (120px) */
+  font-weight: 500;
+  color: #333333;        /* Gris oscuro */
 }
 
+/*========== Inputs y selects (“ha-input”, “ha-select”) ==========*/
 .ha-wrapper .ha-input,
-.ha-wrapper .ha-select,
-.ha-wrapper .ha-btn {
-  padding: 0.5rem;
-  font-size: 1rem;
+.ha-wrapper .ha-select {
+  flex: 0 0 auto;        /* No se expanden automáticamente */
+  width: auto;           
+  max-width: 300px;      /* Ancho máximo 300px */
+  padding: 10px;
+  font-size: 14px;
+  border-radius: 5px;
+  border: 1px solid #CCCCCC;
+  background-color: #FAFAFA; /* Gris muy claro de fondo */
+  transition: border-color 0.2s ease;
 }
 
+.ha-wrapper .ha-input:focus,
+.ha-wrapper .ha-select:focus {
+  outline: none;
+  border-color: #6B001F; /* Burdeos oscuro en foco */
+}
+
+/* Ajustamos anchos específicos si es necesario */
+.ha-wrapper #grado.ha-input {
+  max-width: 250px;
+}
+
+.ha-wrapper #seccion.ha-input {
+  max-width: 150px;
+}
+
+.ha-wrapper #nombreAlumno.ha-input {
+  max-width: 400px;
+}
+
+.ha-wrapper #mes.ha-input {
+  max-width: 250px;
+}
+
+/*========== Botón principal (“ha-btn”) ==========*/
 .ha-wrapper .ha-btn {
-  background-color: #2d89ef;
-  color: white;
+  /* Que no ocupe toda la línea, solo lo justo: */
+  flex: 0 0 auto;
+  margin: 10px 0 0;    /* elimina el “0” extra de la izquierda */
+  
+  /* Padding horizontal menor para reducir su ancho: */
+  padding: 10px 20px;
+  
+  background-color: #FFC107; /* Dorado */
+  color: #6B001F;            /* Texto burdeos */
   border: none;
   border-radius: 5px;
+  font-size: 16px;
+  font-weight: 600;
   cursor: pointer;
+  text-align: left;           /* Alineado a la izquierda */
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
 .ha-wrapper .ha-btn:hover {
-  background-color: #1b5fbd;
+  background-color: #6B001F; /* Burdeos oscuro en hover */
+  color: #FFFFFF;            /* Texto blanco en hover */
 }
 
+/*========== Separador horizontal ==========*/
+.ha-wrapper hr {
+  width: 100%;
+  border: none;
+  border-top: 1px solid #DDD;
+  margin: 20px 0;
+}
+
+/*========== Contenedor de la tabla (“ha-tabla-contenedor”) ==========*/
+.ha-wrapper .ha-tabla-contenedor {
+  width: 100%;
+  margin-top: 20px;
+  overflow-x: auto;        /* Scroll horizontal si se achica */
+}
+
+/*========== Tabla: layout fijo y estilos generales ==========*/
 .ha-wrapper .ha-tabla-contenedor table {
   width: 100%;
+  table-layout: fixed;     /* Uso de ancho fijo para columnas */
   border-collapse: collapse;
-  margin-top: 1rem;
   font-size: 0.9rem;
+  background: #FFFFFF;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 0 10px rgba(0,0,0,0.05);
 }
 
 .ha-wrapper .ha-tabla-contenedor thead th {
-  background-color: #eee;
-  padding: 6px;
-  border: 1px solid #ccc;
+  background-color: #6B001F; /* Burdeos oscuro */
+  color: #FFFFFF;
+  padding: 8px 10px;
+  border: 1px solid #DDD;
   text-align: center;
 }
 
 .ha-wrapper .ha-tabla-contenedor tbody td {
-  border: 1px solid #ccc;
-  padding: 5px;
+  border: 1px solid #DDD;
+  padding: 8px 10px;
   text-align: center;
+  background-color: #FFFFFF;
 }
 
-.ha-wrapper .ha-tabla-contenedor tbody td.nombre {
+.ha-wrapper .ha-tabla-contenedor tbody tr:hover {
+  background-color: #F5F5F5; /* Gris muy claro en hover */
+}
+
+/*========== Anchos fijos para columnas ==========*/
+/* Primera columna (Nombre del alumno) */
+.ha-wrapper .ha-tabla-contenedor table th:first-child,
+.ha-wrapper .ha-tabla-contenedor table td:first-child {
+  width: 200px;
+  min-width: 200px;
+  max-width: 200px;
   text-align: left;
-  min-width: 180px;
-  font-weight: bold;
+  font-weight: 500;
+  color: #333333;
 }
 
+/* Columnas de días: todas mismas medidas */
+.ha-wrapper .ha-tabla-contenedor table th:not(:first-child),
+.ha-wrapper .ha-tabla-contenedor table td:not(:first-child) {
+  width: 32px;
+  min-width: 32px;
+  max-width: 32px;
+  padding: 8px 0;           /* 8px arriba/abajo, 0 horizontal para centrar letra */
+  text-align: center;
+  overflow: hidden;
+}
+
+/*========== Ajustes de columnas en móviles (≤768px) ==========*/
+@media screen and (max-width: 768px) {
+  /* Campos de formulario pasan a vertical (label arriba, control abajo) */
+  .ha-wrapper .ha-form-group {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .ha-wrapper .ha-form-group .ha-label {
+    flex: none;
+    margin-bottom: 5px;
+    width: auto;
+  }
+  .ha-wrapper .ha-form-group .ha-input,
+  .ha-wrapper .ha-form-group .ha-select {
+    width: 100%;
+    max-width: none;
+  }
+
+  /* Primera columna (Nombre) más pequeña en móvil */
+  .ha-wrapper .ha-tabla-contenedor table th:first-child,
+  .ha-wrapper .ha-tabla-contenedor table td:first-child {
+    width: 150px;
+    min-width: 150px;
+    padding: 6px 8px;
+  }
+
+  /* Columnas de días reducidas en móvil */
+  .ha-wrapper .ha-tabla-contenedor table th:not(:first-child),
+  .ha-wrapper .ha-tabla-contenedor table td:not(:first-child) {
+    width: 24px;
+    min-width: 24px;
+    max-width: 24px;
+    padding: 6px 0;
+    font-size: 0.75rem;
+  }
+
+  /* Reducir padding de encabezados en móvil */
+  .ha-wrapper .ha-tabla-contenedor thead th,
+  .ha-wrapper .ha-tabla-contenedor tbody td {
+    padding: 6px 8px;
+  }
+}
+
+/*========== Estados de la tabla (P, T, F) ==========*/
+/* Estado “P” (Pagado) */
 .ha-wrapper .ha-tabla-contenedor td[data-estado="P"] {
-  background-color: #c8e6c9; /* verde claro */
+  background-color: #FFF3CD; /* Dorado clarito */
+  color: #6B001F;            /* Texto burdeos */
 }
 
+/* Estado “T” (Tarde o Presente) */
 .ha-wrapper .ha-tabla-contenedor td[data-estado="T"] {
-  background-color: #fff9c4; /* amarillo claro */
+  background-color: rgba(107, 0, 31, 0.1); /* Burdeos translúcido */
+  color: #6B001F;
 }
 
+/* Estado “F” (Falta) */
 .ha-wrapper .ha-tabla-contenedor td[data-estado="F"] {
-  background-color: #ffcdd2; /* rojo claro */
+  background-color: #FFC1C1; /* Rojo muy claro */
+  color: #6B001F;
+}
+
+/* ——— Encabezado: “Alumno” y días ——— */
+.ha-wrapper .ha-tabla-contenedor table thead th {
+  /* Fondo burdeos oscuro (mantiene tu background actual) */
+  background-color: #6B001F;
+  /* Nuevo color de texto: dorado */
+  color: #FFC107;
+}
+
+
+/* Autocomplete suggestions */
+.ha-form-group.ha-autocomplete {
+  position: relative;
+}
+
+.ha-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin: 2px 0 0;
+  padding: 0;
+  list-style: none;
+  background: #ffffff;
+  border: 1px solid #cccccc;
+  border-radius: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 20;
+}
+
+.ha-suggestions li {
+  padding: 8px 10px;
+  cursor: pointer;
+  color: #333333;
+}
+
+.ha-suggestions li:hover {
+  background-color: #F5F5F5;
 }

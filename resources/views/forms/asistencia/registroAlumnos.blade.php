@@ -17,26 +17,13 @@
         <tr>
           <th>N°</th>
           <th>Alumno</th>
-          <th colspan="3">Estado</th>
+          <th>Presente</th>
+          <th>Tarde</th>
+          <th>Falta</th>
         </tr>
       </thead>
-      <tbody>
-        <tr>
-          <td>1</td>
-          <td>Luis Contreras</td>
-          <td><label><input type="radio" name="estado[1]" value="Puntual" required> Puntual</label></td>
-          <td><label><input type="radio" name="estado[1]" value="Tarde"> Tarde</label></td>
-          <td><label><input type="radio" name="estado[1]" value="Falta"> Falta</label></td>
-          <input type="hidden" name="alumno[1]" value="Luis Contreras">
-        </tr>
-        <tr>
-          <td>2</td>
-          <td>Pedro Ruiz</td>
-          <td><label><input type="radio" name="estado[2]" value="Puntual" required> Puntual</label></td>
-          <td><label><input type="radio" name="estado[2]" value="Tarde"> Tarde</label></td>
-          <td><label><input type="radio" name="estado[2]" value="Falta"> Falta</label></td>
-          <input type="hidden" name="alumno[2]" value="Pedro Ruiz">
-        </tr>
+      <tbody id="ra-tbody">
+        <!-- Aquí inyectaremos las filas desde JS -->
       </tbody>
     </table>
 

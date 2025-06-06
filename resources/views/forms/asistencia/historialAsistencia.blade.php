@@ -1,33 +1,40 @@
 <div class="ha-wrapper">
-  <form id="formResumenMensual" class="ha-form">
+  <div class="ha-form">
     <h2 class="ha-titulo">Resumen Mensual de Asistencia</h2>
 
     <div class="ha-form-group">
       <label for="grado" class="ha-label">Grado:</label>
-      <select id="grado" class="ha-select">
-        <option value="">-- Todos --</option>
-        <option value="1">1°</option>
-        <option value="2">2°</option>
-        <option value="3">3°</option>
-      </select>
+      <input type="text" id="grado" class="ha-input" placeholder="Ej. 1°">
     </div>
 
     <div class="ha-form-group">
+      <label for="seccion" class="ha-label">Sección:</label>
+      <input type="text" id="seccion" class="ha-input" placeholder="Ej. A">
+    </div>
+
+    <div class="ha-form-group ha-autocomplete">
       <label for="nombreAlumno" class="ha-label">Nombre del alumno:</label>
-      <input type="text" id="nombreAlumno" class="ha-input" placeholder="Buscar por nombre">
+      <input
+        type="text"
+        id="nombreAlumno"
+        class="ha-input"
+        placeholder="Buscar por nombre"
+        autocomplete="off"
+      >
+      <ul id="suggestions" class="ha-suggestions"></ul>
     </div>
 
     <div class="ha-form-group">
       <label for="mes" class="ha-label">Mes:</label>
-      <input type="month" id="mes" class="ha-input">
+      <input type="month" id="mes" class="ha-input" readonly>
     </div>
-
-    <button type="submit" class="ha-btn">Buscar</button>
 
     <hr>
 
     <div id="tablaResumen" class="ha-tabla-contenedor">
-      <!-- Aquí se mostrará la tabla de asistencia -->
+      <!-- La tabla se genera desde JS -->
     </div>
-  </form>
+  </div>
 </div>
+
+

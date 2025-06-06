@@ -1,56 +1,91 @@
-.lm-wrapper {
+/*========== Reset y fuente ==========*/
+.lm-wrapper * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
   font-family: 'Poppins', sans-serif;
-  background: #f0f0f0;
+}
+
+/*========== Fondo general del contenedor ==========*/
+.lm-wrapper {
+  background: #F4F4F4; /* Gris muy claro para contraste suave */
   padding: 30px;
 }
 
+/*========== Formulario principal (contenedor) ==========*/
 .lm-wrapper .lm-form {
-  background: #ffffff;
+  background: #FFFFFF; /* Fondo blanco limpio */
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0,0,0,0.1);
-  max-width: 1300px;
+  max-width: 1800px;    /* Ajustado para pantallas grandes */
   margin: 0 auto;
 }
 
+/*========== Título encima del formulario ==========*/
 .lm-wrapper .lm-titulo {
   text-align: center;
   margin-bottom: 20px;
 }
 
+.lm-wrapper .lm-titulo h2 {
+  font-size: 28px;
+  font-weight: 600;
+  color: #6B001F; /* Burdeos oscuro */
+}
+
+/*========== Filtro / sección de inputs (arriba) ==========*/
 .lm-wrapper .lm-filters {
   display: flex;
   justify-content: space-between;
   margin-bottom: 20px;
 }
 
-.lm-wrapper .lm-input {
+/*========== Inputs de filtro y selects ==========*/
+.lm-wrapper .lm-input,
+.lm-wrapper .lm-select,
+.lm-wrapper .lm-estado-select {
   padding: 10px;
   font-size: 14px;
   border-radius: 5px;
-  border: 1px solid #ccc;
+  border: 1px solid #CCCCCC;
+  background-color: #FAFAFA;
+  transition: border-color 0.2s ease;
+}
+
+.lm-wrapper .lm-input {
   width: 75%;
 }
 
 .lm-wrapper .lm-select {
-  padding: 10px;
-  font-size: 14px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
   width: 23%;
 }
 
+.lm-wrapper .lm-estado-select {
+  width: 180px;
+}
+
+/* Border en foco para inputs/selects */
+.lm-wrapper .lm-input:focus,
+.lm-wrapper .lm-select:focus,
+.lm-wrapper .lm-estado-select:focus {
+  outline: none;
+  border-color: #6B001F; /* Burdeos oscuro al enfocarse */
+}
+
+/*========== Tabla de datos ==========*/
 .lm-wrapper .lm-tabla {
   width: 100%;
   table-layout: fixed;
   border-collapse: separate;
   border-spacing: 0 5px;
-  background: white;
+  background: #FFFFFF; /* Blanco para la tabla */
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 
+/* Celdas de encabezado y cuerpo */
 .lm-wrapper .lm-tabla th,
 .lm-wrapper .lm-tabla td {
   padding: 12px;
@@ -59,48 +94,15 @@
   word-wrap: break-word;
 }
 
+/* Encabezado de la tabla */
 .lm-wrapper .lm-tabla th {
-  background: #4CAF50;
-  color: white;
+  background: #6B001F; /* Burdeos oscuro */
+  color: #FFFFFF;
 }
 
+/* Hover en filas */
 .lm-wrapper .lm-tabla tr:hover {
-  background-color: #f5f5f5;
-}
-
-.lm-wrapper .lm-estado-select {
-  padding: 5px;
-  font-size: 14px;
-  border-radius: 5px;
-  width: 180px;
-}
-
-.lm-wrapper .lm-btn {
-  margin-top: 20px;
-  padding: 10px 20px;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  font-size: 16px;
-  cursor: pointer;
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.lm-wrapper .lm-confirmacion {
-  display: none;
-  text-align: center;
-  margin-top: 15px;
-  background-color: #d4edda;
-  color: #155724;
-  padding: 10px;
-  border: 1px solid #c3e6cb;
-  border-radius: 5px;
-  max-width: 400px;
-  margin-left: auto;
-  margin-right: auto;
+  background-color: #F5F5F5;
 }
 
 /* Anchos personalizados para columnas */
@@ -115,3 +117,40 @@
 
 .lm-wrapper .lm-tabla th:nth-child(4),
 .lm-wrapper .lm-tabla td:nth-child(4) { width: 20%; }
+
+/*========== Botón de acción (Enviar, Guardar, etc.) ==========*/
+.lm-wrapper .lm-btn {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background-color: #FFC107; /* Dorado */
+  color: #6B001F;            /* Texto en burdeos oscuro */
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+.lm-wrapper .lm-btn:hover {
+  background-color: #6B001F; /* Burdeos oscuro en hover */
+  color: #FFFFFF;            /* Texto blanco al pasar */
+}
+
+/*========== Mensaje de confirmación (oculto por defecto) ==========*/
+.lm-wrapper .lm-confirmacion {
+  display: none;
+  text-align: center;
+  margin-top: 15px;
+  background-color: #FFF3CD; /* Dorado clarito (fondo de aviso) */
+  color: #6B001F;            /* Texto en burdeos */
+  padding: 10px;
+  border: 1px solid #FFE69E; /* Borde dorado suave */
+  border-radius: 5px;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}

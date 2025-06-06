@@ -29,13 +29,14 @@ export default function initRegistroDocente(container = document.querySelector('
   // Manejar el envío del formulario
   form?.addEventListener('submit', (e) => {
     e.preventDefault();
-    const nombre = container.querySelector('#nombre')?.value;
-    const grado = container.querySelector('#grado')?.value;
-    const fecha = fechaSpan?.textContent;
-    const hora = horaSpan?.textContent;
+    const nombre  = container.querySelector('#nombre')?.value.trim();
+    const grado   = container.querySelector('#grado')?.value.trim();
+    const seccion = container.querySelector('#seccion')?.value.trim();
+    const fecha   = fechaSpan?.textContent;
+    const hora    = horaSpan?.textContent;
 
-    if (mensaje && nombre && grado && fecha && hora) {
-      mensaje.textContent = `✅ Asistencia registrada para ${nombre} (${grado}) el ${fecha} a las ${hora}`;
+    if (mensaje && nombre && grado && seccion && fecha && hora) {
+      mensaje.textContent = `✅ Asistencia registrada para ${nombre} (Grado: ${grado} – Sección: ${seccion}) el ${fecha} a las ${hora}`;
     }
   });
 }
