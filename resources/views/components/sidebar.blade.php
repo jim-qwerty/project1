@@ -4,7 +4,7 @@
       {{-- Logo --}}
       <a href="#" class="nav__link nav__logo">
         <i class='bx bxs-disc nav__icon'></i>
-        <span class="nav__logo-name">Bedimcode</span>
+        <span class="nav__logo-name">La Catolica</span>
       </a>
 
       {{-- Perfil --}}

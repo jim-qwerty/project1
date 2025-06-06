@@ -1,6 +1,6 @@
 <header class="header">
   <div class="header__container">
-    <img src="assets/img/perfil.jpg" alt="" class="header__img" />
+    <img src="assets/img/catolica.jpg" alt="" class="header__img" />
     <a href="#" class="header__logo">Bedimcode</a>
 
     <div class="header__search">

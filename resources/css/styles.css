@@ -6,13 +6,20 @@
   --header-height: 2rem;
   --nav-width: 219px;
 
-  /*========== Colors ==========*/
-  --first-color: #6923D0;
-  --first-color-light: #F4F0FA;
-  --title-color: #19181B;
-  --text-color: #58555E;
-  --text-color-light: #A5A1AA;
+  /*========== COLORES DE LA INSIGNIA “La Católica” ==========*/
+  /* Burdeos oscuro para elementos principales (sidebar, enlaces activos, íconos en hover) */
+  --first-color: #6B001F;
+  /* Versión muy clara y translúcida de burdeos para fondos secundarios (dropdown, buscador, etc.) */
+  --first-color-light: rgba(107, 0, 31, 0.1);
+  /* Para títulos (por ejemplo, el logo de header) */
+  --title-color: #6B001F;
+  /* Texto principal sobre fondos claros */
+  --text-color: #58555E;  /* puedes reemplazarlo por un gris más intenso si quieres mayor contraste */
+  /* Texto que va encima de fondos oscuros (sidebar) */
+  --text-color-light: #FFFFFF;
+  /* Fondo general de la página (puede quedar igual o ponerse blanco puro) */
   --body-color: #F9F6FD;
+  /* Fondo de contenedores (formularios, cards, footer si quisieras) */
   --container-color: #FFFFFF;
 
   /*========== Font and typography ==========*/
@@ -42,18 +49,11 @@
   box-sizing: border-box;
 }
 
-
-
-
-
-
-/*DISENIO DE IMAGEN DE ADMI*/
-
+/* DISEÑO DE IMAGEN DE ADMI */
 .profile-card {
   text-align: center;
   margin-top: 20px;
   margin-bottom: 25px; /* Agrega espacio debajo del profile-card */
-
 }
 
 .circle {
@@ -87,11 +87,7 @@
   visibility: visible;
 }
 
-
-
-
-/* PARA QUE EL SLIDEBAR Y EL FORM SE OCULTEN AL MISMO TIEMPO*/
-
+/* PARA QUE EL SIDEBAR Y EL FORM SE OCULTEN AL MISMO TIEMPO */
 .container {
   display: flex;
   flex-direction: row;
@@ -113,24 +109,10 @@
   justify-content: space-between;
 }
 
-
 /* Cuando se hace hover sobre la barra lateral, el contenido se ajusta */
 .nav:hover ~ .main-content {
   margin-left: var(--nav-width); /* Igual al tamaño expandido del sidebar */
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 body {
   margin: var(--header-height) 0 0 0;
@@ -204,7 +186,7 @@ img {
   color: var(--text-color);
 }
 
-.header__icon, 
+.header__icon,
 .header__toggle {
   font-size: 1.2rem;
 }
@@ -214,14 +196,14 @@ img {
   cursor: pointer;
 }
 
-/*========== NAV ==========*/
+/*========== NAV (SIDEBAR) ==========*/
 .nav {
   position: fixed;
   top: 0;
   left: -100%;
   height: 100vh;
   padding: 1rem 1rem 0;
-  background-color: var(--container-color);
+  background-color: var(--first-color); /* Ahora el fondo del sidebar es burdeos */
   box-shadow: 1px 0 0 rgba(22, 8, 43, 0.1);
   z-index: var(--z-fixed);
   transition: .4s;
@@ -245,9 +227,10 @@ img {
 .nav__logo {
   font-weight: var(--font-semi-bold);
   margin-bottom: 2.5rem;
+  color: var(--text-color-light); /* Blanco para logo/texto dentro del sidebar */
 }
 
-.nav__list, 
+.nav__list,
 .nav__items {
   display: grid;
 }
@@ -264,22 +247,23 @@ img {
   font-size: var(--normal-font-size);
   text-transform: uppercase;
   letter-spacing: .1rem;
-  color: var(--text-color-light);
+  color: var(--text-color-light); /* Blanco en subtítulos */
 }
 
 .nav__link {
   display: flex;
   align-items: center;
-  color: var(--text-color);
+  color: var(--text-color-light); /* Blanco para enlaces normales */
 }
 
 .nav__link:hover {
-  color: var(--first-color);
+  color: var(--first-color-light); /* Al pasar, un burdeos clarito translúcido */
 }
 
 .nav__icon {
   font-size: 1.2rem;
   margin-right: .5rem;
+  color: var(--text-color-light); /* Blanco para íconos normales */
 }
 
 .nav__name {
@@ -290,6 +274,11 @@ img {
 
 .nav__logout {
   margin-top: 5rem;
+  color: var(--text-color-light); /* Blanco para el “Salir” */
+}
+
+.nav__logout:hover {
+  color: var(--first-color-light);
 }
 
 /* Dropdown */
@@ -300,7 +289,7 @@ img {
 }
 
 .nav__dropdown-collapse {
-  background-color: var(--first-color-light);
+  background-color: var(--first-color-light); /* Fondo claro translúcido de burdeos */
   border-radius: .25rem;
   margin-top: 1rem;
 }
@@ -314,16 +303,17 @@ img {
 .nav__dropdown-item {
   font-size: var(--smaller-font-size);
   font-weight: var(--font-medium);
-  color: var(--text-color);
+  color: var(--text-color-light); /* Blanco para items */
 }
 
 .nav__dropdown-item:hover {
-  color: var(--first-color);
+  color: var(--first-color); /* Burdeos oscuro al pasar */
 }
 
 .nav__dropdown-icon {
   margin-left: auto;
   transition: .4s;
+  color: var(--text-color-light); /* Blanco para la flecha */
 }
 
 /* Show dropdown collapse */
@@ -343,11 +333,11 @@ img {
 
 /*===== Active link =====*/
 .active {
-  color: var(--first-color);
+  color: var(--first-color); /* El enlace activo se pinta de burdeos */
 }
 
 /* ========== MEDIA QUERIES ==========*/
-/* For small devices reduce search*/
+/* For small devices reduce search */
 @media screen and (max-width: 320px) {
   .header__search {
     width: 70%;
@@ -383,6 +373,7 @@ img {
     left: 0;
     padding: 1.2rem 1.5rem 0;
     width: 68px; /* Reduced navbar */
+    background-color: var(--first-color); /* Sigue burdeos cuando está colapsado */
   }
   .nav__items {
     row-gap: 1.7rem;
@@ -400,36 +391,36 @@ img {
     transition: .3s;
   }
   
-  
   /* Navbar expanded */
   .nav:hover {
     width: var(--nav-width);
+    background-color: var(--first-color); /* Sigue burdeos cuando se expande */
   }
   
   /* Visible elements */
   .nav:hover .nav__logo-name {
     opacity: 1;
+    color: var(--text-color-light);
   }
   .nav:hover .nav__subtitle {
     opacity: 1;
+    color: var(--text-color-light);
   }
   .nav:hover .nav__name {
     opacity: 1;
+    color: var(--text-color-light);
   }
   .nav:hover .nav__dropdown-icon {
     opacity: 1;
+    color: var(--text-color-light);
   }
 }
-
 
 html, body {
   height: 100%;
   margin: 0;
   padding: 0;
 }
-
-
-
 
 /* El contenedor del contenido principal (como formularios) */
 #form-container {
