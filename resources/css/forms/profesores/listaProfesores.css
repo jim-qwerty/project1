@@ -1,38 +1,122 @@
-.lp-wrapper .lp-filtros {
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 1rem;
-  align-items: center;
-  flex-wrap: wrap;
+/*========== Reset y fuente ==========*/
+.lp-wrapper * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
 }
 
+/*========== Fondo general del contenedor ==========*/
+.lp-wrapper {
+  min-height: 100vh;
+  background: #F4F4F4; /* Gris muy claro */
+  padding: 30px;
+}
+
+/*========== Contenedor del formulario ==========*/
+.lp-wrapper form {
+  background: #FFFFFF;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 1800px;
+  margin: 0 auto;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/*========== Filtros (grado + buscador) ==========*/
+.lp-wrapper .lp-filtros {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+/* Limita ancho del select de grado y del buscador */
+.lp-wrapper .lp-filtros select#gradoFiltro
+{
+  max-width: 200px;
+  flex: 0 0 auto;
+}
+.lp-wrapper .lp-filtros input#buscador
+{
+  max-width: 600px;
+  flex: 0 0 auto;
+} 
+
+/*========== Etiquetas y controles ==========*/
+.lp-wrapper label {
+  font-weight: 500;
+  color: #333333;
+}
+.lp-wrapper select,
+.lp-wrapper input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #CCCCCC;
+  border-radius: 5px;
+  background-color: #FAFAFA;
+  transition: border-color 0.2s ease;
+}
+.lp-wrapper select:focus,
+.lp-wrapper input[type="text"]:focus {
+  outline: none;
+  border-color: #6B001F;
+}
+
+/*========== Tabla de profesores ==========*/
 .lp-wrapper .lp-tabla {
   width: 100%;
   border-collapse: collapse;
+  background: #FFFFFF;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 0 5px rgba(0,0,0,0.05);
 }
-
 .lp-wrapper .lp-tabla th,
 .lp-wrapper .lp-tabla td {
-  border: 1px solid #ccc;
-  padding: 8px;
+  border: 1px solid #DDD;
+  padding: 12px;
   text-align: center;
 }
-
-.lp-wrapper .lp-estado-radio {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
+.lp-wrapper .lp-tabla thead th {
+  background-color: #6B001F;
+  color: #FFFFFF;
+  font-weight: 600;
 }
 
+/*========== Botones de acción ==========*/
 .lp-wrapper button.editar {
-  background-color: #2196F3;
-  color: white;
+  padding: 8px 16px;
+  background-color: #FFC107; /* Dorado */
+  color: #6B001F;            /* Burdeos */
   border: none;
-  padding: 6px 12px;
+  border-radius: 5px;
+  font-weight: 600;
   cursor: pointer;
-  border-radius: 4px;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+.lp-wrapper button.editar:hover {
+  background-color: #6B001F;
+  color: #FFFFFF;
 }
 
-.lp-wrapper button.editar:hover {
-  background-color: #1976D2;
+/*========== Responsive (móvil ≤ 768px) ==========*/
+@media screen and (max-width: 768px) {
+  .lp-wrapper form {
+    padding: 15px;
+  }
+  .lp-wrapper .lp-filtros {
+    justify-content: flex-start;
+    grid-template-columns: 1fr;
+  }
+  .lp-wrapper .lp-tabla th,
+  .lp-wrapper .lp-tabla td {
+    padding: 8px;
+  }
 }
