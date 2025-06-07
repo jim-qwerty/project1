@@ -1,94 +1,81 @@
-import '/resources/css/forms/gestionUsuarios/crearUsuarios.css'; // Asegúrate que Vite lo procese
+// resources/js/forms/gestionUsuarios/crearUsuarios.js
+import '/resources/css/forms/gestionUsuarios/crearUsuarios.css';
 
-export default function initCrearUsuarios(container = document.querySelector('.crear-usuarios')) {
+export default function initCrearUsuarios(container = document.querySelector('.cu-wrapper')) {
   if (!container) return;
 
-  /* ─────────────────── Datos de ejemplo ─────────────────── */
   const profesores = [
-    { nombre: 'Juan Pérez', grado: '1ro' },
-    { nombre: 'María García', grado: '1ro' },
-    { nombre: 'Ana Gómez', grado: '2do' },
-    { nombre: 'Pedro Díaz', grado: '3ro' },
-    { nombre: 'Lucía Torres', grado: '3ro' },
-    { nombre: 'Carlos Ruiz', grado: '4to' }
+    { nombre: 'Juan Pérez' },
+    { nombre: 'María García' },
+    { nombre: 'Ana Gómez' },
+    { nombre: 'Pedro Díaz' },
+    { nombre: 'Lucía Torres' },
+    { nombre: 'Carlos Ruiz' }
   ];
 
-  /* ───────────────────────── UI ─────────────────────────── */
-  const rolSel = container.querySelector('#rolUsuario');
-  const gradoLab = container.querySelector('#gradoLabel');
-  const gradoSel = container.querySelector('#gradoUsuario');
+  // Referencias UI
+  const rolSel      = container.querySelector('#rolUsuario');
   const buscadorInp = container.querySelector('#buscadorNombre');
-  const sugerDiv = container.querySelector('#sugerenciasNombres');
-  const inputNombre = container.querySelector('#inputNombre');
-  const passInp = container.querySelector('#inputPassword');
-  const form = container.querySelector('#formularioCrearUsuario');
-  const mensajeP = container.querySelector('#mensaje');
+  const sugerDiv    = container.querySelector('#sugerenciasNombres');
+  const inputNombres  = container.querySelector('#inputNombres');
+  const inputApellidos= container.querySelector('#inputApellidos');
+  const passInp     = container.querySelector('#inputPassword');
+  const form        = container.querySelector('#formularioCrearUsuario');
+  const mensajeP    = container.querySelector('#mensaje');
 
-  /* ────────────────── Helpers ────────────────── */
-  const limpiarSugerencias = () => (sugerDiv.innerHTML = '');
+  const limpiarSugerencias = () => sugerDiv.innerHTML = '';
 
+  // Ahora devuelve solo nombres cuando rol=profesor
   const generarListaNombres = () => {
-    if (rolSel.value !== 'profesor') return [];
-    const grado = gradoSel.value;
-    return profesores
-      .filter(p => !grado || p.grado === grado)
-      .map(p => p.nombre);
+    return rolSel.value === 'profesor'
+      ? profesores.map(p => p.nombre)
+      : [];
   };
 
   const mostrarSugerencias = () => {
-    const texto = buscadorInp.value.trim().toLowerCase();
     limpiarSugerencias();
-    if (!texto) return;
+    if (rolSel.value !== 'profesor') return;
+    const term = buscadorInp.value.trim().toLowerCase();
+    if (!term) return;
 
-    const lista = generarListaNombres().filter(n =>
-      n.toLowerCase().includes(texto)
-    );
-
-    lista.forEach(nombre => {
-      const div = document.createElement('div');
-      div.textContent = nombre;
-      div.addEventListener('click', () => {
-        buscadorInp.value = nombre;
-        inputNombre.value = nombre;
-        limpiarSugerencias();
+    generarListaNombres()
+      .filter(nombre => nombre.toLowerCase().includes(term))
+      .forEach(nombre => {
+        const div = document.createElement('div');
+        div.textContent = nombre;
+        div.addEventListener('click', () => {
+          buscadorInp.value = nombre;
+          const partes = nombre.split(' ');
+          inputApellidos.value = partes.pop();
+          inputNombres.value  = partes.join(' ');
+          limpiarSugerencias();
+        });
+        sugerDiv.appendChild(div);
       });
-      sugerDiv.appendChild(div);
-    });
   };
 
-  /* ─────────────── Eventos UI ─────────────── */
+  // Eventos
   rolSel.addEventListener('change', () => {
-    if (rolSel.value === 'profesor') {
-      gradoLab.classList.remove('oculto');
-    } else {
-      gradoLab.classList.add('oculto');
-      gradoSel.value = '';
-    }
-    mostrarSugerencias();
+    limpiarSugerencias();
   });
-
-  gradoSel.addEventListener('change', mostrarSugerencias);
   buscadorInp.addEventListener('input', mostrarSugerencias);
   buscadorInp.addEventListener('blur', () => setTimeout(limpiarSugerencias, 150));
 
-  /* ─────────────── Submit ─────────────── */
-  form.addEventListener('submit', (e) => {
+  form.addEventListener('submit', e => {
     e.preventDefault();
-
-    const dataUsuario = {
-      usuario: inputNombre.value.trim(),
-      nombres: inputNombre.value.trim(),
-      password: passInp.value,
-      rol: rolSel.value,
-      grado: rolSel.value === 'profesor' ? gradoSel.value : null
+    const nuevoUsuario = {
+      nombres:   inputNombres.value.trim(),
+      apellidos: inputApellidos.value.trim(),
+      password:  passInp.value,
+      rol:       rolSel.value
     };
-
-    console.log('Usuario creado:', dataUsuario);
+    console.log('Usuario creado:', nuevoUsuario);
     mensajeP.textContent = '✅ Usuario registrado correctamente.';
     mensajeP.style.color = 'green';
 
     form.reset();
-    gradoLab.classList.add('oculto');
-    setTimeout(() => (mensajeP.textContent = ''), 3000);
+    setTimeout(() => mensajeP.textContent = '', 3000);
   });
 }
+
+document.addEventListener('DOMContentLoaded', () => initCrearUsuarios());
