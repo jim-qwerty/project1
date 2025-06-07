@@ -1,4 +1,4 @@
-import '/resources/css/forms/profesores/listaProfesores.css';
+import '/resources/css/forms/docentes/listaDocentes.css';
 
 export default function initListaProfesores(container = document.querySelector('lista-profesores')) {
   if (!container) return;

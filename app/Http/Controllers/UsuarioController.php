@@ -20,12 +20,9 @@ class UsuarioController extends Controller
         return response()->json($usuarios);
     }
 
-    public function create()
+      public function create()
     {
-        // Si quieres un select de docentes:
-        // $docentes = app(\App\Services\DocenteService::class)->listar();
-        // return view('usuarios.create', compact('docentes'));
-        return view('usuarios.create');
+        return view('forms.gestionUsuarios.crearUsuarios');
     }
 
     public function store(Request $request)
@@ -35,12 +32,16 @@ class UsuarioController extends Controller
             'password_hash' => 'required|string',
             'rol'           => 'required|in:admin,profesor',
             'docente_id'    => 'nullable|exists:docentes,id',
+            'nombres'       => 'required|string|max:100',
+            'apellidos'     => 'required|string|max:100',
             'estado'        => 'in:activo,inactivo',
         ]);
 
         $usuario = $this->service->crear($datos);
+
         return response()->json($usuario, 201);
     }
+
 
     public function show($id)
     {

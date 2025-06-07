@@ -30,25 +30,26 @@ class DocenteController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $datos = $request->validate([
-            'nombres'               => 'required|string|max:100',
-            'apellidos'             => 'required|string|max:100',
-            'dni'                   => 'required|size:8|unique:docentes,dni',
-            'fecha_nacimiento'      => 'required|date',
-            'edad'                  => 'nullable|integer',
-            'grado_asignado_id'     => 'nullable|exists:grados,id',
-            'seccion_asignada_id'   => 'nullable|exists:secciones,id',
-            'correo_electronico'    => 'nullable|email|max:100',
-            'celular'               => 'nullable|size:9',
-            'direccion'             => 'nullable|string|max:200',
-            'sexo'                  => 'required|in:M,F',
-            'estado'                => 'in:activo,inactivo',
-        ]);
+{
+    $datos = $request->validate([
+        'nombres'               => 'required|string|max:100',
+        'apellidos'             => 'required|string|max:100',
+        'dni'                   => 'required|size:8|unique:docentes,dni',
+        'fecha_nacimiento'      => 'required|date',
+        'edad'                  => 'nullable|integer',
+        'grado_asignado_id'     => 'required|exists:grados,id',
+        'seccion_asignada_id'   => 'required|exists:secciones,id',
+        'correo_electronico'    => 'required|email|max:100',
+        'celular'               => 'required|size:9',
+        'direccion'             => 'required|string|max:200',
+        'sexo'                  => 'required|in:M,F',
+        'estado'                => 'required|in:activo,inactivo',
+    ]);
 
-        $docente = $this->service->crear($datos);
-        return response()->json($docente, 201);
-    }
+    $docente = $this->service->crear($datos);
+
+    return response()->json($docente, 201);
+}
 
     public function show($id)
     {

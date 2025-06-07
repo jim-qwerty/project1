@@ -46,8 +46,10 @@ function inicializarSidebar() {
     "crear-usuarios": { path: "gestionUsuarios", file: "crearUsuarios" },
     "lista-usuarios": { path: "gestionUsuarios", file: "listaUsuarios" },
 
-    "agregar-profesores": { path: "profesores", file: "agregarProfesores" },
-    "lista-profesores": { path: "profesores", file: "listaProfesores" },
+    "agregar-docentes": { path: "docentes", file: "agregarDocentes" },
+    "lista-docentes": { path: "docentes", file: "listaDocentes" },
+
+    "asignar-secciones": { path: "grado", file: "listaDocentes" },
 
     "indexMenuPrincipal": { path: "menu", file: "indexMenuPrincipal" },
   };

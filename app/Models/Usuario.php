@@ -6,9 +6,19 @@ use Illuminate\Database\Eloquent\Model;
 
 class Usuario extends Model
 {
-    protected $fillable = ['username', 'password_hash', 'rol', 'docente_id', 'estado'];
+    // Campos asignables
+    protected $fillable = [
+      'username','password_hash',
+      'rol','docente_id',
+      'nombres','apellidos'
+      // NOTA: ya no incluimos 'estado' en fillable si no lo enviamos desde el form
+    ];
 
-    // Indica que la contraseña se guarda en password_hash
+    // Atributos que siempre parten con este valor
+    protected $attributes = [
+      'estado' => 'activo',
+    ];
+
     protected $hidden = ['password_hash'];
 
     public function docente()

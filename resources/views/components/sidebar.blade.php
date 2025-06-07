@@ -105,8 +105,23 @@
             </a>
             <div class="nav__dropdown-collapse">
               <div class="nav__dropdown-content">
-                <a href="#" class="nav__dropdown-item" data-form="agregar-profesores">Agregar</a>
-                <a href="#" class="nav__dropdown-item" data-form="lista-profesores">Lista</a>
+                <a href="#" class="nav__dropdown-item" data-form="agregar-docentes">Agregar</a>
+                <a href="#" class="nav__dropdown-item" data-form="lista-docentes">Lista</a>
+              </div>
+            </div>
+          </div>
+
+          {{-- SECCIONES --}}
+          <div class="nav__dropdown">
+            <a href="#" class="nav__link">
+              <i class='bx bx-user-circle nav__icon'></i>
+              <span class="nav__name">Seccion</span>
+              <i class='bx bx-chevron-down nav__icon nav__dropdown-icon'></i>
+            </a>
+            <div class="nav__dropdown-collapse">
+              <div class="nav__dropdown-content">
+                <a href="#" class="nav__dropdown-item" data-form="asignar-secciones">Asignar seccion</a>
+                
               </div>
             </div>
           </div>
@@ -125,6 +140,7 @@
               </div>
             </div>
           </div>
+
         </div>
       </div>
     </div>

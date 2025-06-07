@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\DAOs\UsuarioDAO;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class UsuarioService
 {
@@ -27,6 +28,10 @@ class UsuarioService
     public function crear(array $datos)
     {
         return DB::transaction(function () use ($datos) {
+            // Hashear contraseña
+            $datos['password_hash'] = Hash::make($datos['password_hash']);
+            // Estado por defecto
+            $datos['estado'] = $datos['estado'] ?? 'activo';
             return $this->usuarioDAO->create($datos);
         });
     }
