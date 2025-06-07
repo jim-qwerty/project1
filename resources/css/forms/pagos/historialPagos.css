@@ -1,93 +1,149 @@
-.hp-wrapper .hp-form {
-  padding: 1rem;
-  font-family: Arial, sans-serif;
-  background-color: #fdfdfd;
-  border: 1px solid #ccc;
-  border-radius: 8px;
+/*========== Reset y fuente ==========*/
+.hp-wrapper * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
 }
 
+/*========== Fondo general del contenedor ==========*/
+.hp-wrapper {
+  min-height: 100vh;
+  background: #F4F4F4; /* Gris muy claro */
+  padding: 30px;
+}
+
+/*========== Título principal ==========*/
 .hp-wrapper .hp-titulo {
-  margin-bottom: 1rem;
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 30px;
+  text-align: center;
+  color: #6B001F; /* Burdeos oscuro */
 }
 
+/*========== Estilo del formulario ==========*/
+.hp-wrapper .hp-form {
+  background: #FFFFFF;
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 1200px;
+  margin: 0 auto;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/*========== Filtros ==========*/
 .hp-wrapper .hp-filtros {
-  margin-bottom: 1rem;
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
   align-items: center;
 }
 
+/*========== Etiquetas ==========*/
 .hp-wrapper .hp-label {
-  font-weight: bold;
+  font-weight: 500;
+  color: #333333;
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
+  flex-direction: column;
+  gap: 5px;
 }
 
+/*========== Selects e inputs ==========*/
 .hp-wrapper .hp-select,
 .hp-wrapper .hp-input {
-  padding: 0.3rem;
+  width: 100%;
+  padding: 10px;
   font-size: 14px;
-  border-radius: 4px;
-  border: 1px solid #ccc;
+  border-radius: 5px;
+  border: 1px solid #CCCCCC;
+  background: #FAFAFA;
+  transition: border-color 0.2s ease;
 }
 
+.hp-wrapper .hp-select:focus,
+.hp-wrapper .hp-input:focus {
+  outline: none;
+  border-color: #6B001F;
+}
+
+/*========== Buscador de sugerencias ==========*/
 .hp-wrapper .hp-busqueda-wrapper {
   position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.hp-wrapper .hp-busqueda-wrapper input {
-  padding: 0.3rem;
-  margin-left: 0.5rem;
 }
 
 .hp-wrapper .hp-sugerencias {
-  border: 1px solid #ccc;
-  max-height: 150px;
-  overflow-y: auto;
   position: absolute;
-  background: white;
-  width: 100%;
-  z-index: 10;
-  top: 100%;
+  top: calc(100% + 5px);
   left: 0;
+  width: 100%;
+  max-height: 200px;
+  overflow-y: auto;
+  background: #FFFFFF;
+  border: 1px solid #CCCCCC;
+  border-radius: 5px;
+  z-index: 20;
 }
 
 .hp-wrapper .hp-sugerencias div {
-  padding: 5px;
+  padding: 8px 10px;
   cursor: pointer;
+  color: #333333;
 }
 
 .hp-wrapper .hp-sugerencias div:hover {
-  background-color: #eee;
+  background: #F5F5F5;
 }
 
+/*========== Botón deudores ==========*/
 .hp-wrapper .hp-btn-deudores {
-  padding: 0.5rem 1rem;
-  background-color: #dc3545;
-  color: white;
+  padding: 10px 20px;
+  background-color: #FFC107; /* Dorado */
+  color: #6B001F;            /* Burdeos */
   border: none;
-  border-radius: 4px;
+  border-radius: 5px;
+  font-weight: 600;
   cursor: pointer;
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
+.hp-wrapper .hp-btn-deudores:hover {
+  background-color: #6B001F;
+  color: #FFFFFF;
+}
+
+/*========== Tabla de pagos ==========*/
 .hp-wrapper .hp-tabla {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 1rem;
-  background-color: #fff;
+  background: #FFFFFF;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 0 10px rgba(0,0,0,0.05);
 }
 
 .hp-wrapper .hp-tabla th,
 .hp-wrapper .hp-tabla td {
-  border: 1px solid #ccc;
-  padding: 0.5rem;
+  border: 1px solid #DDD;
+  padding: 10px;
   text-align: center;
 }
 
-.hp-wrapper .hp-tabla thead {
-  background-color: #f0f0f0;
+.hp-wrapper .hp-tabla thead th {
+  background-color: #6B001F;
+  color: #FFFFFF;
+  font-weight: 600;
+}
+
+/*========== Responsive ==========*/
+@media screen and (max-width: 768px) {
+  .hp-wrapper .hp-form {
+    padding: 15px;
+  }
+  .hp-wrapper .hp-filtros {
+    grid-template-columns: 1fr;
+  }
 }

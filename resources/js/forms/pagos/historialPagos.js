@@ -1,14 +1,15 @@
-import '/resources/css/forms/pagos/historialPagos.css'; // Asegúrate de que Vite lo procese
+// resources/js/forms/pagos/historialPagos.js
+import '/resources/css/forms/pagos/historialPagos.css';
 
-export default function initHistorialPagos(container = document.querySelector('historial-pagos')) {
+export default function initHistorialPagos(container = document.querySelector('.hp-wrapper')) {
   if (!container) return;
 
-  const historialData = [
-    { grado: "1", seccion: "A", alumno: "Pedro Garcia", mes: "Enero", fecha: "2024-01-15", monto: 50 },
-    { grado: "1", seccion: "A", alumno: "Pedro Perez", mes: "Enero", fecha: "2024-01-20", monto: 50 },
+  const historialData    = [
+    { grado: "1", seccion: "A", alumno: "Pedro Garcia",   mes: "Enero",   fecha: "2024-01-15", monto: 50 },
+    { grado: "1", seccion: "A", alumno: "Pedro Perez",    mes: "Enero",   fecha: "2024-01-20", monto: 50 },
     { grado: "1", seccion: "B", alumno: "Luis Fernandez", mes: "Febrero", fecha: "2024-02-10", monto: 50 },
-    { grado: "2", seccion: "A", alumno: "Carlos Ruiz", mes: "Enero", fecha: "2024-01-17", monto: 50 },
-    { grado: "3", seccion: "B", alumno: "Sofia Mendoza", mes: "Marzo", fecha: "2024-03-05", monto: 50 }
+    { grado: "2", seccion: "A", alumno: "Carlos Ruiz",    mes: "Enero",   fecha: "2024-01-17", monto: 50 },
+    { grado: "3", seccion: "B", alumno: "Sofia Mendoza",  mes: "Marzo",   fecha: "2024-03-05", monto: 50 }
   ];
 
   const alumnosData = [
@@ -20,137 +21,126 @@ export default function initHistorialPagos(container = document.querySelector('h
     { grado: "3", seccion: "B", alumno: "Sofia Mendoza" }
   ];
 
-  const gradoSelect = container.querySelector('#gradoHistorial');
-  const seccionSelect = container.querySelector('#seccionHistorial');
-  const mesSelect = container.querySelector('#mesHistorial');
-  const buscadorInput = container.querySelector('#buscadorAlumno');
-  const sugerenciasDiv = container.querySelector('#sugerenciasAlumnos');
-  const tablaBody = container.querySelector('#tablaPagos tbody');
-  const btnDeudores = container.querySelector('#btnDeudores');
+  const gradoSelect      = container.querySelector('#gradoHistorial');
+  const seccionSelect    = container.querySelector('#seccionHistorial');
+  const mesSelect        = container.querySelector('#mesHistorial');
+  const buscadorInput    = container.querySelector('#buscadorAlumno');
+  const sugerenciasDiv   = container.querySelector('#sugerenciasAlumnos');
+  const tablaBody        = container.querySelector('#tablaPagos tbody');
+  const btnDeudores      = container.querySelector('#btnDeudores');
 
   let resultadosFiltrados = [];
 
-  const actualizarTabla = () => {
-    const grado = gradoSelect.value;
-    const seccion = seccionSelect.value;
-    const mes = mesSelect.value;
-
-    if (!grado || !seccion || !mes) return;
-
-    const alumnosFiltrados = alumnosData.filter(
-      a => a.grado === grado && a.seccion === seccion
-    );
-
-    const pagosDelMes = historialData.filter(
-      h => h.grado === grado && h.seccion === seccion && h.mes === mes
-    );
-
-    const resultados = alumnosFiltrados.map(alumno => {
-      const pago = pagosDelMes.find(p => p.alumno === alumno.alumno);
-      return {
-        alumno: alumno.alumno,
-        mes: mes,
-        fecha: pago ? pago.fecha : '',
-        monto: pago ? pago.monto : 0
-      };
-    });
-
-    resultadosFiltrados = resultados;
-    mostrarResultados(resultados);
-  };
-
-  const mostrarResultados = (lista) => {
+  // pinta una fila de "No hay pagos..." o los pagos
+  function mostrarResultados(lista) {
     tablaBody.innerHTML = '';
-
     if (lista.length === 0) {
-      const fila = document.createElement('tr');
-      const celda = document.createElement('td');
-      celda.colSpan = 4;
-      celda.textContent = 'No hay pagos registrados para esta combinación.';
-      fila.appendChild(celda);
-      tablaBody.appendChild(fila);
+      const tr = document.createElement('tr');
+      const td = document.createElement('td');
+      td.colSpan = 4;
+      td.textContent = 'No hay pagos registrados para esta combinación.';
+      tr.appendChild(td);
+      tablaBody.appendChild(tr);
       return;
     }
-
     lista.forEach(pago => {
-      const fila = document.createElement('tr');
-      fila.innerHTML = `
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
         <td>${pago.alumno}</td>
         <td>${pago.mes}</td>
         <td>${pago.fecha}</td>
         <td>${pago.monto.toFixed(2)}</td>
       `;
-      tablaBody.appendChild(fila);
+      tablaBody.appendChild(tr);
     });
-  };
+  }
 
-  const mostrarDeudores = () => {
-    const grado = gradoSelect.value;
+  // actualiza resultadosFiltrados tras cambiar filtros y pinta tabla inicial
+  function actualizarTabla() {
+    const grado   = gradoSelect.value;
     const seccion = seccionSelect.value;
-    const mes = mesSelect.value;
+    const mes     = mesSelect.value;
 
-    if (!grado || !seccion || !mes) return;
-
-    const alumnosFiltrados = alumnosData.filter(
-      a => a.grado === grado && a.seccion === seccion
-    );
-
-    const pagosDelMes = historialData.filter(
-      h => h.grado === grado && h.seccion === seccion && h.mes === mes
-    );
-
-    const nombresQuePagaron = pagosDelMes.map(p => p.alumno);
-
-    const deudores = alumnosFiltrados
-      .filter(a => !nombresQuePagaron.includes(a.alumno))
-      .map(a => ({
-        alumno: a.alumno,
-        mes: mes,
-        fecha: '',
-        monto: 0
-      }));
-
-    mostrarResultados(deudores);
-  };
-
-  const filtrarPorAlumno = () => {
-    const texto = buscadorInput.value.trim().toLowerCase();
-    sugerenciasDiv.innerHTML = '';
-
-    if (!texto) {
-      mostrarResultados(resultadosFiltrados);
+    if (!grado || !seccion || !mes) {
+      resultadosFiltrados = [];
+      mostrarResultados([]);
       return;
     }
 
-    const filtrados = resultadosFiltrados.filter(p =>
-      p.alumno.toLowerCase().includes(texto)
+    const alumnosFiltrados = alumnosData.filter(a =>
+      a.grado === grado && a.seccion === seccion
     );
-    mostrarResultados(filtrados);
+    const pagosDelMes = historialData.filter(h =>
+      h.grado === grado && h.seccion === seccion && h.mes === mes
+    );
 
-    const nombresUnicos = [...new Set(filtrados.map(p => p.alumno))];
+    resultadosFiltrados = alumnosFiltrados.map(a => {
+      const pago = pagosDelMes.find(p => p.alumno === a.alumno);
+      return {
+        alumno: a.alumno,
+        mes,
+        fecha: pago ? pago.fecha : '',
+        monto: pago ? pago.monto : 0
+      };
+    });
 
-    nombresUnicos.forEach(nombre => {
-      const sugerencia = document.createElement('div');
-      sugerencia.textContent = nombre;
-      sugerencia.addEventListener('click', () => {
+    // al iniciar tras filtros, pintamos TODO el listado
+    mostrarResultados(resultadosFiltrados);
+  }
+
+  // al click en "Mostrar deudores"
+  function mostrarDeudores() {
+    mostrarResultados(resultadosFiltrados.filter(r => r.monto === 0));
+  }
+
+  // muestra sólo las sugerencias sin tocar la tabla
+  function actualizarSugerencias() {
+    const term = buscadorInput.value.trim().toLowerCase();
+    sugerenciasDiv.innerHTML = '';
+    if (!term) return;
+
+    // obtengo nombres únicos que coinciden en resultadosFiltrados
+    const nombres = [...new Set(
+      resultadosFiltrados
+        .filter(r => r.alumno.toLowerCase().includes(term))
+        .map(r => r.alumno)
+    )];
+
+    nombres.forEach(nombre => {
+      const div = document.createElement('div');
+      div.textContent = nombre;
+      div.classList.add('hp-sugerencia-item');
+      div.addEventListener('click', () => {
+        // al seleccionar, pinto sólo esa fila en la tabla
         buscadorInput.value = nombre;
         sugerenciasDiv.innerHTML = '';
-        const exacto = resultadosFiltrados.filter(p =>
-          p.alumno.toLowerCase() === nombre.toLowerCase()
+        mostrarResultados(
+          resultadosFiltrados.filter(r =>
+            r.alumno.toLowerCase() === nombre.toLowerCase()
+          )
         );
-        mostrarResultados(exacto);
       });
-      sugerenciasDiv.appendChild(sugerencia);
+      sugerenciasDiv.appendChild(div);
     });
-  };
+  }
 
-  // Eventos
-  gradoSelect.addEventListener('change', actualizarTabla);
+  // listeners
+  gradoSelect  .addEventListener('change', actualizarTabla);
   seccionSelect.addEventListener('change', actualizarTabla);
-  mesSelect.addEventListener('change', actualizarTabla);
-  buscadorInput.addEventListener('input', filtrarPorAlumno);
-  buscadorInput.addEventListener('blur', () => {
-    setTimeout(() => sugerenciasDiv.innerHTML = '', 150);
-  });
-  btnDeudores.addEventListener('click', mostrarDeudores);
+  mesSelect    .addEventListener('change', actualizarTabla);
+  btnDeudores  .addEventListener('click', mostrarDeudores);
+
+  buscadorInput
+    .addEventListener('input', actualizarSugerencias);
+
+  buscadorInput
+    .addEventListener('blur', () => {
+      // cierra sugerencias tras perder foco
+      setTimeout(() => sugerenciasDiv.innerHTML = '', 150);
+    });
+
+  // tabla visible desde el inicio (sólo header + "No hay pagos…")
+  mostrarResultados([]);
 }
+
+document.addEventListener('DOMContentLoaded', () => initHistorialPagos());
