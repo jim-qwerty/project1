@@ -1,66 +1,146 @@
+/* resources/css/forms/gestionUsuarios/listaUsuarios.css */
+
+/*========== Reset y fuente ==========*/
+.lu-wrapper * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
+
+/*========== Fondo general del contenedor ==========*/
+.lu-wrapper {
+  min-height: 100vh;
+  background: #F4F4F4;
+  padding: 30px;
+}
+
+/*========== Estilo del formulario ==========*/
 .lu-wrapper .lu-form {
-  font-family: Arial, sans-serif;
-  max-width: 700px;
-  margin: 1rem auto;
-  padding: 1rem;
-  background: #f9f9f9;
-  border-radius: 8px;
-  border: 1px solid #ddd;
+  background: #FFFFFF;
+  padding: 20px;
+  border-radius: 10px;
+  margin: 0 auto 30px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  max-width: 1800px;
 }
 
+/*========== Título principal ==========*/
 .lu-wrapper .lu-titulo {
-  margin-bottom: 1rem;
+  font-size: 28px;
+  font-weight: 600;
+  text-align: center;
+  color: #6B001F;
+  margin-bottom: 30px;
 }
 
+/*========== Filtros (Rol + Buscador) ==========*/
 .lu-wrapper .lu-filtros {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
   align-items: center;
-  gap: 1rem;
-  margin-bottom: 1rem;
+  margin-bottom: 30px;
 }
 
-.lu-wrapper .lu-label {
-  font-weight: bold;
+/*========== Etiquetas dentro de filtros ==========*/
+.lu-wrapper .lu-filtros .lu-label {
+  display: flex;
+  flex-direction: column;
+  font-weight: 500;
+  color: #333333;
 }
 
+/*========== Inputs y selects dentro de filtros ==========*/
 .lu-wrapper .lu-select,
 .lu-wrapper .lu-input {
-  padding: 0.4rem;
-  border-radius: 4px;
-  border: 1px solid #ccc;
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #CCCCCC;
+  border-radius: 5px;
+  background: #FAFAFA;
+  transition: border-color 0.2s ease;
+}
+.lu-wrapper .lu-select:focus,
+.lu-wrapper .lu-input:focus {
+  outline: none;
+  border-color: #6B001F;
 }
 
-.lu-wrapper .lu-input {
-  flex: 1;
-  min-width: 200px;
+/*========== Sugerencias debajo del buscador ==========*/
+.lu-wrapper .lu-busqueda-wrapper {
+  position: relative;
+}
+.lu-wrapper .lu-sugerencias {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: #FFFFFF;
+  border: 1px solid #CCCCCC;
+  border-radius: 5px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 10;
+}
+.lu-wrapper .lu-sugerencias div {
+  padding: 12px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #333333;
+  border-bottom: 1px solid #EEEEEE;
+  transition: background-color 0.2s;
+}
+.lu-wrapper .lu-sugerencias div:last-child {
+  border-bottom: none;
+}
+.lu-wrapper .lu-sugerencias div:hover {
+  background-color: #F4F4F4;
 }
 
+/*========== Tabla de usuarios ==========*/
 .lu-wrapper .lu-tabla {
   width: 100%;
   border-collapse: collapse;
-  background-color: white;
+  margin-bottom: 20px;
 }
-
 .lu-wrapper .lu-tabla th,
 .lu-wrapper .lu-tabla td {
-  border: 1px solid #ccc;
-  padding: 8px;
-  text-align: left;
+  border: 1px solid #DDD;
+  text-align: center;
+  padding: 10px;
+}
+.lu-wrapper .lu-tabla thead th {
+  background-color: #6B001F;
+  color: #FFFFFF;
+  font-weight: 600;
 }
 
-.lu-wrapper .lu-tabla th {
-  background-color: #eee;
-}
-
+/*========== Botones de acción ==========*/
 .lu-wrapper .ver-btn {
-  background-color: #007bff;
-  color: white;
+  padding: 10px 20px;
+  background: #FFC107;
+  color: #6B001F;
   border: none;
-  padding: 5px 8px;
-  border-radius: 4px;
+  border-radius: 5px;
+  font-size: 16px;
+  font-weight: 600;
   cursor: pointer;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+.lu-wrapper .ver-btn:hover {
+  background: #6B001F;
+  color: #FFFFFF;
 }
 
-.lu-wrapper .ver-btn:hover {
-  background-color: #0056b3;
+/*========== Responsive (móvil ≤768px) ==========*/
+@media screen and (max-width: 768px) {
+  .lu-wrapper .lu-form {
+    padding: 15px;
+  }
+  .lu-wrapper .lu-filtros {
+    grid-template-columns: 1fr;
+  }
 }
