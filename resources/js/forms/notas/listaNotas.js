@@ -16,7 +16,7 @@ export default function initListaNotas(container = document.querySelector('.ln-w
   // Datos simulados
   const datosNotas = {
     '1-A': [
-      { nombre: 'Pedro García',    c1: 'A', c2: 'B', c3: 'A', final: 'A' },
+      { nombre: 'Pedro García ASLDKAJSLDKAJSLD ALSKDJALSDJALKSD',    c1: 'A', c2: 'B', c3: 'A', final: 'A' },
       { nombre: 'María Torres',    c1: 'B', c2: 'B', c3: 'C', final: 'B' }
     ],
     '2-B': [

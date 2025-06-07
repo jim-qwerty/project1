@@ -1,84 +1,140 @@
-.pm-wrapper .pm-form {
-  padding: 1rem;
-  font-family: Arial, sans-serif;
-  background-color: #fdfdfd;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  max-width: 600px;
-  margin: auto;
+/*========== Reset y fuente ==========*/
+.pm-wrapper * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
 }
 
+/*========== Fondo general del contenedor ==========*/
+.pm-wrapper {
+  min-height: 100vh;
+  background: #F4F4F4; /* Gris muy claro */
+  padding: 30px;
+}
+
+/*========== Título principal del formulario ==========*/
 .pm-wrapper .pm-titulo {
-  margin-bottom: 1rem;
+  width: 100%;
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 30px;
+  text-align: center;
+  color: #6B001F; /* Burdeos oscuro */
 }
 
-.pm-wrapper .pm-filtros {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-
-.pm-wrapper .pm-label {
+/*========== Estilo del formulario ==========*/
+.pm-wrapper .pm-form {
+  background: #FFFFFF;
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 1200px;
+  margin: 0 auto 30px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
   display: flex;
   flex-direction: column;
-  font-weight: bold;
+  gap: 20px;
 }
 
-.pm-wrapper .pm-input,
-.pm-wrapper .pm-select {
-  padding: 0.5rem;
-  border-radius: 4px;
-  border: 1px solid #999;
+/*========== Grupo de filtros ==========*/
+.pm-wrapper .pm-filtros {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
 }
 
-.pm-wrapper .pm-btn {
-  padding: 0.6rem 1.2rem;
-  background-color: #4caf50;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.pm-wrapper .pm-btn:hover {
-  background-color: #388e3c;
-}
-
-.pm-wrapper .pm-mensaje {
-  margin-top: 1rem;
-  font-weight: bold;
-  color: green;
-}
-
+/*========== Campo “Alumno” ==========*/
 .pm-wrapper .pm-campo-alumno {
   position: relative;
   display: flex;
   flex-direction: column;
-  margin-bottom: 1rem;
 }
 
+/*========== Etiqueta de campo ==========*/
+.pm-wrapper .pm-label {
+  font-weight: 500;
+  margin-bottom: 5px;
+  color: #333333;
+  display: block;
+}
+
+/*========== Inputs y selects ==========*/
+.pm-wrapper .pm-input,
+.pm-wrapper .pm-select {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  border-radius: 5px;
+  border: 1px solid #CCCCCC;
+  background-color: #FAFAFA;
+  transition: border-color 0.2s ease;
+}
+
+.pm-wrapper .pm-input:focus,
+.pm-wrapper .pm-select:focus {
+  outline: none;
+  border-color: #6B001F; /* Burdeos oscuro */
+}
+
+/*========== Lista de coincidencias ==========*/
 .pm-wrapper .pm-lista-coincidencias {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  border: 1px solid #ccc;
-  max-height: 150px;
-  overflow-y: auto;
-  background: white;
   position: absolute;
-  top: 100%;
+  top: calc(100% + 5px);
   left: 0;
   width: 100%;
-  z-index: 10;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid #CCCCCC;
+  border-radius: 5px;
+  background: #FFFFFF;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 20;
 }
 
 .pm-wrapper .pm-lista-coincidencias li {
-  padding: 5px;
+  padding: 8px 10px;
   cursor: pointer;
+  color: #333333;
 }
 
 .pm-wrapper .pm-lista-coincidencias li:hover {
-  background-color: #eee;
+  background-color: #F5F5F5;
+}
+
+/*========== Botón principal ==========*/
+.pm-wrapper .pm-btn {
+  padding: 10px 30px;
+  background-color: #FFC107; /* Dorado */
+  color: #6B001F;            /* Burdeos */
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  align-self: flex-start;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+.pm-wrapper .pm-btn:hover {
+  background-color: #6B001F; /* Burdeos oscuro */
+  color: #FFFFFF;
+}
+
+/*========== Mensaje de confirmación ==========*/
+.pm-wrapper .pm-mensaje {
+  margin-top: 15px;
+  color: green;
+  font-weight: 600;
+}
+
+/*========== Responsive (móvil ≤768px) ==========*/
+@media screen and (max-width: 768px) {
+  .pm-wrapper .pm-form {
+    padding: 15px;
+  }
+  .pm-wrapper .pm-filtros {
+    grid-template-columns: 1fr;
+  }
 }
