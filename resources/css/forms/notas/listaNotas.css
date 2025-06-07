@@ -1,65 +1,124 @@
-.ln-wrapper .ln-form {
-  font-family: Arial, sans-serif;
-  padding: 20px;
-  background-color: #f2f2f2;
-  border-radius: 10px;
-  max-width: 900px;
-  margin: auto;
+/*========== Reset y fuente ==========*/
+.ln-wrapper * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
 }
 
+/*========== Fondo general ==========*/
+.ln-wrapper {
+  min-height: 100vh;
+  background: #F4F4F4;
+  padding: 30px;
+}
+
+/*========== Título principal ==========*/
+.ln-wrapper .ln-title {
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 30px;
+  text-align: center;
+  color: #6B001F;
+}
+
+/*========== Formulario ==========*/
+.ln-wrapper .ln-form {
+  background: #FFFFFF;
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 1200px;
+  margin: 0 auto;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+/*========== Filtros ==========*/
 .ln-wrapper .ln-filtros {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+/*========== Etiqueta ==========*/
+.ln-wrapper .ln-label {
+  font-weight: 500;
+  margin-bottom: 5px;
+  color: #333333;
+  display: block;
+}
+
+/*========== Inputs y selects ==========*/
+.ln-wrapper .ln-input,
+.ln-wrapper .ln-select {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #CCCCCC;
+  border-radius: 5px;
+  background-color: #FAFAFA;
+  transition: border-color 0.2s ease;
+}
+
+.ln-wrapper .ln-input:focus,
+.ln-wrapper .ln-select:focus {
+  outline: none;
+  border-color: #6B001F;
+}
+
+/*========== Tabla contenedor ==========*/
+.ln-wrapper .ln-tabla-contenedor {
+  width: 100%;
+  overflow-x: auto;
   margin-bottom: 20px;
 }
 
-.ln-wrapper .ln-label {
-  display: flex;
-  flex-direction: column;
-  font-weight: bold;
-}
-
-.ln-wrapper .ln-select {
-  padding: 8px;
-  font-size: 14px;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-}
-
+/*========== Tabla ==========*/
 .ln-wrapper .ln-tabla {
-  overflow-x: auto;
-}
-
-.ln-wrapper .ln-tabla table {
   width: 100%;
   border-collapse: collapse;
-  background-color: #fff;
-  margin-top: 10px;
+  background: #FFFFFF;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 0 10px rgba(0,0,0,0.05);
 }
 
 .ln-wrapper .ln-tabla th,
 .ln-wrapper .ln-tabla td {
-  border: 1px solid #ccc;
+  border: 1px solid #DDD;
   padding: 10px;
   text-align: center;
 }
 
-.ln-wrapper .ln-tabla th {
-  background-color: #e0e0e0;
+.ln-wrapper .ln-tabla thead th {
+  background-color: #6B001F;
+  color: #FFFFFF;
+  font-weight: 600;
 }
 
+/*========== Botón principal ==========*/
 .ln-wrapper .ln-btn {
+  display: inline-block;
   margin-top: 20px;
-  padding: 10px 15px;
-  font-size: 16px;
-  background-color: #1e88e5;
-  color: white;
+  padding: 10px 30px;
+  background-color: #FFC107;
+  color: #6B001F;
   border: none;
   border-radius: 5px;
+  font-size: 16px;
+  font-weight: 600;
   cursor: pointer;
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
 .ln-wrapper .ln-btn:hover {
-  background-color: #1565c0;
+  background-color: #6B001F;
+  color: #FFFFFF;
+}
+
+/*========== Responsive (móvil ≤768px) ==========*/
+@media screen and (max-width: 768px) {
+  .ln-wrapper .ln-filtros {
+    grid-template-columns: 1fr;
+  }
 }

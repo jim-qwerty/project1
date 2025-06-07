@@ -1,21 +1,14 @@
 <div class="ln-wrapper">
   <form id="formReporteNotas" class="ln-form">
+    <h2 class="ln-title">Reporte de Notas</h2>
+
     <div class="ln-filtros">
       <label class="ln-label">Grado:
-        <select id="gradoSelect" name="grado" class="ln-select">
-          <option value="">--Selecciona--</option>
-          <option value="1">1</option>
-          <option value="2">2</option>
-          <option value="3">3</option>
-        </select>
+        <input type="text" id="gradoSelect" name="grado" class="ln-input" placeholder="Ej. 1">
       </label>
 
       <label class="ln-label">Sección:
-        <select id="seccionSelect" name="seccion" class="ln-select">
-          <option value="">--Selecciona--</option>
-          <option value="A">A</option>
-          <option value="B">B</option>
-        </select>
+        <input type="text" id="seccionSelect" name="seccion" class="ln-input" placeholder="Ej. A">
       </label>
 
       <label class="ln-label">Curso:
@@ -37,8 +30,25 @@
       </label>
     </div>
 
-    <div id="tablaNotas" class="ln-tabla"></div>
+    <div id="tablaNotas" class="ln-tabla-contenedor">
+      <table class="ln-tabla">
+        <thead>
+          <tr>
+            <th>Alumno</th>
+            <th>Competencia 1</th>
+            <th>Competencia 2</th>
+            <th>Competencia 3</th>
+            <th>Nota Final</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{-- JS inyecta aquí las filas sólo cuando completan filtros --}}
+        </tbody>
+      </table>
+    </div>
 
-    <button id="btnReporte" type="submit" class="ln-btn" style="display: none;">📄 Generar Reporte</button>
+    <button id="btnReporte" type="submit" class="ln-btn">📄 Generar Reporte</button>
   </form>
 </div>
+
+
