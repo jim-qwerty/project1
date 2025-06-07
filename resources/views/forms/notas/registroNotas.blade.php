@@ -1,23 +1,30 @@
+{{-- resources/views/registroNotas.blade.php --}}
 <div class="rn-wrapper">
   <form id="formularioNotas" class="rn-form">
+    <h2>Registro de Notas</h2>
+
     <div class="rn-input-group">
+      <!-- GRADO como campo de texto -->
       <label class="rn-label">Grado:
-        <select id="gradoSelect" class="rn-select">
-          <option value="">Seleccionar</option>
-          <option value="1">1°</option>
-          <option value="2">2°</option>
-          <option value="3">3°</option>
-        </select>
+        <input
+          type="text"
+          id="gradoSelect"
+          class="rn-input"
+          placeholder="Ej. 1°"
+        >
       </label>
 
+      <!-- SECCIÓN como campo de texto -->
       <label class="rn-label">Sección:
-        <select id="seccionSelect" class="rn-select">
-          <option value="">Seleccionar</option>
-          <option value="A">A</option>
-          <option value="B">B</option>
-        </select>
+        <input
+          type="text"
+          id="seccionSelect"
+          class="rn-input"
+          placeholder="Ej. A"
+        >
       </label>
 
+      <!-- CURSO sigue siendo select -->
       <label class="rn-label">Curso:
         <select id="cursoSelect" class="rn-select">
           <option value="">Seleccionar</option>
@@ -29,6 +36,7 @@
         </select>
       </label>
 
+      <!-- BIMESTRE sigue siendo select -->
       <label class="rn-label">Bimestre:
         <select id="bimestreSelect" class="rn-select">
           <option value="">Seleccionar</option>
@@ -40,7 +48,7 @@
       </label>
     </div>
 
-    <div id="panelNotas" class="rn-panel" style="display:none">
+    <div id="panelNotas" class="rn-panel">
       <label class="rn-label">Buscar alumno:
         <input type="text" id="buscarAlumno" class="rn-input" placeholder="Nombre">
       </label>
@@ -58,38 +66,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>1</td>
-            <td id="nombreAlumno">---</td>
-            <td>
-              <div class="rn-radio-group">
-                <label><input type="radio" name="c1" value="A">A</label>
-                <label><input type="radio" name="c1" value="B">B</label>
-                <label><input type="radio" name="c1" value="C">C</label>
-              </div>
-            </td>
-            <td>
-              <div class="rn-radio-group">
-                <label><input type="radio" name="c2" value="A">A</label>
-                <label><input type="radio" name="c2" value="B">B</label>
-                <label><input type="radio" name="c2" value="C">C</label>
-              </div>
-            </td>
-            <td>
-              <div class="rn-radio-group">
-                <label><input type="radio" name="c3" value="A">A</label>
-                <label><input type="radio" name="c3" value="B">B</label>
-                <label><input type="radio" name="c3" value="C">C</label>
-              </div>
-            </td>
-            <td>
-              <div class="rn-radio-group">
-                <label><input type="radio" name="final" value="A">A</label>
-                <label><input type="radio" name="final" value="B">B</label>
-                <label><input type="radio" name="final" value="C">C</label>
-              </div>
-            </td>
-          </tr>
+          {{-- JS inyectará aquí una fila por cada alumno --}}
         </tbody>
       </table>
 
@@ -100,3 +77,5 @@
     </div>
   </form>
 </div>
+
+
