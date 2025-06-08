@@ -33,17 +33,21 @@ export default function initAgregarProfesores(
   // === 1) Sección de valores estáticos ===
   // Si quieres asegurar siempre unas opciones mínimas, rellena aquí:
   const gradosEstaticos = [
-    { id: 1, nombre: '1' },
-    { id: 2, nombre: '2' },
-    { id: 3, nombre: '3' },
-    { id: 4, nombre: '4' },
-    { id: 5, nombre: '5' },
-    { id: 6, nombre: '6' },
+    { id: 1, nombre: '3 años' },
+    { id: 2, nombre: '4 años' },
+    { id: 3, nombre: '5 años' },
+    { id: 4, nombre: 'Primero' },
+    { id: 5, nombre: 'Segundo' },
+    { id: 6, nombre: 'Tercero' },
+    { id: 7, nombre: 'Cuarto' },
+    { id: 8, nombre: 'Quinto' },
+    { id: 9, nombre: 'Sexto' },
+    
   ];
   const seccionesEstaticas = [
-    { id: 'A', nombre: 'A' },
-    { id: 'B', nombre: 'B' },
-    { id: 'C', nombre: 'C' },
+    { id: '1', nombre: 'A' },
+    { id: '2', nombre: 'B' },
+    { id: '3', nombre: 'C' },
     
   ];
 
@@ -73,54 +77,7 @@ export default function initAgregarProfesores(
   });
 
 
-  /*
-  // ====== Cargar datos dinámicos (si existen) ======
-  if (window.initialData) {
-    // Si el backend embebe initialData, sobreescribe los estáticos:
-    const { grados, secciones } = window.initialData;
-    gradoSelect.innerHTML    = '<option value="">Seleccione un grado</option>';
-    seccionSelect.innerHTML  = '<option value="">Seleccione una sección</option>';
-
-    grados.forEach(g =>
-      gradoSelect.insertAdjacentHTML(
-        'beforeend',
-        `<option value="${g.id}">${g.nombre}</option>`
-      )
-    );
-    secciones.forEach(s =>
-      seccionSelect.insertAdjacentHTML(
-        'beforeend',
-        `<option value="${s.id}">${s.nombre ?? s.id}</option>`
-      )
-    );
-  } else {
-    // Intento por API si no hay initialData
-    axios.get('/api/grados')
-      .then(({ data }) => {
-        gradoSelect.innerHTML = '<option value="">Seleccione un grado</option>';
-        data.forEach(g =>
-          gradoSelect.insertAdjacentHTML(
-            'beforeend',
-            `<option value="${g.id}">${g.nombre}</option>`
-          )
-        );
-      })
-      .catch(() => {/* ignora fallo, quedan los estáticos });
-/*
-    axios.get('/api/secciones')
-      .then(({ data }) => {
-        seccionSelect.innerHTML = '<option value="">Seleccione una sección</option>';
-        data.forEach(s =>
-          seccionSelect.insertAdjacentHTML(
-            'beforeend',
-            `<option value="${s.id}">${s.nombre ?? s.id}</option>`
-          )
-        );
-      })
-      .catch(() => {/* ignora fallo, quedan los estáticos });
-  }
-
-  */
+  
 
   // ====== Envío del formulario ======
   form.addEventListener('submit', e => {
@@ -132,8 +89,8 @@ export default function initAgregarProfesores(
       dni:                 form.dni.value.trim(),
       fecha_nacimiento:    form.fecha_nacimiento.value,
       edad:                form.edad.value || null,
-      grado_asignado_id:   form.grado_asignado_id.value,
-      seccion_asignada_id: form.seccion_asignada_id.value,
+      grado_asignado_id:   form.grado_asignado_id.value.trim(),
+      seccion_asignada_id: form.seccion_asignada_id.value.trim(),
       correo_electronico:  form.correo_electronico.value.trim(),
       celular:             form.celular.value.trim(),
       direccion:           form.direccion.value.trim(),

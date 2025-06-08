@@ -31,24 +31,33 @@ class DocenteController extends Controller
 
     public function store(Request $request)
 {
+    // 1) Validación
     $datos = $request->validate([
-        'nombres'               => 'required|string|max:100',
-        'apellidos'             => 'required|string|max:100',
-        'dni'                   => 'required|size:8|unique:docentes,dni',
-        'fecha_nacimiento'      => 'required|date',
-        'edad'                  => 'nullable|integer',
-        'grado_asignado_id'     => 'required|exists:grados,id',
-        'seccion_asignada_id'   => 'required|exists:secciones,id',
-        'correo_electronico'    => 'required|email|max:100',
-        'celular'               => 'required|size:9',
-        'direccion'             => 'required|string|max:200',
-        'sexo'                  => 'required|in:M,F',
-        'estado'                => 'required|in:activo,inactivo',
+        'nombres'             => 'required|string|max:100',
+        'apellidos'           => 'required|string|max:100',
+        'dni'                 => 'required|size:8|unique:docentes,dni',
+        'fecha_nacimiento'    => 'required|date',
+        'edad'                => 'nullable|integer',
+        'grado_asignado_id'   => 'required|exists:grados,id',
+        'seccion_asignada_id' => 'required|exists:secciones,id',
+        'correo_electronico'  => 'required|email|max:100',
+        'celular'             => 'required|size:9',
+        'direccion'           => 'required|string|max:200',
+        'sexo'                => 'required|in:M,F',
+        'estado'              => 'required|in:activo,inactivo',
     ]);
 
+    // 2) Persistencia a través de tu servicio
     $docente = $this->service->crear($datos);
 
-    return response()->json($docente, 201);
+    // 3) ¿Cómo respondes?
+    // - Si es formulario tradicional: rediriges con mensaje de éxito
+    return redirect()
+        ->back()
+        ->with('success', 'Docente registrado correctamente.');
+
+    // - Si es AJAX (JSON): devuelves el objeto y código 201
+    // return response()->json($docente, 201);
 }
 
     public function show($id)

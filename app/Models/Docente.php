@@ -7,9 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 class Docente extends Model
 {
     protected $fillable = [
-        'nombres', 'apellidos', 'dni', 'fecha_nacimiento', 'edad',
-        'grado_asignado_id', 'seccion_asignada_id', 'correo_electronico',
-        'celular', 'direccion', 'sexo', 'estado'
+      'nombres','apellidos','dni','fecha_nacimiento','edad',
+      'grado_asignado_id','seccion_asignada_id',
+      'correo_electronico','celular','direccion','sexo','estado',
     ];
 
     // Un docente asignado a un grado y sección
