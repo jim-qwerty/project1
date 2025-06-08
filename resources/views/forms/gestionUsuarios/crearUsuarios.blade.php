@@ -1,14 +1,5 @@
-{{-- resources/views/forms/gestionUsuarios/crearUsuarios.blade.php --}}
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <meta name="csrf-token" content="{{ csrf_token() }}">
-  <title>Crear Usuario</title>
-  @vite(['resources/css/forms/gestionUsuarios/crearUsuarios.css', 'resources/js/forms/gestionUsuarios/crearUsuarios.js'])
-</head>
-<body>
+
+
   <div class="cu-wrapper">
     <form id="formularioCrearUsuario"
           class="cu-form"
@@ -69,5 +60,4 @@
       <p id="mensaje" class="cu-mensaje"></p>
     </form>
   </div>
-</body>
-</html>
+
