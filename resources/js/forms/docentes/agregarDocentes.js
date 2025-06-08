@@ -10,10 +10,12 @@ export default function initAgregarProfesores(
     return;
   }
 
-  const form = container.querySelector('#formulario-profesor');
-  const mensaje = container.querySelector('#mensaje');
-  const fechaNacimiento = form.querySelector('#fechaNacimiento');
-  const edadInput = form.querySelector('#edad');
+  const form             = container.querySelector('#formulario-profesor');
+  const gradoSelect      = form.querySelector('#gradoAsignado');
+  const seccionSelect    = form.querySelector('#seccionAsignada');
+  const mensaje          = container.querySelector('#mensaje');
+  const fechaNacimiento  = form.querySelector('#fechaNacimiento');
+  const edadInput        = form.querySelector('#edad');
 
   if (!form || !fechaNacimiento || !edadInput) {
     console.warn("Faltan elementos esenciales en el formulario");
@@ -28,16 +30,99 @@ export default function initAgregarProfesores(
     console.warn("No se encontró <meta name=\"csrf-token\">");
   }
 
+  // === 1) Sección de valores estáticos ===
+  // Si quieres asegurar siempre unas opciones mínimas, rellena aquí:
+  const gradosEstaticos = [
+    { id: 1, nombre: '1' },
+    { id: 2, nombre: '2' },
+    { id: 3, nombre: '3' },
+    { id: 4, nombre: '4' },
+    { id: 5, nombre: '5' },
+    { id: 6, nombre: '6' },
+  ];
+  const seccionesEstaticas = [
+    { id: 'A', nombre: 'A' },
+    { id: 'B', nombre: 'B' },
+    { id: 'C', nombre: 'C' },
+    
+  ];
+
+  // Inserta los valores estáticos
+  gradosEstaticos.forEach(g =>
+    gradoSelect.insertAdjacentHTML(
+      'beforeend',
+      `<option value="${g.id}">${g.nombre}</option>`
+    )
+  );
+  seccionesEstaticas.forEach(s =>
+    seccionSelect.insertAdjacentHTML(
+      'beforeend',
+      `<option value="${s.id}">${s.nombre}</option>`
+    )
+  );
+  // ======================================
+
   // Calcular edad al cambiar fecha
   fechaNacimiento.addEventListener('change', () => {
     const fecha = new Date(fechaNacimiento.value);
-    const hoy = new Date();
-    let edad = hoy.getFullYear() - fecha.getFullYear();
-    const mes = hoy.getMonth() - fecha.getMonth();
+    const hoy   = new Date();
+    let edad    = hoy.getFullYear() - fecha.getFullYear();
+    const mes   = hoy.getMonth() - fecha.getMonth();
     if (mes < 0 || (mes === 0 && hoy.getDate() < fecha.getDate())) edad--;
     edadInput.value = isNaN(edad) ? '' : edad;
   });
 
+
+  /*
+  // ====== Cargar datos dinámicos (si existen) ======
+  if (window.initialData) {
+    // Si el backend embebe initialData, sobreescribe los estáticos:
+    const { grados, secciones } = window.initialData;
+    gradoSelect.innerHTML    = '<option value="">Seleccione un grado</option>';
+    seccionSelect.innerHTML  = '<option value="">Seleccione una sección</option>';
+
+    grados.forEach(g =>
+      gradoSelect.insertAdjacentHTML(
+        'beforeend',
+        `<option value="${g.id}">${g.nombre}</option>`
+      )
+    );
+    secciones.forEach(s =>
+      seccionSelect.insertAdjacentHTML(
+        'beforeend',
+        `<option value="${s.id}">${s.nombre ?? s.id}</option>`
+      )
+    );
+  } else {
+    // Intento por API si no hay initialData
+    axios.get('/api/grados')
+      .then(({ data }) => {
+        gradoSelect.innerHTML = '<option value="">Seleccione un grado</option>';
+        data.forEach(g =>
+          gradoSelect.insertAdjacentHTML(
+            'beforeend',
+            `<option value="${g.id}">${g.nombre}</option>`
+          )
+        );
+      })
+      .catch(() => {/* ignora fallo, quedan los estáticos });
+/*
+    axios.get('/api/secciones')
+      .then(({ data }) => {
+        seccionSelect.innerHTML = '<option value="">Seleccione una sección</option>';
+        data.forEach(s =>
+          seccionSelect.insertAdjacentHTML(
+            'beforeend',
+            `<option value="${s.id}">${s.nombre ?? s.id}</option>`
+          )
+        );
+      })
+      .catch(() => {/* ignora fallo, quedan los estáticos });
+  }
+
+  */
+
+  // ====== Envío del formulario ======
   form.addEventListener('submit', e => {
     e.preventDefault();
 

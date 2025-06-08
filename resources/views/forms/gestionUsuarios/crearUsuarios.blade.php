@@ -1,6 +1,6 @@
-
-
   <div class="cu-wrapper">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
     <form id="formularioCrearUsuario"
           class="cu-form"
           autocomplete="off"

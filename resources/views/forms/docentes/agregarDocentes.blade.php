@@ -1,3 +1,6 @@
+{{-- resources/views/docentes/agregarDocente.blade.php --}}
+
+<!-- Token CSRF para protección contra CSRF -->
 <meta name="csrf-token" content="{{ csrf_token() }}">
 
 <div id="agregar-profesores" class="ap-wrapper">
@@ -15,6 +18,7 @@
       <div class="ap-input-box">
         <span class="ap-details">Nombres</span>
         <input type="text"
+               id="inputNombres"
                name="nombres"
                required
                placeholder="Ingrese nombres"
@@ -25,6 +29,7 @@
       <div class="ap-input-box">
         <span class="ap-details">Apellidos</span>
         <input type="text"
+               id="inputApellidos"
                name="apellidos"
                required
                placeholder="Ingrese apellidos"
@@ -35,6 +40,7 @@
       <div class="ap-input-box">
         <span class="ap-details">DNI</span>
         <input type="text"
+               id="inputDni"
                name="dni"
                required
                placeholder="Ingrese DNI"
@@ -48,7 +54,7 @@
         <input type="date"
                id="fechaNacimiento"
                name="fecha_nacimiento"
-               required />
+               required>
       </div>
 
       <div class="ap-input-box">
@@ -56,36 +62,31 @@
         <input type="text"
                id="edad"
                name="edad"
-               readonly />
+               readonly>
       </div>
 
       <div class="ap-input-box">
         <span class="ap-details">Grado asignado</span>
-        <select name="grado_asignado_id" required>
+        <select id="gradoAsignado"
+                name="grado_asignado_id"
+                required>
           <option value="">Seleccione un grado</option>
-          <option value="1">1°</option>
-          <option value="2">2°</option>
-          <option value="3">3°</option>
-          <option value="4">4°</option>
-          <option value="5">5°</option>
-          <option value="6">6°</option>
         </select>
       </div>
 
       <div class="ap-input-box">
         <span class="ap-details">Sección asignada</span>
-        <select name="seccion_asignada_id" required>
+        <select id="seccionAsignada"
+                name="seccion_asignada_id"
+                required>
           <option value="">Seleccione una sección</option>
-          <option value="A">A</option>
-          <option value="B">B</option>
-          <option value="C">C</option>
-          <option value="D">D</option>
         </select>
       </div>
 
       <div class="ap-input-box">
         <span class="ap-details">Correo</span>
         <input type="email"
+               id="inputCorreo"
                name="correo_electronico"
                required
                placeholder="ejemplo@correo.com">
@@ -94,6 +95,7 @@
       <div class="ap-input-box">
         <span class="ap-details">Celular</span>
         <input type="text"
+               id="inputCelular"
                name="celular"
                required
                placeholder="Ingrese número"
@@ -105,6 +107,7 @@
       <div class="ap-input-box">
         <span class="ap-details">Dirección</span>
         <input type="text"
+               id="inputDireccion"
                name="direccion"
                required
                placeholder="Ingrese dirección">
@@ -137,3 +140,4 @@
 
   <div id="mensaje"></div>
 </div>
+
