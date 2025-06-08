@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Grado;    // ← importa tu modelo Grado
+use App\Models\Seccion;  // ← importa tu modelo Seccion
 
 class Docente extends Model
 {

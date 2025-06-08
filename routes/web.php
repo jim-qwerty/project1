@@ -28,6 +28,10 @@ Route::post('/docentes', [DocenteController::class, 'store'])
      ->name('docentes.store');
 
 
+     // Listar (JSON) todos los docentes
+Route::get('/docentes', [DocenteController::class, 'index'])
+     ->name('docentes.index');
+
 // Al final la ruta catch-all de formularios
 Route::get('/forms/{carpeta}/{formulario}', function ($carpeta, $formulario) {
     return view("forms.$carpeta.$formulario");

@@ -1,4 +1,4 @@
-<div class="lp-wrapper">
+<div id="lista-profesores" class="lp-wrapper">
   <form id="formListaProfesores">
     <div class="lp-filtros">
       <label for="gradoFiltro">Grado:</label>
