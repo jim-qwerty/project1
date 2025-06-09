@@ -11,46 +11,48 @@ export default function initListaProfesores(
   const buscador    = container.querySelector('#buscador');
   const cuerpoTabla = container.querySelector('#cuerpoTabla');
 
-  // Inicializamos vacío; luego cargamos desde la API
+  // Array que rellenaremos desde la API
   let profesores = [];
 
-  // Renderiza las filas según el array filtrado
+  // Función que renderiza la tabla
   const renderTabla = (filtrados) => {
     cuerpoTabla.innerHTML = '';
     filtrados.forEach((profesor, index) => {
       const fila = document.createElement('tr');
       fila.innerHTML = `
-  <td>${profesor.nombres}</td>
-  <td>${profesor.apellidos}</td>
-  <td>${profesor.grado_asignado?.nombre   ?? ''}</td>
-  <td>${profesor.seccion_asignada?.nombre ?? ''}</td>
-  <td class="estado-radio">
-    <label>
-      <input
-        type="radio"
-        name="estado${index}"
-        value="activo"
-        ${profesor.estado === 'activo' ? 'checked' : ''}>
-      Activo
-    </label>
-    <label>
-      <input
-        type="radio"
-        name="estado${index}"
-        value="inactivo"
-        ${profesor.estado === 'inactivo' ? 'checked' : ''}>
-      Inactivo
-    </label>
-  </td>
-  <td>
-    <button type="button" class="editar">Editar</button>
-  </td>
-`;
+        <td>${profesor.nombres}</td>
+        <td>${profesor.apellidos}</td>
+        <td>${profesor.grado_asignado?.nombre   ?? ''}</td>
+        <td>${profesor.seccion_asignada?.nombre ?? ''}</td>
+        <td>${profesor.correo_electronico}</td>
+        <td>${profesor.celular}</td>
+        <td class="estado-radio">
+          <label>
+            <input
+              type="radio"
+              name="estado${index}"
+              value="activo"
+              ${profesor.estado === 'activo' ? 'checked' : ''}>
+            Activo
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="estado${index}"
+              value="inactivo"
+              ${profesor.estado === 'inactivo' ? 'checked' : ''}>
+            Inactivo
+          </label>
+        </td>
+        <td>
+          <button type="button" class="editar">Editar</button>
+        </td>
+      `;
       cuerpoTabla.appendChild(fila);
     });
   };
 
-  // Filtra por grado y/o texto de búsqueda
+  // Filtrado por grado y texto
   const filtrarProfesores = () => {
     const gradoSel = gradoFiltro.value.toLowerCase();
     const text     = buscador.value.toLowerCase();
@@ -58,7 +60,7 @@ export default function initListaProfesores(
     const filtrados = profesores.filter(p => {
       const matchNombre   = p.nombres.toLowerCase().includes(text);
       const matchApellido = p.apellidos.toLowerCase().includes(text);
-      const matchGrado    = !gradoSel || (p.gradoAsignado?.nombre.toLowerCase() === gradoSel);
+      const matchGrado    = !gradoSel || (p.grado_asignado?.nombre.toLowerCase() === gradoSel);
       return (matchNombre || matchApellido) && matchGrado;
     });
 
@@ -69,7 +71,7 @@ export default function initListaProfesores(
   gradoFiltro.addEventListener('change', filtrarProfesores);
   buscador.addEventListener('input', filtrarProfesores);
 
-  // Carga inicial de datos desde la API
+  // Carga inicial desde el endpoint /docentes
   axios.get('/docentes')
     .then(({ data }) => {
       profesores = data;
@@ -80,5 +82,5 @@ export default function initListaProfesores(
     });
 }
 
-// Inicialización al cargar DOM
+// Inicialización al cargar el DOM
 document.addEventListener('DOMContentLoaded', () => initListaProfesores());

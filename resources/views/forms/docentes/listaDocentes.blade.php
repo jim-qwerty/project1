@@ -1,3 +1,4 @@
+{{-- resources/views/docentes/listaDocentes.blade.php --}}
 <div id="lista-profesores" class="lp-wrapper">
   <form id="formListaProfesores">
     <div class="lp-filtros">
@@ -7,10 +8,12 @@
         <option value="1ro">1ro</option>
         <option value="2do">2do</option>
         <option value="3ro">3ro</option>
-        <!-- Agrega más grados si es necesario -->
       </select>
 
-      <input type="text" id="buscador" name="buscador" placeholder="Buscar por nombre o apellido">
+      <input type="text"
+             id="buscador"
+             name="buscador"
+             placeholder="Buscar por nombre o apellido">
     </div>
 
     <table id="tablaProfesores" class="lp-tabla">
@@ -20,6 +23,8 @@
           <th>Apellido</th>
           <th>Grado</th>
           <th>Sección</th>
+          <th>Correo</th>        {{-- Nueva columna --}}
+          <th>Celular</th>       {{-- Nueva columna --}}
           <th>Estado</th>
           <th>Acción</th>
         </tr>
