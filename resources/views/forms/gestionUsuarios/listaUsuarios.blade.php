@@ -1,4 +1,7 @@
+{{-- resources/views/usuarios/listaUsuarios.blade.php --}}
 <div class="lu-wrapper">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+
   <form id="formUsuarios" class="lu-form">
     <h2 class="lu-titulo">Lista de Usuarios</h2>
 
@@ -21,7 +24,6 @@
           placeholder="Escriba el nombre…"
           autocomplete="off"
         />
-        <!-- contenedor de sugerencias -->
         <div id="sugerenciasNombres" class="lu-sugerencias"></div>
       </label>
     </div>
