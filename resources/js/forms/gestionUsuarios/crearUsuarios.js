@@ -5,14 +5,8 @@ import axios from 'axios';
 export default function initCrearUsuarios(container = document.querySelector('.cu-wrapper')) {
   if (!container) return;
 
-  const profesores = [
-    { id: 1, nombre: 'Juan Pérez' },
-    { id: 2, nombre: 'María García' },
-    { id: 3, nombre: 'Ana Gómez' },
-    { id: 4, nombre: 'Pedro Díaz' },
-    { id: 5, nombre: 'Lucía Torres' },
-    { id: 6, nombre: 'Carlos Ruiz' }
-  ];
+  // Array que luego llenaremos desde la API
+  let profesores = [];
 
   // Referencias UI
   const rolSel        = container.querySelector('#rolUsuario');
@@ -26,18 +20,23 @@ export default function initCrearUsuarios(container = document.querySelector('.c
   const form          = container.querySelector('#formularioCrearUsuario');
   const mensajeP      = container.querySelector('#mensaje');
 
-  // Limpia las sugerencias de la lista
+  // Deshabilita o habilita el buscador según rol
+  const toggleBuscador = () => {
+    const esProfesor = rolSel.value === 'profesor';
+    buscadorInp.disabled = !esProfesor;
+    if (!esProfesor) {
+      buscadorInp.value = '';
+      inputDocente.value = '';
+      limpiarSugerencias();
+    }
+  };
+
+  // Limpia el contenedor de sugerencias
   const limpiarSugerencias = () => {
     sugerDiv.innerHTML = '';
   };
 
-  // Devuelve sólo los nombres si el rol es profesor
-  const generarListaNombres = () =>
-    rolSel.value === 'profesor'
-      ? profesores.map(p => p.nombre)
-      : [];
-
-  // Muestra la caja de sugerencias
+  // Filtra los nombres de profesores según el término
   const mostrarSugerencias = () => {
     limpiarSugerencias();
     if (rolSel.value !== 'profesor') return;
@@ -45,17 +44,18 @@ export default function initCrearUsuarios(container = document.querySelector('.c
     const term = buscadorInp.value.trim().toLowerCase();
     if (!term) return;
 
-    generarListaNombres()
+    profesores
+      .map(p => p.nombre)
       .filter(nombre => nombre.toLowerCase().includes(term))
       .forEach(nombre => {
         const div = document.createElement('div');
         div.textContent = nombre;
         div.addEventListener('click', () => {
           buscadorInp.value = nombre;
-          // Asignar el id correspondiente
+          // Busca el objeto completo para obtener el id
           const docente = profesores.find(p => p.nombre === nombre);
-          inputDocente.value = docente ? docente.id : '';
-          // Rellenar nombres/apellidos
+          inputDocente.value = docente?.id || '';
+          // Rellena los campos de nombre y apellido
           const partes = nombre.split(' ');
           inputApellidos.value = partes.pop();
           inputNombres.value  = partes.join(' ');
@@ -65,20 +65,37 @@ export default function initCrearUsuarios(container = document.querySelector('.c
       });
   };
 
-  // Configurar CSRF para Axios
-  axios.defaults.headers.common['X-CSRF-TOKEN'] =
-    document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+  // Configura CSRF para Axios
+  const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+  if (csrfMeta) {
+    axios.defaults.headers.common['X-CSRF-TOKEN'] = csrfMeta.getAttribute('content');
+  }
 
-  // Eventos de sugerencias
-  rolSel.addEventListener('change', limpiarSugerencias);
+  // Eventos
+  rolSel.addEventListener('change', toggleBuscador);
   buscadorInp.addEventListener('input', mostrarSugerencias);
   buscadorInp.addEventListener('blur', () => setTimeout(limpiarSugerencias, 150));
 
-  // Evento de envío del formulario
+  // Inicializa el estado del buscador
+  toggleBuscador();
+
+  // ==== 1) Carga los profesores desde la API ====
+  axios.get('/docentes')
+    .then(({ data }) => {
+      // data debe ser un array de objetos { id, nombres, apellidos, ... }
+      // Aquí transformamos en [{ id, nombre: "Nombres Apellidos" }, ...]
+      profesores = data.map(d => ({
+        id: d.id,
+        nombre: `${d.nombres} ${d.apellidos}`
+      }));
+    })
+    .catch(err => console.error('Error cargando docentes:', err));
+  // ==============================================
+
+  // Envío del formulario
   form.addEventListener('submit', e => {
     e.preventDefault();
 
-    // Construimos el payload base
     const payload = {
       rol:           rolSel.value,
       nombres:       inputNombres.value.trim(),
@@ -88,33 +105,24 @@ export default function initCrearUsuarios(container = document.querySelector('.c
       estado:        'activo'
     };
 
-    // Solo añadimos docente_id si el rol es profesor y es un número válido
     if (rolSel.value === 'profesor') {
       const id = parseInt(inputDocente.value, 10);
-      if (!isNaN(id)) {
-        payload.docente_id = id;
-      }
+      if (!isNaN(id)) payload.docente_id = id;
     }
 
-    // Llamada AJAX
     axios.post('/usuarios', payload)
-      .then(({ data }) => {
+      .then(() => {
         mensajeP.textContent = '✅ Usuario registrado correctamente.';
         mensajeP.style.color = 'green';
         form.reset();
+        toggleBuscador();
         setTimeout(() => mensajeP.textContent = '', 3000);
       })
       .catch(err => {
-        // Mostrar detalle en consola
         console.error('Error completo:', JSON.stringify(err.response?.data, null, 2));
-
-        // Mostrar errores de validación en pantalla
         const errs = err.response?.data?.errors;
         if (errs) {
-          mensajeP.innerHTML = Object
-            .values(errs)
-            .flat()
-            .join('<br>');
+          mensajeP.innerHTML = Object.values(errs).flat().join('<br>');
         } else {
           mensajeP.textContent = '❌ Error: ' +
             (err.response?.data?.message || err.message);
