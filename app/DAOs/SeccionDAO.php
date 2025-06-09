@@ -8,7 +8,7 @@ class SeccionDAO
 {
     public function getAll()
     {
-        return Seccion::with('grado')->get();
+        return Seccion::all();
     }
 
     public function findById(int $id): ?Seccion

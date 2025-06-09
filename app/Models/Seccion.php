@@ -11,11 +11,7 @@ class Seccion extends Model
     // Lista sólo las columnas que realmente existen
     protected $fillable = ['nombre'];
 
-    // Quita o adapta esta relación si ya no existe grado_id en la tabla
-    // public function grado()
-    // {
-    //     return $this->belongsTo(Grado::class, 'grado_id');
-    // }
+    
 
     public function alumnos()
     {

@@ -31,12 +31,11 @@ class SeccionController extends Controller
     public function store(Request $request)
     {
         $datos = $request->validate([
-            'grado_id' => 'required|exists:grados,id',
-            'nombre'   => 'required|string|max:10',
-        ]);
+        'nombre' => 'required|string|max:10',
+    ]);
 
-        $seccion = $this->service->crear($datos);
-        return response()->json($seccion, 201);
+    $seccion = $this->service->crear($datos);
+    return response()->json($seccion, 201);
     }
 
     public function show($id)
@@ -60,11 +59,10 @@ class SeccionController extends Controller
     public function update(Request $request, $id)
     {
         $datos = $request->validate([
-            'grado_id' => 'sometimes|required|exists:grados,id',
-            'nombre'   => 'sometimes|required|string|max:10',
-        ]);
+        'nombre' => 'sometimes|required|string|max:10',
+    ]);
 
-        $ok = $this->service->actualizar($id, $datos);
+    $ok = $this->service->actualizar($id, $datos);
         if (! $ok) {
             return response()->json(['error' => 'No encontrado o no actualizado'], 404);
         }
