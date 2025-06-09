@@ -1,39 +1,102 @@
-import '/resources/css/forms/matricula/listaMatriculas.css'; // Importa el CSS para que Vite lo procese
+// listaMatriculas.js
+import '/resources/css/forms/matricula/listaMatriculas.css';
 
-// Esta función se debe llamar después de cargar la vista Blade
-export default async function initListaMatriculas(container = document.querySelector('lista-matriculas')) {
+export default function initListaMatriculas(container = document.querySelector('.lm-wrapper')) {
   if (!container) return;
 
+  // Datos de ejemplo (normalmente vendrían de un fetch)
+  const datosAlumnos = [
+    { nombres: 'Juan', apellidos: 'Ramirez Lopez', grado: 'Primero',  seccion: 'A', estado: 'Matriculado' },
+    { nombres: 'Juan', apellidos: 'XD', grado: 'Primero',  seccion: 'A', estado: 'Matriculado' },
+    { nombres: 'María', apellidos: 'García Pérez',  grado: 'Segundo',  seccion: 'B', estado: 'En proceso' },
+    { nombres: 'Carlos', apellidos: 'Ramírez Soto',  grado: 'Primero',  seccion: 'C', estado: 'Retirado' },
+    { nombres: 'Ana',  apellidos: 'Torres Díaz',    grado: 'Tercero',  seccion: 'A', estado: 'Matriculado' },
+    // ... más alumnos
+  ];
 
-    // Referencias a elementos
-    const buscador = container.querySelector('#buscador');
-    const filtroGrado = container.querySelector('#filtro-grado');
-    const tabla = container.querySelector('#tabla-alumnos tbody');
+  const buscador      = container.querySelector('#buscador');
+  const sugerencias   = container.querySelector('#sugerenciasNombres');
+  const filtroGrado   = container.querySelector('#filtro-grado');
+  const filtroSeccion = container.querySelector('#filtro-seccion');
+  const tablaBody     = container.querySelector('#tabla-alumnos tbody');
 
-    if (!buscador || !filtroGrado || !tabla) {
-      console.warn("Elementos no encontrados en listaMatriculas");
-      return;
+  // Deja la tabla vacía al inicio
+  tablaBody.innerHTML = '';
+
+  // Función para renderizar filas (array de objetos alumno)
+  const renderizarTabla = (filas) => {
+    tablaBody.innerHTML = '';
+    filas.forEach(al => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${al.nombres}</td>
+        <td>${al.apellidos}</td>
+        <td>${al.grado}</td>
+        <td>${al.seccion}</td>
+        <td>
+          <select class="lm-estado-select">
+            <option ${al.estado==='Matriculado'? 'selected':''}>Matriculado</option>
+            <option ${al.estado==='En proceso'? 'selected':''}>En proceso</option>
+            <option ${al.estado==='Retirado'? 'selected':''}>Retirado</option>
+          </select>
+        </td>
+      `;
+      tablaBody.appendChild(tr);
+    });
+  };
+
+  // Filtra datos por grado+sección
+  const obtenerFiltrados = () => {
+    const g = filtroGrado.value;
+    const s = filtroSeccion.value;
+    return datosAlumnos.filter(al =>
+      (!g || al.grado === g) &&
+      (!s || al.seccion === s)
+    );
+  };
+
+  // Al cambiar grado o sección, recarga toda la tabla
+  const onFiltroCambio = () => {
+    tablaBody.innerHTML = '';         // limpia
+    buscador.value = '';              // limpia buscador
+    sugerencias.style.display = 'none';
+    if (filtroGrado.value && filtroSeccion.value) {
+      renderizarTabla(obtenerFiltrados());
     }
+  };
+  filtroGrado.addEventListener('change', onFiltroCambio);
+  filtroSeccion.addEventListener('change', onFiltroCambio);
 
-    // Función para filtrar tabla
-    const filtrarTabla = () => {
-      const texto = buscador.value.toLowerCase();
-      const grado = filtroGrado.value.toLowerCase();
+  // Sugerencias mientras escribe
+  buscador.addEventListener('input', () => {
+    const texto = buscador.value.trim().toLowerCase();
+    const list = obtenerFiltrados()
+      .filter(al => (`${al.nombres} ${al.apellidos}`).toLowerCase().includes(texto))
+      .slice(0, 5);
 
-      Array.from(tabla.rows).forEach(fila => {
-        const textoFila = fila.textContent.toLowerCase();
-        const gradoFila = fila.cells[2]?.textContent.toLowerCase(); // Ajusta índice si hace falta
-
-        const coincideTexto = textoFila.includes(texto);
-        const coincideGrado = grado === "" || gradoFila === grado;
-
-        fila.style.display = coincideTexto && coincideGrado ? "" : "none";
+    if (texto && list.length) {
+      sugerencias.innerHTML = '';
+      list.forEach(al => {
+        const div = document.createElement('div');
+        div.textContent = `${al.nombres} ${al.apellidos}`;
+        div.addEventListener('click', () => {
+          // al hacer clic, inserta SOLO esa fila
+          renderizarTabla([al]);
+          sugerencias.style.display = 'none';
+          buscador.value = div.textContent;
+        });
+        sugerencias.appendChild(div);
       });
-    };
+      sugerencias.style.display = 'block';
+    } else {
+      sugerencias.style.display = 'none';
+    }
+  });
 
-    // Eventos
-    buscador.addEventListener('keyup', filtrarTabla);
-    filtroGrado.addEventListener('change', filtrarTabla);
-
-  
+  // Oculta sugerencias al hacer click fuera
+  document.addEventListener('click', e => {
+    if (!container.contains(e.target)) {
+      sugerencias.style.display = 'none';
+    }
+  });
 }

@@ -1,3 +1,5 @@
+/* listaMatriculas.css */
+
 /*========== Reset y fuente ==========*/
 .lm-wrapper * {
   margin: 0;
@@ -41,6 +43,12 @@
   margin-bottom: 20px;
 }
 
+/*========== Contenedor buscador para posición relativa ==========*/
+.lm-buscador-wrapper {
+  position: relative;
+  width: 75%;
+}
+
 /*========== Inputs de filtro y selects ==========*/
 .lm-wrapper .lm-input,
 .lm-wrapper .lm-select,
@@ -53,14 +61,17 @@
   transition: border-color 0.2s ease;
 }
 
+/* Ajuste específico para el input de búsqueda */
 .lm-wrapper .lm-input {
-  width: 75%;
+  width: 100%;
 }
 
+/* Ajuste específico para los selects de grado y sección */
 .lm-wrapper .lm-select {
   width: 23%;
 }
 
+/* Ajuste para el select de estado en la tabla */
 .lm-wrapper .lm-estado-select {
   width: 180px;
 }
@@ -71,6 +82,30 @@
 .lm-wrapper .lm-estado-select:focus {
   outline: none;
   border-color: #6B001F; /* Burdeos oscuro al enfocarse */
+}
+
+/*========== Menú de sugerencias ==========*/
+.lm-sugerencias {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #FFFFFF;
+  border: 1px solid #CCCCCC;
+  border-top: none;
+  max-height: 150px;
+  overflow-y: auto;
+  z-index: 100;
+  display: none;
+}
+
+.lm-sugerencias div {
+  padding: 8px 10px;
+  cursor: pointer;
+}
+
+.lm-sugerencias div:hover {
+  background-color: #F5F5F5;
 }
 
 /*========== Tabla de datos ==========*/
@@ -90,7 +125,7 @@
 .lm-wrapper .lm-tabla td {
   padding: 12px;
   text-align: left;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid #DDD;
   word-wrap: break-word;
 }
 
@@ -110,13 +145,16 @@
 .lm-wrapper .lm-tabla td:nth-child(1) { width: 30%; }
 
 .lm-wrapper .lm-tabla th:nth-child(2),
-.lm-wrapper .lm-tabla td:nth-child(2) { width: 40%; }
+.lm-wrapper .lm-tabla td:nth-child(2) { width: 25%; }
 
 .lm-wrapper .lm-tabla th:nth-child(3),
-.lm-wrapper .lm-tabla td:nth-child(3) { width: 30%; }
+.lm-wrapper .lm-tabla td:nth-child(3) { width: 15%; }
 
 .lm-wrapper .lm-tabla th:nth-child(4),
-.lm-wrapper .lm-tabla td:nth-child(4) { width: 20%; }
+.lm-wrapper .lm-tabla td:nth-child(4) { width: 15%; }
+
+.lm-wrapper .lm-tabla th:nth-child(5),
+.lm-wrapper .lm-tabla td:nth-child(5) { width: 15%; }
 
 /*========== Botón de acción (Enviar, Guardar, etc.) ==========*/
 .lm-wrapper .lm-btn {
