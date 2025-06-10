@@ -6,8 +6,14 @@ use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\AlumnoController;
 use App\Http\Controllers\ApoderadoController;
 
+//Para matricula
 Route::post('/alumnos',      [AlumnoController::class,   'store'])->name('alumnos.store');
 Route::post('/apoderados',   [ApoderadoController::class,'store'])->name('apoderados.store');
+
+
+//Para lista de matriculas
+Route::get('/alumnos/json', [AlumnoController::class, 'indexJson']);
+
 
 
 Route::get('/', function () {

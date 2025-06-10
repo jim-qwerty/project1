@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Services\AlumnoService;
 use Illuminate\Http\Request;
+use App\Models\Alumno;
 
 class AlumnoController extends Controller
 {
@@ -98,4 +100,21 @@ class AlumnoController extends Controller
         }
         return response()->json(['success' => true]);
     }
+
+    public function indexJson()
+{
+    // Asume que tu modelo Alumno carga grado y sección
+    $alumnos = Alumno::with(['grado','seccion'])
+        ->get()
+        ->map(function($a) {
+            return [
+                'nombres'   => $a->nombres,
+                'apellidos' => $a->apellidos,
+                'grado'     => $a->grado->nombre,
+                'seccion'   => $a->seccion->nombre,
+                'estado'    => $a->estado_matricula,
+            ];
+        });
+    return response()->json($alumnos);
+}
 }
