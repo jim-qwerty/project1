@@ -3,6 +3,13 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UsuarioController;
 
+use App\Http\Controllers\AlumnoController;
+use App\Http\Controllers\ApoderadoController;
+
+Route::post('/alumnos',      [AlumnoController::class,   'store'])->name('alumnos.store');
+Route::post('/apoderados',   [ApoderadoController::class,'store'])->name('apoderados.store');
+
+
 Route::get('/', function () {
     return view('home');
 });

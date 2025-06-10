@@ -1,3 +1,6 @@
+<meta name="csrf-token" content="{{ csrf_token() }}">
+
+
 <div class="m-wrapper">
   <!-- FORMULARIO DE MATRÍCULA -->
   <form id="matricula-form" class="m-formulario">
@@ -44,6 +47,14 @@
         <span class="m-details">Grado</span>
         <select id="grado" required>
           <option value="">Seleccione grado</option>
+        </select>
+      </div>
+
+      <!-- Nuevo bloque Sección -->
+      <div class="m-input-box">
+        <span class="m-details">Sección</span>
+        <select id="seccion" required>
+          <option value="">Seleccione sección</option>
         </select>
       </div>
 
@@ -161,3 +172,5 @@
     </div>
   </div>
 </div>
+
+<div id="mensaje" class="m-mensaje" style="display:none; color: green; margin-bottom: 1em;"></div>
