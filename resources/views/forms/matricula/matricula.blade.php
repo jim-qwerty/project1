@@ -111,55 +111,7 @@
     </div>
   </form>
 
-  <!-- FORMULARIO DE PAGO -->
-  <form id="pago-form" class="m-formulario" style="display: none;">
-    <h2 class="m-title">Pago de Matrícula</h2>
-
-    <div class="m-user-details">
-      <div class="m-section-title">DETALLES DEL PAGO</div>
-
-      <div class="m-input-box">
-        <span class="m-details">Alumno</span>
-        <input type="text" id="resumen-nombre" readonly>
-      </div>
-
-      <div class="m-input-box">
-        <span class="m-details">DNI</span>
-        <input type="text" id="resumen-dni" readonly>
-      </div>
-
-      <div class="m-input-box">
-        <span class="m-details">Monto a pagar (S/)</span>
-        <input type="number" min="1" required placeholder="Ingrese monto">
-      </div>
-
-      <div class="m-input-box">
-        <span class="m-details">Método de pago</span>
-        <select required>
-          <option value="">Seleccione</option>
-          <option value="efectivo">Efectivo</option>
-          <option value="tarjeta">Tarjeta de crédito/débito</option>
-          <option value="yape">Yape</option>
-          <option value="plin">Plin</option>
-        </select>
-      </div>
-
-      <div class="m-input-box">
-        <span class="m-details">Fecha de pago</span>
-        <input type="date" required>
-      </div>
-
-      <div class="m-input-box">
-        <span class="m-details">Observación</span>
-        <input type="text" placeholder="Detalles...">
-      </div>
-    </div>
-
-    <div class="m-button-group">
-      <button type="button" id="regresar-btn">← Regresar</button>
-      <input type="submit" value="Confirmar Pago">
-    </div>
-  </form>
+  
 
   <!-- CONFIRMACIÓN -->
   <div id="confirmacion" class="m-confirmacion" style="display: none;">

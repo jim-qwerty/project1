@@ -32,7 +32,7 @@ class MatriculaController extends Controller
     {
         $datos = $request->validate([
             'alumno_id'       => 'required|exists:alumnos,id',
-            'fecha_matricula' => 'required|date',
+            
             'monto'           => 'required|numeric',
             'metodo_pago'     => 'nullable|string|max:50',
             'fecha_pago'      => 'nullable|date',
@@ -65,20 +65,16 @@ class MatriculaController extends Controller
     public function update(Request $request, $id)
     {
         $datos = $request->validate([
-            'alumno_id'       => 'sometimes|required|exists:alumnos,id',
-            'fecha_matricula' => 'sometimes|required|date',
-            'monto'           => 'sometimes|required|numeric',
-            'metodo_pago'     => 'nullable|string|max:50',
-            'fecha_pago'      => 'nullable|date',
-            'observacion'     => 'nullable|string',
-            'estado_pago'     => 'in:pagado,pendiente',
+            'alumno_id'   => 'required|exists:alumnos,id',
+        'monto'       => 'required|numeric',
+        'metodo_pago' => 'nullable|string|max:50',
+        'fecha_pago'  => 'required|date',
+        'observacion' => 'nullable|string',
+        'estado_pago' => 'required|in:pagado,pendiente',
         ]);
 
-        $ok = $this->service->actualizar($id, $datos);
-        if (! $ok) {
-            return response()->json(['error' => 'No encontrado o no actualizado'], 404);
-        }
-        return response()->json(['success' => true]);
+        $matricula = $this->service->crear($datos);
+    return response()->json($matricula, 201);;
     }
 
     public function destroy($id)

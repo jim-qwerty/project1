@@ -5,6 +5,7 @@ use App\Http\Controllers\UsuarioController;
 
 use App\Http\Controllers\AlumnoController;
 use App\Http\Controllers\ApoderadoController;
+use App\Http\Controllers\MatriculaController;
 
 //Para matricula
 Route::post('/alumnos',      [AlumnoController::class,   'store'])->name('alumnos.store');
@@ -15,6 +16,13 @@ Route::get('/forms/matricula/pagoMatricula', function () {
     // Laravel buscará resources/views/forms/matricula/pagoMatricula.blade.php
     return view('forms.matricula.pagoMatricula');
 });
+
+
+
+//Para hacer el pago de matriculas
+Route::post('/matriculas', [MatriculaController::class, 'store'])
+     ->name('matriculas.store');
+
 
 
 

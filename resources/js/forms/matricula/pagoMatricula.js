@@ -6,6 +6,13 @@ import axios from 'axios';
 export default function initPagoForm(container = document.querySelector('.pago-wrapper')) {
   if (!container) return;
 
+  // Configurar CSRF para Axios
+  const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+  if (csrfMeta) {
+    axios.defaults.headers.common['X-CSRF-TOKEN'] = csrfMeta.content;
+  }
+
+  // Referencias al DOM
   const pagoForm    = container.querySelector('#pago-form');
   const btnRegresar = container.querySelector('#regresar-btn');
   const mensajeBox  = container.querySelector('#mensaje');
@@ -14,28 +21,63 @@ export default function initPagoForm(container = document.querySelector('.pago-w
   const btnNo       = container.querySelector('#btn-no');
   const confirmMsg  = container.querySelector('#confirmacion-mensaje');
 
-  // utilidades
-  const mostrarMensaje = txt=>{
-    if(!mensajeBox) return;
-    mensajeBox.textContent=txt; mensajeBox.style.display='block';
-    setTimeout(()=>mensajeBox.style.display='none',4000);
+  // Mostrar mensajes breves
+  const mostrarMensaje = txt => {
+    if (!mensajeBox) return;
+    mensajeBox.textContent = txt;
+    mensajeBox.style.display = 'block';
+    setTimeout(() => mensajeBox.style.display = 'none', 4000);
   };
-  const confirmar = txt=>new Promise(res=>{
-    confirmBox.style.display='flex'; confirmMsg.textContent=txt;
-    btnSi.onclick=()=>{confirmBox.style.display='none';res(true)};
-    btnNo.onclick=()=>{confirmBox.style.display='none';res(false)};
+
+  // Modal de confirmación
+  const confirmar = txt => new Promise(res => {
+    confirmBox.style.display = 'flex';
+    confirmMsg.textContent = txt;
+    btnSi.onclick = () => { confirmBox.style.display = 'none'; res(true); };
+    btnNo.onclick = () => { confirmBox.style.display = 'none'; res(false); };
   });
 
-  // envío pago
-  pagoForm?.addEventListener('submit',async e=>{
-    e.preventDefault(); if(!await confirmar('¿Confirmar pago?')) return;
-    // Aquí podrías llamar a tu endpoint de pago:
-    // await axios.post('/pagos', {...});
-    mostrarMensaje('¡Pago exitoso!'); pagoForm.reset();
+  // Envío del formulario de pago
+  pagoForm?.addEventListener('submit', async e => {
+    e.preventDefault();
+    if (!await confirmar('¿Confirmar pago?')) return;
+
+    // Lee los campos del formulario
+    const payload = {
+      alumno_id:   window.alumnoParaPago,
+      monto:       container.querySelector('input[type="number"]').value.trim(),
+      metodo_pago: container.querySelector('select').value,
+      fecha_pago:  container.querySelector('input[type="date"]').value,
+      observacion: container.querySelector('input[placeholder="Detalles..."]').value.trim(),
+      estado_pago: 'pagado'
+    };
+
+    // Loguea el payload para depuración
+    console.log('Payload de pago a enviar:', payload);
+
+    try {
+      await axios.post('/matriculas', payload);
+      mostrarMensaje('✅ Pago registrado con éxito!');
+      pagoForm.reset();
+    } catch (err) {
+      // Manejo de errores de validación 422
+      if (err.response?.status === 422) {
+        console.error('Errores de validación:', err.response.data.errors);
+        // Muestra el primer mensaje de error
+        const firstError = Object.values(err.response.data.errors)[0][0];
+        mostrarMensaje(`❌ ${firstError}`);
+      } else {
+        console.error('Error al registrar pago:', err);
+        mostrarMensaje('❌ Error al registrar el pago.');
+      }
+    }
   });
 
-  // regresar
-  btnRegresar?.addEventListener('click',()=> window.history.back());
+  // Botón regresar
+  btnRegresar?.addEventListener('click', () => {
+    const matriculaLink = document.querySelector('[data-form="matricula-form"]');
+    if (matriculaLink) matriculaLink.click();
+  });
 }
 
-document.addEventListener('DOMContentLoaded',()=>initPagoForm());
+document.addEventListener('DOMContentLoaded', () => initPagoForm());

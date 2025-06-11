@@ -131,6 +131,11 @@ export default function initMatriculaForm(container = document.getElementById('f
     try {
       const { data: alumno } = await axios.post('/alumnos', leerDatosAlumno());
       await axios.post('/apoderados', leerDatosApoderado(alumno.id));
+      
+       //Guarda el ID para el pago
+        window.alumnoParaPago = alumno.id;
+
+
       mostrarMensaje('✅ Matrícula y apoderado guardados.');
       form.reset();
 
