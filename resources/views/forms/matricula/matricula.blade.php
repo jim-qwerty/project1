@@ -171,6 +171,7 @@
       </div>
     </div>
   </div>
+
+  <div id="mensaje" class="m-mensaje" style="display:none; color: green; margin-bottom: 1em;"></div>
 </div>
 
-<div id="mensaje" class="m-mensaje" style="display:none; color: green; margin-bottom: 1em;"></div>

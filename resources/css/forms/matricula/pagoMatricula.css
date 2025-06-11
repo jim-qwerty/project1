@@ -1,0 +1,111 @@
+/*========== Reset y fuente ==========*/
+.pago-wrapper * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
+
+/*========== Fondo general del contenedor ==========*/
+.pago-wrapper {
+  min-height: 100vh;
+  background: #F4F4F4;
+  padding: 30px;
+}
+
+/*========== Título principal del formulario ==========*/
+.pago-wrapper .pago-title {
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 30px;
+  text-align: center;
+  color: #6B001F;
+}
+
+/*========== Estilo del formulario (pago-formulario) ==========*/
+.pago-wrapper .pago-formulario {
+  background: #FFFFFF;
+  padding: 20px;
+  border-radius: 10px;
+  margin: 0 auto 30px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  max-width: 1800px;
+}
+
+/*========== Secciones de datos ==========*/
+.pago-wrapper .pago-user-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+/*========== Título de cada sección ==========*/
+.pago-wrapper .pago-section-title {
+  grid-column: 1 / -1;
+  font-size: 20px;
+  font-weight: 600;
+  color: #6B001F;
+  border-bottom: 2px solid #FFC107;
+  padding-bottom: 5px;
+  margin-bottom: 15px;
+}
+
+/*========== Caja de cada campo ==========*/
+.pago-wrapper .pago-input-box {
+  display: flex;
+  flex-direction: column;
+}
+
+/*========== Etiqueta de cada campo ==========*/
+.pago-wrapper .pago-details {
+  font-weight: 500;
+  margin-bottom: 5px;
+  color: #333333;
+}
+
+/*========== Inputs y selects ==========*/
+.pago-wrapper .pago-input-box input,
+.pago-wrapper .pago-input-box select {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  border-radius: 5px;
+  border: 1px solid #CCCCCC;
+  background-color: #FAFAFA;
+  transition: border-color 0.2s ease;
+}
+
+/*========== Focus en inputs y selects ==========*/
+.pago-wrapper .pago-input-box input:focus,
+.pago-wrapper .pago-input-box select:focus {
+  outline: none;
+  border-color: #6B001F;
+}
+
+/*========== Botones finales ==========*/
+.pago-wrapper .pago-button-group {
+  text-align: center;
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 50px;
+}
+
+.pago-wrapper .pago-button-group input,
+.pago-wrapper .pago-button-group button {
+  padding: 10px 30px;
+  border: none;
+  background: #FFC107;
+  color: #6B001F;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+.pago-wrapper .pago-button-group input:hover,
+.pago-wrapper .pago-button-group button:hover {
+  background: #6B001F;
+  color: #FFFFFF;
+}

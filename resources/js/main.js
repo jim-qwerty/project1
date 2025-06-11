@@ -32,6 +32,7 @@ function inicializarSidebar() {
   const rutasFormularios = {
     "matricula-form": { path: "matricula", file: "matricula" },
     "lista-matriculas": { path: "matricula", file: "listaMatriculas" },
+    
 
     "registro-notas": { path: "notas", file: "registroNotas" },
     "lista-notas": { path: "notas", file: "listaNotas" },

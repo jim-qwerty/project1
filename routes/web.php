@@ -10,6 +10,13 @@ use App\Http\Controllers\ApoderadoController;
 Route::post('/alumnos',      [AlumnoController::class,   'store'])->name('alumnos.store');
 Route::post('/apoderados',   [ApoderadoController::class,'store'])->name('apoderados.store');
 
+// para ir a pago de matricula
+Route::get('/forms/matricula/pagoMatricula', function () {
+    // Laravel buscará resources/views/forms/matricula/pagoMatricula.blade.php
+    return view('forms.matricula.pagoMatricula');
+});
+
+
 
 //Para lista de matriculas
 Route::get('/alumnos/json', [AlumnoController::class, 'indexJson']);

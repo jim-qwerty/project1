@@ -29,10 +29,10 @@
   border-radius: 10px;
   margin: 0 auto 30px;
   box-shadow: 0 0 10px rgba(0,0,0,0.1);
-  max-width: 1800px; /* Ajusta el ancho a un valor más razonable (antes era 1800px) */
+  max-width: 1800px; /* Ajusta a un ancho razonable */
 }
 
-/*========== Secciones de datos (DATOS DEL ALUMNO / APODERADO) ==========*/
+/*========== Secciones de datos ==========*/
 .m-wrapper .m-user-details {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -40,13 +40,13 @@
   margin-bottom: 30px;
 }
 
-/*========== Título de cada sección dentro del formulario ==========*/
+/*========== Título de cada sección ==========*/
 .m-wrapper .m-section-title {
-  grid-column: 1 / -1; /* Ocupa todo el ancho de la grid */
+  grid-column: 1 / -1;
   font-size: 20px;
   font-weight: 600;
-  color: #6B001F; /* Burdeos oscuro */
-  border-bottom: 2px solid #FFC107; /* Línea dorada */
+  color: #6B001F;
+  border-bottom: 2px solid #FFC107;
   padding-bottom: 5px;
   margin-bottom: 15px;
 }
@@ -80,16 +80,15 @@
 .m-wrapper .m-input-box input:focus,
 .m-wrapper .m-input-box select:focus {
   outline: none;
-  border-color: #6B001F; /* Burdeos oscuro al enfocarse */
+  border-color: #6B001F;
 }
 
-/*========== Grupo de radio buttons (“Sexo”) ==========*/
+/*========== Grupo de radio (“Sexo”) ==========*/
 .m-wrapper .m-radio-group {
   display: flex;
-  gap: 40px; /* Ajusta el espacio entre opciones si gustas */
+  gap: 40px;
   margin-top: 5px;
 }
-
 .m-wrapper .m-radio-group label {
   display: flex;
   align-items: center;
@@ -97,13 +96,12 @@
   color: #333333;
   cursor: pointer;
 }
-
 .m-wrapper .m-radio-group input[type="radio"] {
   margin-right: 5px;
   transform: scale(1.1);
 }
 
-/*========== Botones de envío / navegación ==========*/
+/*========== Botones finales ==========*/
 .m-wrapper .m-button,
 .m-wrapper .m-button-group {
   text-align: center;
@@ -113,29 +111,27 @@
   gap: 50px;
 }
 
-/* Botón principal “Procesar Matrícula” y “Confirmar Pago” */
 .m-wrapper .m-button input,
 .m-wrapper .m-button-group input,
 .m-wrapper .m-button-group button {
   padding: 10px 30px;
   border: none;
-  background: #FFC107;  /* Dorado */
-  color: #6B001F;        /* Texto en burdeos para contraste */
+  background: #FFC107;
+  color: #6B001F;
   border-radius: 5px;
   cursor: pointer;
   font-size: 16px;
   font-weight: 600;
   transition: background 0.3s ease, color 0.3s ease;
 }
-
 .m-wrapper .m-button input:hover,
 .m-wrapper .m-button-group input:hover,
 .m-wrapper .m-button-group button:hover {
-  background: #6B001F; /* Burdeos oscuro en hover */
-  color: #FFFFFF;     /* Texto en blanco al hacer hover */
+  background: #6B001F;
+  color: #FFFFFF;
 }
 
-/*========== Formulario de confirmación modal ==========*/
+/*========== Modal de confirmación ==========*/
 .m-wrapper .m-confirmacion {
   position: fixed;
   top: 0; left: 0;
@@ -147,7 +143,6 @@
   align-items: center;
   z-index: 9999;
 }
-
 .m-wrapper .m-confirmacion > div {
   background: #FFFFFF;
   padding: 30px 40px;
@@ -156,20 +151,16 @@
   max-width: 400px;
   width: 100%;
 }
-
 .m-wrapper .m-confirmacion p {
   font-size: 18px;
   margin-bottom: 20px;
   color: #333333;
 }
-
 .m-wrapper .m-confirmacion-botones {
   display: flex;
   justify-content: center;
   gap: 20px;
 }
-
-/* Botones “Sí” y “No” dentro del modal */
 .m-wrapper #btn-si,
 .m-wrapper #btn-no {
   padding: 10px 20px;
@@ -179,21 +170,17 @@
   cursor: pointer;
   transition: background 0.2s ease;
 }
-
 .m-wrapper #btn-si {
-  background-color: #6B001F; /* Burdeos oscuro */
+  background-color: #6B001F;
   color: #FFFFFF;
 }
-
 .m-wrapper #btn-si:hover {
-  background-color: #4F0016; /* Burdeos aún más oscuro en hover */
+  background-color: #4F0016;
 }
-
 .m-wrapper #btn-no {
-  background-color: #E74C3C; /* Rojo suave (no estrictamente de la insignia, pero distingue la opción “No”) */
+  background-color: #E74C3C;
   color: #FFFFFF;
 }
-
 .m-wrapper #btn-no:hover {
-  background-color: #C0392B; 
+  background-color: #C0392B;
 }
