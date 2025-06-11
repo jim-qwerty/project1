@@ -1,26 +1,35 @@
 // resources/js/forms/pagos/historialPagos.js
+import axios from 'axios';
 import '/resources/css/forms/pagos/historialPagos.css';
 
 export default function initHistorialPagos(container = document.querySelector('.hp-wrapper')) {
   if (!container) return;
+  axios.defaults.headers.common['X-CSRF-TOKEN'] =
+    document.querySelector('meta[name="csrf-token"]').content;
 
-  const historialData    = [
-    { grado: "1", seccion: "A", alumno: "Pedro Garcia",   mes: "Enero",   fecha: "2024-01-15", monto: 50 },
-    { grado: "1", seccion: "A", alumno: "Pedro Perez",    mes: "Enero",   fecha: "2024-01-20", monto: 50 },
-    { grado: "1", seccion: "B", alumno: "Luis Fernandez", mes: "Febrero", fecha: "2024-02-10", monto: 50 },
-    { grado: "2", seccion: "A", alumno: "Carlos Ruiz",    mes: "Enero",   fecha: "2024-01-17", monto: 50 },
-    { grado: "3", seccion: "B", alumno: "Sofia Mendoza",  mes: "Marzo",   fecha: "2024-03-05", monto: 50 }
+  // 1) Arrays para poblar selects
+  const gradosEstaticos = [
+    { id: 1, nombre: '3 años' },
+    { id: 2, nombre: '4 años' },
+    { id: 3, nombre: '5 años' },
+    { id: 4, nombre: 'Primero' },
+    { id: 5, nombre: 'Segundo' },
+    { id: 6, nombre: 'Tercero' },
+    { id: 7, nombre: 'Cuarto' },
+    { id: 8, nombre: 'Quinto' },
+    { id: 9, nombre: 'Sexto' }
+  ];
+  const seccionesEstaticas = [
+    { id: 1, nombre: 'A' },
+    { id: 2, nombre: 'B' },
+    { id: 3, nombre: 'C' }
+  ];
+  const mesesEstaticos = [
+    'Enero','Febrero','Marzo','Abril','Mayo','Junio',
+    'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'
   ];
 
-  const alumnosData = [
-    { grado: "1", seccion: "A", alumno: "Pedro Garcia" },
-    { grado: "1", seccion: "A", alumno: "Pedro Perez" },
-    { grado: "1", seccion: "A", alumno: "Maria Torres" },
-    { grado: "1", seccion: "B", alumno: "Luis Fernandez" },
-    { grado: "2", seccion: "A", alumno: "Carlos Ruiz" },
-    { grado: "3", seccion: "B", alumno: "Sofia Mendoza" }
-  ];
-
+  // 2) Referencias al DOM
   const gradoSelect      = container.querySelector('#gradoHistorial');
   const seccionSelect    = container.querySelector('#seccionHistorial');
   const mesSelect        = container.querySelector('#mesHistorial');
@@ -29,94 +38,136 @@ export default function initHistorialPagos(container = document.querySelector('.
   const tablaBody        = container.querySelector('#tablaPagos tbody');
   const btnDeudores      = container.querySelector('#btnDeudores');
 
-  let resultadosFiltrados = [];
+  // 3) Datos traídos de la BD
+  let pagosData   = [];
+  let alumnosData = [];
+  let resultados  = [];
 
-  // pinta una fila de "No hay pagos..." o los pagos
-  function mostrarResultados(lista) {
+  // 4) Función para poblar selects
+  function poblarSelect(selectEl, items, textKey='nombre', valueKey='id', placeholder='') {
+    selectEl.innerHTML = `<option value="">${placeholder}</option>`;
+    items.forEach(i => {
+      const opt = document.createElement('option');
+      opt.value       = i[valueKey];
+      opt.textContent = i[textKey];
+      selectEl.appendChild(opt);
+    });
+  }
+
+  poblarSelect(gradoSelect, gradosEstaticos, 'nombre','id','Seleccione grado');
+  poblarSelect(seccionSelect, seccionesEstaticas, 'nombre','id','Seleccione sección');
+  mesSelect.innerHTML = `<option value="">Seleccione mes</option>`;
+  mesesEstaticos.forEach(m => {
+    const opt = document.createElement('option');
+    opt.value = m;
+    opt.textContent = m;
+    mesSelect.appendChild(opt);
+  });
+
+  // 5) Traer datos iniciales de la API
+  async function cargarDatosBD() {
+    try {
+      const [rPagos, rAlumnos] = await Promise.all([
+        axios.get('/pagos'),
+        axios.get('/alumnos/json')
+      ]);
+      pagosData   = rPagos.data;
+      alumnosData = rAlumnos.data.map(a => ({
+        id: a.id,
+        grado_id: a.grado_id,
+        seccion_id: a.seccion_id,
+        nombre_completo: `${a.nombres} ${a.apellidos}`
+      }));
+    } catch(err) {
+      console.error('Error cargando pagos o alumnos:', err);
+    }
+  }
+
+  // 6) Renderizar la tabla
+  function mostrarTabla(lista) {
     tablaBody.innerHTML = '';
-    if (lista.length === 0) {
+    if (!lista.length) {
       const tr = document.createElement('tr');
-      const td = document.createElement('td');
-      td.colSpan = 4;
-      td.textContent = 'No hay pagos registrados para esta combinación.';
-      tr.appendChild(td);
+      tr.innerHTML = `<td colspan="4">No hay pagos registrados para esta combinación.</td>`;
       tablaBody.appendChild(tr);
       return;
     }
-    lista.forEach(pago => {
+    lista.forEach(r => {
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td>${pago.alumno}</td>
-        <td>${pago.mes}</td>
-        <td>${pago.fecha}</td>
-        <td>${pago.monto.toFixed(2)}</td>
+        <td>${r.alumno}</td>
+        <td>${r.mes}</td>
+        <td>${r.fecha_pago}</td>
+        <td>${r.monto.toFixed(2)}</td>
       `;
       tablaBody.appendChild(tr);
     });
   }
 
-  // actualiza resultadosFiltrados tras cambiar filtros y pinta tabla inicial
-  function actualizarTabla() {
-    const grado   = gradoSelect.value;
-    const seccion = seccionSelect.value;
-    const mes     = mesSelect.value;
-
-    if (!grado || !seccion || !mes) {
-      resultadosFiltrados = [];
-      mostrarResultados([]);
-      return;
+  // 7) Actualizar resultados según filtros
+  function actualizarResultados() {
+    const g       = gradoSelect.value;
+    const s       = seccionSelect.value;
+    const mesText = mesSelect.value;
+    if (!g || !s || !mesText) {
+      resultados = [];
+      return mostrarTabla([]);
     }
 
-    const alumnosFiltrados = alumnosData.filter(a =>
-      a.grado === grado && a.seccion === seccion
-    );
-    const pagosDelMes = historialData.filter(h =>
-      h.grado === grado && h.seccion === seccion && h.mes === mes
+    // Convertir mesText a entero 1-12
+    const mesInt = mesesEstaticos.indexOf(mesText) + 1;
+
+    // Filtrar alumnos por grado/sección
+    const alumnosFiltro = alumnosData.filter(a =>
+      String(a.grado_id) === String(g) &&
+      String(a.seccion_id) === String(s)
     );
 
-    resultadosFiltrados = alumnosFiltrados.map(a => {
-      const pago = pagosDelMes.find(p => p.alumno === a.alumno);
+    resultados = alumnosFiltro.map(a => {
+      const pago = pagosData.find(p =>
+        String(p.grado_id)   === String(g) &&
+        String(p.seccion_id) === String(s) &&
+        p.alumno.id          == a.id &&
+        p.mes                === mesInt
+      );
       return {
-        alumno: a.alumno,
-        mes,
-        fecha: pago ? pago.fecha : '',
-        monto: pago ? pago.monto : 0
+        alumno:     a.nombre_completo,
+        mes:        mesText,
+        fecha_pago: pago ? pago.fecha_pago : '',
+        monto:      pago ? Number(pago.monto)      : 0   // <-- convertimos a número
       };
     });
 
-    // al iniciar tras filtros, pintamos TODO el listado
-    mostrarResultados(resultadosFiltrados);
+    mostrarTabla(resultados);
   }
 
-  // al click en "Mostrar deudores"
+  // 8) Mostrar solo deudores
   function mostrarDeudores() {
-    mostrarResultados(resultadosFiltrados.filter(r => r.monto === 0));
+    mostrarTabla(resultados.filter(r => r.monto === 0));
   }
 
-  // muestra sólo las sugerencias sin tocar la tabla
+  // 9) Autocompletar buscador
   function actualizarSugerencias() {
     const term = buscadorInput.value.trim().toLowerCase();
     sugerenciasDiv.innerHTML = '';
     if (!term) return;
 
-    // obtengo nombres únicos que coinciden en resultadosFiltrados
     const nombres = [...new Set(
-      resultadosFiltrados
+      resultados
         .filter(r => r.alumno.toLowerCase().includes(term))
         .map(r => r.alumno)
     )];
 
-    nombres.forEach(nombre => {
+    nombres.forEach(n => {
       const div = document.createElement('div');
-      div.textContent = nombre;
+      div.textContent = n;
       div.classList.add('hp-sugerencia-item');
       div.addEventListener('click', () => {
-        // al seleccionar, pinto sólo esa fila en la tabla
-        buscadorInput.value = nombre;
+        buscadorInput.value = n;
         sugerenciasDiv.innerHTML = '';
-        mostrarResultados(
-          resultadosFiltrados.filter(r =>
-            r.alumno.toLowerCase() === nombre.toLowerCase()
+        mostrarTabla(
+          resultados.filter(r =>
+            r.alumno.toLowerCase() === n.toLowerCase()
           )
         );
       });
@@ -124,23 +175,21 @@ export default function initHistorialPagos(container = document.querySelector('.
     });
   }
 
-  // listeners
-  gradoSelect  .addEventListener('change', actualizarTabla);
-  seccionSelect.addEventListener('change', actualizarTabla);
-  mesSelect    .addEventListener('change', actualizarTabla);
+  // 10) Listeners
+  gradoSelect  .addEventListener('change', actualizarResultados);
+  seccionSelect.addEventListener('change', actualizarResultados);
+  mesSelect    .addEventListener('change', actualizarResultados);
   btnDeudores  .addEventListener('click', mostrarDeudores);
+  buscadorInput.addEventListener('input', actualizarSugerencias);
+  buscadorInput.addEventListener('blur', () => {
+    setTimeout(() => sugerenciasDiv.innerHTML = '', 150);
+  });
 
-  buscadorInput
-    .addEventListener('input', actualizarSugerencias);
-
-  buscadorInput
-    .addEventListener('blur', () => {
-      // cierra sugerencias tras perder foco
-      setTimeout(() => sugerenciasDiv.innerHTML = '', 150);
-    });
-
-  // tabla visible desde el inicio (sólo header + "No hay pagos…")
-  mostrarResultados([]);
+  // 11) Inicialización
+  (async () => {
+    await cargarDatosBD();
+    mostrarTabla([]);  // tabla vacía al inicio
+  })();
 }
 
 document.addEventListener('DOMContentLoaded', () => initHistorialPagos());

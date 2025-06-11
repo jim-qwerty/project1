@@ -1,3 +1,8 @@
+{{-- resources/views/forms/pagos/historialPagos.blade.php --}}
+
+{{-- CSRF token (por si en tu JS usas Axios para más peticiones) --}}
+<meta name="csrf-token" content="{{ csrf_token() }}">
+
 <div class="hp-wrapper">
   <form id="formularioHistorial" class="hp-form">
     <h2 class="hp-titulo">Historial de Pagos</h2>
@@ -5,46 +10,39 @@
     <div class="hp-filtros">
       <label class="hp-label" for="gradoHistorial">Grado:
         <select id="gradoHistorial" class="hp-select" required>
-          <option value="">Seleccione</option>
-          <option value="1">1°</option>
-          <option value="2">2°</option>
-          <option value="3">3°</option>
+          <option value="">Seleccione grado</option>
+          {{-- Opciones cargadas desde JS --}}
         </select>
       </label>
 
       <label class="hp-label" for="seccionHistorial">Sección:
         <select id="seccionHistorial" class="hp-select" required>
-          <option value="">Seleccione</option>
-          <option value="A">A</option>
-          <option value="B">B</option>
+          <option value="">Seleccione sección</option>
+          {{-- Opciones cargadas desde JS --}}
         </select>
       </label>
 
       <label class="hp-label" for="mesHistorial">Mes:
         <select id="mesHistorial" class="hp-select" required>
-          <option value="">Seleccione</option>
-          <option value="Enero">Enero</option>
-          <option value="Febrero">Febrero</option>
-          <option value="Marzo">Marzo</option>
-          <option value="Abril">Abril</option>
-          <option value="Mayo">Mayo</option>
-          <option value="Junio">Junio</option>
-          <option value="Julio">Julio</option>
-          <option value="Agosto">Agosto</option>
-          <option value="Septiembre">Septiembre</option>
-          <option value="Octubre">Octubre</option>
-          <option value="Noviembre">Noviembre</option>
-          <option value="Diciembre">Diciembre</option>
+          <option value="">Seleccione mes</option>
+          {{-- Opciones cargadas desde JS --}}
         </select>
       </label>
 
       <label class="hp-label" for="buscadorAlumno">Buscar alumno:</label>
       <div class="hp-busqueda-wrapper">
-        <input type="text" id="buscadorAlumno" class="hp-input" placeholder="Escriba el nombre del alumno...">
+        <input
+          type="text"
+          id="buscadorAlumno"
+          class="hp-input"
+          placeholder="Escriba el nombre del alumno..."
+        >
         <div id="sugerenciasAlumnos" class="hp-sugerencias"></div>
       </div>
 
-      <button type="button" id="btnDeudores" class="hp-btn-deudores">Mostrar solo deudores</button>
+      <button type="button" id="btnDeudores" class="hp-btn-deudores">
+        Mostrar solo deudores
+      </button>
     </div>
 
     <table id="tablaPagos" class="hp-tabla">
@@ -60,3 +58,5 @@
     </table>
   </form>
 </div>
+
+

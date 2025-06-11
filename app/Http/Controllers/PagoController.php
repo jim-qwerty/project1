@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Services\PagoService;
 use Illuminate\Http\Request;
 
+
+
+
 class PagoController extends Controller
 {
     protected $service;
@@ -34,7 +37,7 @@ class PagoController extends Controller
     {
         $datos = $request->validate([
             'alumno_id'       => 'required|exists:alumnos,id',
-            'tipo_pago'       => 'required|in:matricula,mensualidad',
+            
             'grado_id'        => 'required|exists:grados,id',
             'seccion_id'      => 'required|exists:secciones,id',
             'mes'             => 'nullable|integer',
@@ -71,7 +74,7 @@ class PagoController extends Controller
     {
         $datos = $request->validate([
             'alumno_id'       => 'sometimes|required|exists:alumnos,id',
-            'tipo_pago'       => 'sometimes|required|in:matricula,mensualidad',
+            
             'grado_id'        => 'sometimes|required|exists:grados,id',
             'seccion_id'      => 'sometimes|required|exists:secciones,id',
             'mes'             => 'nullable|integer',
@@ -97,4 +100,8 @@ class PagoController extends Controller
         }
         return response()->json(['success' => true]);
     }
+
+    
+
+
 }

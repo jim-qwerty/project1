@@ -7,6 +7,10 @@ use App\Http\Controllers\AlumnoController;
 use App\Http\Controllers\ApoderadoController;
 use App\Http\Controllers\MatriculaController;
 
+use App\Http\Controllers\PagoController;
+
+
+
 //Para matricula
 Route::post('/alumnos',      [AlumnoController::class,   'store'])->name('alumnos.store');
 Route::post('/apoderados',   [ApoderadoController::class,'store'])->name('apoderados.store');
@@ -29,6 +33,25 @@ Route::post('/matriculas', [MatriculaController::class, 'store'])
 //Para lista de matriculas
 Route::get('/alumnos/json', [AlumnoController::class, 'indexJson']);
 
+
+// pagos mensuales
+// Para mostrar el formulario
+Route::get('/pagos/create', [PagoController::class, 'create'])->name('pagos.create');
+
+// Para guardar el pago
+Route::post('/pagos', [PagoController::class, 'store'])->name('pagos.store');
+
+Route::get('/alumnos/filtrar', [AlumnoController::class, 'filtrar'])
+     ->name('alumnos.filtrar');
+
+
+// HISTORIAL DE PAGOS
+     Route::get('/pagos',        [PagoController::class,   'index'])->name('pagos.index');
+Route::get('/alumnos/json', [AlumnoController::class,'indexJson']);
+
+// Para obtener el listado completo de pagos en JSON
+Route::get('/pagos', [PagoController::class, 'index'])
+     ->name('pagos.index');
 
 
 Route::get('/', function () {

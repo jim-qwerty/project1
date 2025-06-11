@@ -103,18 +103,41 @@ class AlumnoController extends Controller
 
     public function indexJson()
 {
-    // Asume que tu modelo Alumno carga grado y sección
-    $alumnos = Alumno::with(['grado','seccion'])
+    /// Trae id, grado_id, seccion_id, nombres y apellidos
+    $alumnos = Alumno::select(['id','grado_id','seccion_id','nombres','apellidos'])
         ->get()
         ->map(function($a) {
             return [
-                'nombres'   => $a->nombres,
-                'apellidos' => $a->apellidos,
-                'grado'     => $a->grado->nombre,
-                'seccion'   => $a->seccion->nombre,
-                'estado'    => $a->estado_matricula,
+                'id'              => $a->id,
+                'grado_id'        => $a->grado_id,
+                'seccion_id'      => $a->seccion_id,
+                'nombres'         => $a->nombres,
+                'apellidos'       => $a->apellidos,
             ];
         });
+
+    return response()->json($alumnos);
+}
+
+
+    public function filtrar(Request $request)
+{
+    $request->validate([
+        'grado_id'   => 'required|exists:grados,id',
+        'seccion_id' => 'required|exists:secciones,id',
+    ]);
+
+    $alumnos = \App\Models\Alumno::where('grado_id', $request->grado_id)
+        ->where('seccion_id', $request->seccion_id)
+        ->get(['id','nombres','apellidos'])
+        ->map(function($a) {
+            return [
+                'id'              => $a->id,
+                'nombre_completo' => trim("{$a->nombres} {$a->apellidos}"),
+            ];
+        })
+        ->values();
+
     return response()->json($alumnos);
 }
 }
