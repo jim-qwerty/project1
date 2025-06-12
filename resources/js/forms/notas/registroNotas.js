@@ -1,39 +1,75 @@
-// resources/js/forms/notas/registroNotas.js
 import '/resources/css/forms/notas/registroNotas.css';
 
 export default function initRegistroNotas(container = document.querySelector('.rn-wrapper')) {
   if (!container) return;
 
-  // Referencias del DOM
-  const gradoInput    = container.querySelector('#gradoSelect');
-  const seccionInput  = container.querySelector('#seccionSelect');
-  const cursoSelect   = container.querySelector('#cursoSelect');
-  const bimestreInput = container.querySelector('#bimestreSelect');
-  const buscarInput   = container.querySelector('#buscarAlumno');
-  const resultadosUl  = container.querySelector('#listaResultados');
-  const tbody         = container.querySelector('.rn-tabla tbody');
-  const btnSiguiente  = container.querySelector('#btnSiguiente');
-  const form          = container.querySelector('#formularioNotas');
-  const mensaje       = container.querySelector('#mensajeConfirmacion');
+  // 1) Datos estáticos para los selects
+  const gradosEstaticos = [
+    { id: 1, nombre: '3 años' },
+    { id: 2, nombre: '4 años' },
+    { id: 3, nombre: '5 años' },
+    { id: 4, nombre: 'Primero' },
+    { id: 5, nombre: 'Segundo' },
+    { id: 6, nombre: 'Tercero' },
+    { id: 7, nombre: 'Cuarto' },
+    { id: 8, nombre: 'Quinto' },
+    { id: 9, nombre: 'Sexto' }
+  ];
+  const seccionesEstaticas = [
+    { id: 1, nombre: 'A' },
+    { id: 2, nombre: 'B' },
+    { id: 3, nombre: 'C' }
+  ];
+  const cursosEstaticos = [
+    { id: 1, nombre: 'Matemática' },
+    { id: 2, nombre: 'Comunicación' },
+    { id: 3, nombre: 'Ciencia y Tecnología' },
+    { id: 4, nombre: 'Personal Social' },
+    { id: 5, nombre: 'Educación Física' }
+  ];
+  const bimestresEstaticos = [
+    { id: 'I', nombre: 'I° Bimestre' },
+    { id: 'II', nombre: 'II° Bimestre' },
+    { id: 'III', nombre: 'III° Bimestre' },
+    { id: 'IV', nombre: 'IV° Bimestre' }
+  ];
 
-  // Datos simulados por grado-sección
-  const alumnosPorGradoSeccion = {
-    '1-A': ['Pedro Garcia', 'Maria Torres', 'Pedro Ramirez'],
-    '1-B': ['Luis Fernandez', 'Ana Lopez'],
-    '2-A': ['Carlos Ruiz', 'Lucia Vargas'],
-    '2-B': ['Pedro Martinez', 'Valeria Gomez'],
-    '3-A': ['Diego Vega', 'Fernanda Nuñez'],
-    '3-B': ['Sofia Mendoza', 'Andres Salas'],
-  };
+  // 2) Referencias del DOM
+  const gradoSelect    = container.querySelector('#gradoSelect');
+  const seccionSelect  = container.querySelector('#seccionSelect');
+  const cursoSelect    = container.querySelector('#cursoSelect');
+  const bimestreSelect = container.querySelector('#bimestreSelect');
+  const buscarInput    = container.querySelector('#buscarAlumno');
+  const resultadosUl   = container.querySelector('#listaResultados');
+  const tbody          = container.querySelector('.rn-tabla tbody');
+  const btnSiguiente   = container.querySelector('#btnSiguiente');
+  const form           = container.querySelector('#formularioNotas');
+  const mensaje        = container.querySelector('#mensajeConfirmacion');
 
-  let alumnos = [];        // array actual de alumnos
-  let alumnoActual = '';   // nombre del alumno seleccionado
-  let indiceAlumno = 0;    // índice del alumnoActual
+  // 3) Token CSRF para peticiones
+  const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-  // 1) Al iniciar: solo limpio el tbody (table header ya está en el HTML)
-  tbody.innerHTML = '';
+  let alumnos = [];
+  let alumnoActual = '';
+  let indiceAlumno = 0;
 
-  // 2) Función helper para generar las celdas de radios
+  // 4) Función genérica para poblar un select
+  function poblarSelect(selectEl, datos) {
+    datos.forEach(item => {
+      const opt = document.createElement('option');
+      opt.value = item.id;
+      opt.textContent = item.nombre;
+      selectEl.appendChild(opt);
+    });
+  }
+
+  // 5) Poblamos todos los selects al inicio
+  poblarSelect(gradoSelect, gradosEstaticos);
+  poblarSelect(seccionSelect, seccionesEstaticas);
+  poblarSelect(cursoSelect, cursosEstaticos);
+  poblarSelect(bimestreSelect, bimestresEstaticos);
+
+  // 6) Generador de celdas de radios
   function competenciasHTML(idx) {
     return ['c1','c2','c3','final']
       .map(campo => `
@@ -47,26 +83,46 @@ export default function initRegistroNotas(container = document.querySelector('.r
       .join('');
   }
 
-  // 3) Cargar y renderizar filas solo cuando todo esté seleccionado
-  function cargarAlumnos() {
-    const g   = gradoInput.value.trim();
-    const s   = seccionInput.value.trim();
-    const c   = cursoSelect.value;
-    const b   = bimestreInput.value;
-    const key = `${g}-${s}`;
+  // 7) Petición AJAX para traer alumnos de la BD según grado y sección
+  async function fetchAlumnosBD() {
+    try {
+      const res = await fetch('/alumnos/filtrar', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': token,
+        },
+        body: JSON.stringify({
+          grado_id: gradoSelect.value,
+          seccion_id: seccionSelect.value,
+        }),
+      });
+      if (!res.ok) throw new Error(res.statusText);
+      const data = await res.json();
+      return data.map(a => a.nombre_completo);
+    } catch (err) {
+      console.error('Error al cargar alumnos:', err);
+      return [];
+    }
+  }
 
-    // obtengo el array correspondiente o vacío
-    alumnos = alumnosPorGradoSeccion[key] || [];
-    indiceAlumno = 0;
+  // 8) Cargar y renderizar filas solo cuando todo esté seleccionado
+  async function cargarAlumnos() {
+    const g = gradoSelect.value;
+    const s = seccionSelect.value;
+    const c = cursoSelect.value;
+    const b = bimestreSelect.value;
+
     alumnoActual = '';
+    indiceAlumno = 0;
     mensaje.textContent = '';
     resultadosUl.innerHTML = '';
-
-    // limpio siempre el tbody
     tbody.innerHTML = '';
 
-    // solo populamos si todos los selects/inputs tienen valor y hay alumnos
-    if (g && s && c && b && alumnos.length) {
+    if (g && s && c && b) {
+      alumnos = await fetchAlumnosBD();
+      if (!alumnos.length) return;
+
       alumnos.forEach((nombre, idx) => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
@@ -76,12 +132,11 @@ export default function initRegistroNotas(container = document.querySelector('.r
         `;
         tbody.appendChild(tr);
       });
-      // dejamos seleccionado el primero
       alumnoActual = alumnos[0];
     }
   }
 
-  // 4) Buscar sugerencias (no toca la tabla)
+  // 9) Buscar sugerencias
   function buscarAlumno() {
     const term = buscarInput.value.trim().toLowerCase();
     resultadosUl.innerHTML = '';
@@ -101,7 +156,7 @@ export default function initRegistroNotas(container = document.querySelector('.r
       });
   }
 
-  // 5) Mostrar una sola fila para el alumno clicado
+  // 10) Mostrar una sola fila para el alumno clicado
   function mostrarAlumno(nombre) {
     const idx = alumnos.indexOf(nombre);
     if (idx < 0) return;
@@ -116,29 +171,29 @@ export default function initRegistroNotas(container = document.querySelector('.r
     alumnoActual = nombre;
   }
 
-  // 6) Avanzar al siguiente alumno
+  // 11) Avanzar al siguiente alumno
   function siguienteAlumno() {
     if (!alumnos.length) return;
     indiceAlumno = (indiceAlumno + 1) % alumnos.length;
     mostrarAlumno(alumnos[indiceAlumno]);
   }
 
-  // 7) Registrar notas (simulado)
+  // 12) Registrar notas (simulado)
   function registrarNotas(e) {
     e.preventDefault();
     if (!alumnoActual) return;
     mensaje.textContent = `✅ Notas registradas para ${alumnoActual}.`;
   }
 
-  // Listeners de los selects/inputs
-  gradoInput    .addEventListener('change', cargarAlumnos);
-  seccionInput  .addEventListener('change', cargarAlumnos);
-  cursoSelect   .addEventListener('change', cargarAlumnos);
-  bimestreInput .addEventListener('change', cargarAlumnos);
+  // 13) Listeners de eventos
+  gradoSelect    .addEventListener('change', cargarAlumnos);
+  seccionSelect  .addEventListener('change', cargarAlumnos);
+  cursoSelect    .addEventListener('change', cargarAlumnos);
+  bimestreSelect .addEventListener('change', cargarAlumnos);
 
-  buscarInput   .addEventListener('input', buscarAlumno);
-  btnSiguiente  .addEventListener('click', siguienteAlumno);
-  form          .addEventListener('submit', registrarNotas);
+  buscarInput    .addEventListener('input', buscarAlumno);
+  btnSiguiente   .addEventListener('click', siguienteAlumno);
+  form           .addEventListener('submit', registrarNotas);
 }
 
 // Inicializar al DOMContentLoaded

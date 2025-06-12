@@ -43,6 +43,8 @@ Route::post('/pagos', [PagoController::class, 'store'])->name('pagos.store');
 
 Route::get('/alumnos/filtrar', [AlumnoController::class, 'filtrar'])
      ->name('alumnos.filtrar');
+// web.php
+Route::post('/alumnos/filtrar', [AlumnoController::class, 'filtrar'])->name('alumnos.filtrar');
 
 
 // HISTORIAL DE PAGOS
@@ -52,6 +54,11 @@ Route::get('/alumnos/json', [AlumnoController::class,'indexJson']);
 // Para obtener el listado completo de pagos en JSON
 Route::get('/pagos', [PagoController::class, 'index'])
      ->name('pagos.index');
+
+
+//REGISTRO DE NOTAS
+Route::post('/alumnos/filtrar', [AlumnoController::class, 'filtrar'])->name('alumnos.filtrar');
+
 
 
 Route::get('/', function () {

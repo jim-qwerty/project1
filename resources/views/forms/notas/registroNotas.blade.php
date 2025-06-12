@@ -1,49 +1,37 @@
 {{-- resources/views/registroNotas.blade.php --}}
+
+<meta name="csrf-token" content="{{ csrf_token() }}">
+
 <div class="rn-wrapper">
   <form id="formularioNotas" class="rn-form">
     <h2>Registro de Notas</h2>
 
     <div class="rn-input-group">
-      <!-- GRADO como campo de texto -->
+      <!-- GRADO como select -->
       <label class="rn-label">Grado:
-        <input
-          type="text"
-          id="gradoSelect"
-          class="rn-input"
-          placeholder="Ej. 1°"
-        >
-      </label>
-
-      <!-- SECCIÓN como campo de texto -->
-      <label class="rn-label">Sección:
-        <input
-          type="text"
-          id="seccionSelect"
-          class="rn-input"
-          placeholder="Ej. A"
-        >
-      </label>
-
-      <!-- CURSO sigue siendo select -->
-      <label class="rn-label">Curso:
-        <select id="cursoSelect" class="rn-select">
-          <option value="">Seleccionar</option>
-          <option value="Matemática">Matemática</option>
-          <option value="Comunicación">Comunicación</option>
-          <option value="Ciencia y Tecnología">Ciencia y Tecnología</option>
-          <option value="Personal Social">Personal Social</option>
-          <option value="Educación Física">Educación Física</option>
+        <select id="gradoSelect" class="rn-select">
+          <option value="">Seleccionar grado</option>
         </select>
       </label>
 
-      <!-- BIMESTRE sigue siendo select -->
+      <!-- SECCIÓN como select -->
+      <label class="rn-label">Sección:
+        <select id="seccionSelect" class="rn-select">
+          <option value="">Seleccionar sección</option>
+        </select>
+      </label>
+
+      <!-- CURSO como select vacío -->
+      <label class="rn-label">Curso:
+        <select id="cursoSelect" class="rn-select">
+          <option value="">Seleccionar curso</option>
+        </select>
+      </label>
+
+      <!-- BIMESTRE como select vacío -->
       <label class="rn-label">Bimestre:
         <select id="bimestreSelect" class="rn-select">
-          <option value="">Seleccionar</option>
-          <option value="1">1° Bimestre</option>
-          <option value="2">2° Bimestre</option>
-          <option value="3">3° Bimestre</option>
-          <option value="4">4° Bimestre</option>
+          <option value="">Seleccionar bimestre</option>
         </select>
       </label>
     </div>
@@ -77,5 +65,3 @@
     </div>
   </form>
 </div>
-
-
