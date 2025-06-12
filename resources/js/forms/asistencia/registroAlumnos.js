@@ -1,71 +1,105 @@
+// resources/js/forms/asistencia/registroAlumnos.js
 import '/resources/css/forms/asistencia/registroAlumnos.css';
 
 export default function initRegistroAlumnos(container = document.querySelector('.ra-wrapper')) {
   if (!container) return;
 
-  // Referencias a elementos
-  const fechaInput   = container.querySelector('#fechaActual');
-  const gradoInput   = container.querySelector('input[name="grado"]');
-  const seccionInput = container.querySelector('input[name="seccion"]');
-  const tbody        = container.querySelector('#ra-tbody');
+  // 1) Arrays estáticos para los selects
+  const gradosEstaticos = [
+    { id: 1, nombre: '3 años' },
+    { id: 2, nombre: '4 años' },
+    { id: 3, nombre: '5 años' },
+    { id: 4, nombre: 'Primero' },
+    { id: 5, nombre: 'Segundo' },
+    { id: 6, nombre: 'Tercero' },
+    { id: 7, nombre: 'Cuarto' },
+    { id: 8, nombre: 'Quinto' },
+    { id: 9, nombre: 'Sexto' }
+  ];
+  const seccionesEstaticas = [
+    { id: 1, nombre: 'A' },
+    { id: 2, nombre: 'B' },
+    { id: 3, nombre: 'C' }
+  ];
 
-  // 1) Inicializar la fecha de hoy
+  // 2) Referencias al DOM
+  const fechaInput    = container.querySelector('#fechaActual');
+  const gradoSelect   = container.querySelector('#gradoSelect');
+  const seccionSelect = container.querySelector('#seccionSelect');
+  const tbody         = container.querySelector('#ra-tbody');
+
+  // 3) CSRF token para los fetch
+  const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+  // 4) Inicializar placeholder de fecha (editable)
   if (fechaInput) {
     const hoy = new Date();
-    const yyyy = hoy.getFullYear();
-    const mm   = String(hoy.getMonth() + 1).padStart(2, '0');
-    const dd   = String(hoy.getDate()).padStart(2, '0');
-    fechaInput.value = `${yyyy}-${mm}-${dd}`;
+    fechaInput.placeholder = hoy.toISOString().slice(0,10);
   }
 
-  // 2) Función que simula obtener alumnos según grado y sección
-  //    Sustituye esto por un fetch real a tu API cuando la tengas:
-  async function obtenerAlumnos(grado, seccion) {
-    const todos = [
-      { id: 1, nombre: 'Luis Contreras', grado: '1', seccion: 'A' },
-      { id: 2, nombre: 'Pedro Ruiz',     grado: '1', seccion: 'B' },
-      { id: 3, nombre: 'Ana Torres',     grado: '2', seccion: 'A' },
-      // … otros alumnos
-    ];
-    // Filtramos localmente
-    return todos.filter(a => a.grado === grado && a.seccion === seccion);
+  // 5) Helper para poblar un <select>
+  function poblarSelect(selectEl, datos) {
+    selectEl.innerHTML = '<option value="">--Selecciona--</option>';
+    datos.forEach(item => {
+      const o = document.createElement('option');
+      o.value = item.id;
+      o.textContent = item.nombre;
+      selectEl.appendChild(o);
+    });
   }
 
-  // 3) Función que limpia el <tbody> y lo rellena con los alumnos
-  async function cargarTabla() {
-    const grado   = gradoInput.value.trim();
-    const seccion = seccionInput.value.trim();
+  // 6) Poblamos grado y sección con datos estáticos
+  poblarSelect(gradoSelect, gradosEstaticos);
+  poblarSelect(seccionSelect, seccionesEstaticas);
 
-    // Solo procedemos si ambos campos no están vacíos
-    if (!grado || !seccion) {
-      tbody.innerHTML = '';
-      return;
+  // 7) Función real que trae alumnos desde la BD
+  async function obtenerAlumnosDesdeBD(gradoId, seccionId) {
+    const res = await fetch('/alumnos/filtrar', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': token
+      },
+      body: JSON.stringify({
+        grado_id: parseInt(gradoId),
+        seccion_id: parseInt(seccionId)
+      })
+    });
+    if (!res.ok) {
+      console.error('Fallo al cargar alumnos:', res.statusText);
+      return [];
     }
+    // El endpoint debe devolver [{id,nombre_completo},…]
+    const data = await res.json();
+    return data.map(a => ({ id: a.id, nombre: a.nombre_completo }));
+  }
 
-    const alumnos = await obtenerAlumnos(grado, seccion);
+  // 8) Cargar la tabla de asistencia
+  async function cargarTabla() {
+    const grado   = gradoSelect.value;
+    const seccion = seccionSelect.value;
+    const fecha   = fechaInput.value.trim(); // si necesitas usarla
 
-    // Vaciamos filas anteriores
     tbody.innerHTML = '';
+    if (!fecha || !grado || !seccion) return;
 
+    // Trae alumnos reales
+    const alumnos = await obtenerAlumnosDesdeBD(grado, seccion);
     if (alumnos.length === 0) {
       const tr = document.createElement('tr');
-      tr.innerHTML = `<td colspan="5">No hay alumnos para grado "${grado}" sección "${seccion}".</td>`;
+      tr.innerHTML = `<td colspan="5">No hay alumnos para grado "${grado}" sección "${seccion}" el ${fecha}.</td>`;
       tbody.appendChild(tr);
       return;
     }
 
-    // Crear fila por alumno
+    // Construye filas
     alumnos.forEach((al, idx) => {
       const tr = document.createElement('tr');
-
-      // Nº
-      tr.innerHTML += `<td>${idx + 1}</td>`;
-      // Nombre
-      tr.innerHTML += `<td>${al.nombre}</td>`;
-
-      // Estados P, T, F
+      tr.innerHTML = `<td>${idx + 1}</td><td>${al.nombre}</td>`;
+      // Radios P, T, F
       ['P','T','F'].forEach(estado => {
-        // Para “P” agregamos required al primer radio
         const req = estado === 'P' ? 'required' : '';
         tr.innerHTML += `
           <td>
@@ -74,24 +108,19 @@ export default function initRegistroAlumnos(container = document.querySelector('
             </label>
           </td>`;
       });
-
-      // Hidden con el id
+      // Campo oculto con el ID
       tr.innerHTML += `<input type="hidden" name="alumno_id[${al.id}]" value="${al.id}">`;
-
       tbody.appendChild(tr);
     });
   }
 
-  // 4) Escuchamos cambios (o “salir de campo”) en grado y sección
-  gradoInput.addEventListener('change', cargarTabla);
-  seccionInput.addEventListener('change', cargarTabla);
+  // 9) Disparamos la carga al cambiar fecha, grado o sección
+  fechaInput.addEventListener('change', cargarTabla);
+  gradoSelect.addEventListener('change', cargarTabla);
+  seccionSelect.addEventListener('change', cargarTabla);
 
-  // Si quieres también disparar la carga al escribir:
-  // gradoInput.addEventListener('keyup', cargarTabla);
-  // seccionInput.addEventListener('keyup', cargarTabla);
-
-  // 5) (Opcional) Si ya vienen precargados, llamar al inicio
-  if (gradoInput.value && seccionInput.value) {
+  // 10) Si ya vienen valores (edición), cargamos al inicio
+  if (fechaInput.value && gradoSelect.value && seccionSelect.value) {
     cargarTabla();
   }
 }
