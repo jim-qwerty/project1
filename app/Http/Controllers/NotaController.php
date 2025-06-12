@@ -104,4 +104,20 @@ class NotaController extends Controller
         }
         return response()->json(['success' => true]);
     }
+
+    public function indexJson(Request $request)
+{
+  $request->validate([
+    'grado_id'   => 'required|exists:grados,id',
+    'seccion_id' => 'required|exists:secciones,id',
+    'curso_id'   => 'required|exists:cursos,id',
+    'bimestre'   => ['required', Rule::in(['I','II','III','IV'])],
+  ]);
+
+  return Nota::where('grado_id',$request->grado_id)
+             ->where('seccion_id',$request->seccion_id)
+             ->where('curso_id',$request->curso_id)
+             ->where('bimestre',$request->bimestre)
+             ->get(['alumno_id','competencia1','competencia2','competencia3','nota_final']);
+}
 }

@@ -65,6 +65,10 @@ Route::post('/alumnos/filtrar', [AlumnoController::class, 'filtrar'])->name('alu
 //Para pasar los datos del formulario de notas a la bd
 Route::post('/notas', [NotaController::class, 'store'])->name('notas.store');
 
+//Pasar notas del bd al formulario
+Route::get('/notas/filtrar', [NotaController::class,'indexJson']);
+
+
 
 
 Route::get('/', function () {
