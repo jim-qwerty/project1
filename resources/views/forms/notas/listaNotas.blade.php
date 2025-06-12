@@ -1,31 +1,32 @@
+{{-- resources/views/listaNotas.blade.php --}}
+<meta name="csrf-token" content="{{ csrf_token() }}">
+
 <div class="ln-wrapper">
   <form id="formReporteNotas" class="ln-form">
     <h2 class="ln-title">Reporte de Notas</h2>
 
     <div class="ln-filtros">
       <label class="ln-label">Grado:
-        <input type="text" id="gradoSelect" name="grado" class="ln-input" placeholder="Ej. 1">
+        <select id="gradoSelect" name="grado" class="ln-select">
+          <option value="">--Selecciona grado--</option>
+        </select>
       </label>
 
       <label class="ln-label">Sección:
-        <input type="text" id="seccionSelect" name="seccion" class="ln-input" placeholder="Ej. A">
+        <select id="seccionSelect" name="seccion" class="ln-select">
+          <option value="">--Selecciona sección--</option>
+        </select>
       </label>
 
       <label class="ln-label">Curso:
         <select id="cursoSelect" name="curso" class="ln-select">
-          <option value="">--Selecciona--</option>
-          <option value="Matemática">Matemática</option>
-          <option value="Comunicación">Comunicación</option>
+          <option value="">--Selecciona curso--</option>
         </select>
       </label>
 
       <label class="ln-label">Bimestre:
         <select id="bimestreSelect" name="bimestre" class="ln-select">
-          <option value="">--Selecciona--</option>
-          <option value="1">1</option>
-          <option value="2">2</option>
-          <option value="3">3</option>
-          <option value="4">4</option>
+          <option value="">--Selecciona bimestre--</option>
         </select>
       </label>
     </div>
@@ -47,8 +48,8 @@
       </table>
     </div>
 
-    <button id="btnReporte" type="submit" class="ln-btn">📄 Generar Reporte</button>
+    <button id="btnReporte" type="submit" class="ln-btn" style="display:none">
+      📄 Generar Reporte
+    </button>
   </form>
 </div>
-
-
