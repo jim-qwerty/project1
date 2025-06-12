@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Services\NotaService;
 use Illuminate\Http\Request;
+use App\Models\Nota;
+use Illuminate\Validation\Rule;
 
 class NotaController extends Controller
 {
@@ -34,21 +36,24 @@ class NotaController extends Controller
 
     public function store(Request $request)
     {
-        $datos = $request->validate([
-            'alumno_id'     => 'required|exists:alumnos,id',
-            'grado_id'      => 'required|exists:grados,id',
-            'seccion_id'    => 'required|exists:secciones,id',
-            'curso_id'      => 'required|exists:cursos,id',
-            'bimestre'      => 'required|in:I,II,III,IV',
-            'competencia1'  => 'required|in:A,B,C',
-            'competencia2'  => 'required|in:A,B,C',
-            'competencia3'  => 'required|in:A,B,C',
-            'nota_final'    => 'required|in:A,B,C',
-            'docente_id'    => 'nullable|exists:docentes,id',
+        // Validamos que venga un array 'notas'
+        $validated = $request->validate([
+            'notas'                   => 'required|array',
+            'notas.*.alumno_id'       => 'required|integer|exists:alumnos,id',
+            'notas.*.grado_id'        => 'required|integer|exists:grados,id',
+            'notas.*.seccion_id'      => 'required|integer|exists:secciones,id',
+            'notas.*.curso_id'        => 'required|integer|exists:cursos,id',
+            'notas.*.bimestre'        => ['required', Rule::in(['I','II','III','IV'])],
+            'notas.*.competencia1'    => ['required', Rule::in(['A','B','C'])],
+            'notas.*.competencia2'    => ['required', Rule::in(['A','B','C'])],
+            'notas.*.competencia3'    => ['required', Rule::in(['A','B','C'])],
+            'notas.*.nota_final'      => ['required', Rule::in(['A','B','C'])],
         ]);
 
-        $nota = $this->service->crear($datos);
-        return response()->json($nota, 201);
+        // Inserción masiva; si ya existe, el UNIQUE impedirá duplicados
+        Nota::insert($validated['notas']);
+
+        return response()->json(['success' => true], 201);
     }
 
     public function show($id)
@@ -81,7 +86,7 @@ class NotaController extends Controller
             'competencia2'  => 'sometimes|required|in:A,B,C',
             'competencia3'  => 'sometimes|required|in:A,B,C',
             'nota_final'    => 'sometimes|required|in:A,B,C',
-            'docente_id'    => 'nullable|exists:docentes,id',
+            
         ]);
 
         $ok = $this->service->actualizar($id, $datos);

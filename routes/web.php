@@ -8,6 +8,7 @@ use App\Http\Controllers\ApoderadoController;
 use App\Http\Controllers\MatriculaController;
 
 use App\Http\Controllers\PagoController;
+use App\Http\Controllers\NotaController;
 
 
 
@@ -58,6 +59,11 @@ Route::get('/pagos', [PagoController::class, 'index'])
 
 //REGISTRO DE NOTAS
 Route::post('/alumnos/filtrar', [AlumnoController::class, 'filtrar'])->name('alumnos.filtrar');
+// routes/web.php
+
+
+//Para pasar los datos del formulario de notas a la bd
+Route::post('/notas', [NotaController::class, 'store'])->name('notas.store');
 
 
 
