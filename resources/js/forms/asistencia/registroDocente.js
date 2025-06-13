@@ -1,42 +1,92 @@
-import '/resources/css/forms/asistencia/registroDocente.css'; // Asegúrate que Vite procese este archivo
+import '/resources/css/forms/asistencia/registroDocente.css';
 
-export default function initRegistroDocente(container = document.querySelector('registro-docente')) {
+export default function initRegistroDocente(container = document.querySelector('.rd-wrapper')) {
   if (!container) return;
 
-  // Referencias a los elementos
-  const fechaSpan = container.querySelector('#fechaActual');
-  const horaSpan = container.querySelector('#horaActual');
-  const form = container.querySelector('#formRegistroDocente');
-  const mensaje = container.querySelector('#mensajeConfirmacion');
+  // 1) Referencias
+  const nombreInput  = container.querySelector('#nombre');
+  const suggestions  = container.querySelector('#suggestions');
+  const gradoInput   = container.querySelector('#grado');
+  const seccionInput = container.querySelector('#seccion');
+  const fechaSpan    = container.querySelector('#fechaActual');
+  const horaSpan     = container.querySelector('#horaActual');
+  const form         = container.querySelector('#formRegistroDocente');
+  const mensaje      = container.querySelector('#mensajeConfirmacion');
 
-  const actualizarFechaHora = () => {
+  // 2) CSRF para fetch
+  const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+
+  // 3) Reloj
+  function actualizarFechaHora() {
     const ahora = new Date();
-    const yyyy = ahora.getFullYear();
-    const mm = String(ahora.getMonth() + 1).padStart(2, '0');
-    const dd = String(ahora.getDate()).padStart(2, '0');
-    const hh = String(ahora.getHours()).padStart(2, '0');
-    const min = String(ahora.getMinutes()).padStart(2, '0');
-    const ss = String(ahora.getSeconds()).padStart(2, '0');
-
-    if (fechaSpan) fechaSpan.textContent = `${yyyy}-${mm}-${dd}`;
-    if (horaSpan) horaSpan.textContent = `${hh}:${min}:${ss}`;
-  };
-
-  // Iniciar la actualización de fecha y hora
+    fechaSpan.textContent = ahora.toISOString().slice(0,10);
+    horaSpan.textContent  = ahora.toTimeString().slice(0,8);
+  }
   actualizarFechaHora();
   setInterval(actualizarFechaHora, 1000);
 
-  // Manejar el envío del formulario
-  form?.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const nombre  = container.querySelector('#nombre')?.value.trim();
-    const grado   = container.querySelector('#grado')?.value.trim();
-    const seccion = container.querySelector('#seccion')?.value.trim();
-    const fecha   = fechaSpan?.textContent;
-    const hora    = horaSpan?.textContent;
+  // 4) Autocomplete docente
+  let debounce;
+  nombreInput.addEventListener('input', () => {
+    clearTimeout(debounce);
+    const q = nombreInput.value.trim();
+    if (!q) {
+      suggestions.innerHTML = '';
+      gradoInput.value = '';
+      seccionInput.value = '';
+      return;
+    }
+    debounce = setTimeout(async () => {
+      try {
+        const res = await fetch(`/docentes/filtrar?nombre=${encodeURIComponent(q)}`, {
+          headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': csrfToken }
+        });
+        if (!res.ok) throw new Error(res.statusText);
+        const data = await res.json(); 
+        // data = [{ id, apellidos, nombres, grado_nombre, seccion_nombre }, ...]
+        suggestions.innerHTML = data.map(d => `
+          <li
+            data-grado="${d.grado_nombre}"
+            data-seccion="${d.seccion_nombre}"
+          >${d.nombres} ${d.apellidos}</li>
+        `).join('');
+        // click en sugerencia
+        suggestions.querySelectorAll('li').forEach(li => {
+          li.addEventListener('click', () => {
+            nombreInput.value  = li.textContent;
+            gradoInput.value   = li.dataset.grado;
+            seccionInput.value = li.dataset.seccion;
+            suggestions.innerHTML = '';
+          });
+        });
+      } catch(err) {
+        console.error('Error buscando docentes:', err);
+      }
+    }, 300);
+  });
 
-    if (mensaje && nombre && grado && seccion && fecha && hora) {
-      mensaje.textContent = `✅ Asistencia registrada para ${nombre} (Grado: ${grado} – Sección: ${seccion}) el ${fecha} a las ${hora}`;
+  // cierra sugerencias al clicar fuera
+  document.addEventListener('click', e => {
+    if (!container.contains(e.target)) suggestions.innerHTML = '';
+  });
+
+  // 5) Envío de formulario
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const nombre  = nombreInput.value.trim();
+    const grado   = gradoInput.value.trim();
+    const seccion = seccionInput.value.trim();
+    const fecha   = fechaSpan.textContent;
+    const hora    = horaSpan.textContent;
+    if (nombre && grado && seccion) {
+      // Aquí podrías hacer un fetch POST a tu ruta de store de asistencia_docentes
+      // Por simplicidad: mostramos mensaje
+      mensaje.textContent = `✅ Asistencia registrada: ${nombre} – Grado ${grado}, Sección ${seccion} – ${fecha} ${hora}`;
+    } else {
+      mensaje.textContent = '❌ Por favor selecciona un docente válido.';
     }
   });
 }
+
+// Inicializar
+document.addEventListener('DOMContentLoaded', () => initRegistroDocente());

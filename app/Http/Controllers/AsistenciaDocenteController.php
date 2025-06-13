@@ -33,7 +33,7 @@ class AsistenciaDocenteController extends Controller
         $datos = $request->validate([
             'docente_id'   => 'required|exists:docentes,id',
             'fecha'        => 'required|date',
-            'estado'       => 'required|in:P,T,F',
+            
             'hora_registro'=> 'nullable|date_format:H:i:s',
         ]);
 
@@ -64,7 +64,7 @@ class AsistenciaDocenteController extends Controller
         $datos = $request->validate([
             'docente_id'   => 'sometimes|required|exists:docentes,id',
             'fecha'        => 'sometimes|required|date',
-            'estado'       => 'sometimes|required|in:P,T,F',
+            
             'hora_registro'=> 'nullable|date_format:H:i:s',
         ]);
 

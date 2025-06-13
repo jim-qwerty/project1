@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Services\DocenteService;
+use App\Models\Docente;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class DocenteController extends Controller
 {
@@ -110,4 +112,40 @@ class DocenteController extends Controller
         }
         return response()->json(['success' => true]);
     }
+
+    public function filtrar(Request $request)
+    {
+         $request->validate([
+        'nombre' => 'required|string|max:100',
+    ]);
+
+    $q = $request->input('nombre');
+
+    try {
+        $docentes = Docente::where('apellidos', 'like', "%{$q}%")
+            ->orWhere('nombres', 'like', "%{$q}%")
+            ->with(['gradoAsignado', 'seccionAsignada'])
+            ->get();
+
+        $result = $docentes->map(function($d) {
+            return [
+                'id'             => $d->id,
+                'apellidos'      => $d->apellidos,
+                'nombres'        => $d->nombres,
+                'grado_nombre'   => optional($d->gradoAsignado)->nombre,
+                'seccion_nombre' => optional($d->seccionAsignada)->nombre,
+            ];
+        });
+
+        return response()->json($result);
+
+    } catch (\Throwable $e) {
+        Log::error('Error en DocenteController@filtrar: '.$e->getMessage());
+        return response()->json([
+            'error' => 'Error interno al buscar docentes'
+        ], 500);
+    }
+    }
+
+
 }

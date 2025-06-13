@@ -112,7 +112,20 @@ Route::post('/docentes', [DocenteController::class, 'store'])
 Route::get('/docentes', [DocenteController::class, 'index'])
      ->name('docentes.index');
 
+
+// Autocomplete de docentes por nombre completo para REGISTRAR DOCENTE POR ASISTENCIA
+Route::get('/docentes/filtrar', [DocenteController::class, 'filtrar'])
+     ->name('docentes.filtrar');
+
+
+
+
 // Al final la ruta catch-all de formularios
 Route::get('/forms/{carpeta}/{formulario}', function ($carpeta, $formulario) {
     return view("forms.$carpeta.$formulario");
 });
+
+
+
+
+
