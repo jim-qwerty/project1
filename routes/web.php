@@ -9,7 +9,7 @@ use App\Http\Controllers\MatriculaController;
 
 use App\Http\Controllers\PagoController;
 use App\Http\Controllers\NotaController;
-
+use App\Http\Controllers\AsistenciaAlumnoController;
 
 
 //Para matricula
@@ -67,6 +67,13 @@ Route::post('/notas', [NotaController::class, 'store'])->name('notas.store');
 
 //Pasar notas del bd al formulario
 Route::get('/notas/filtrar', [NotaController::class,'indexJson']);
+
+
+
+
+//Registro de asistencia de alumnos
+Route::post('/asistencia-alumnos', [AsistenciaAlumnoController::class, 'store'])
+     ->name('asistencia-alumnos.store');
 
 
 

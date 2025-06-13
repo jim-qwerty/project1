@@ -33,16 +33,18 @@ class AsistenciaAlumnoController extends Controller
     public function store(Request $request)
     {
         $datos = $request->validate([
-            'alumno_id'    => 'required|exists:alumnos,id',
-            'fecha'        => 'required|date',
-            'estado'       => 'required|in:P,T,F',
-            'hora_registro'=> 'nullable|date_format:H:i:s',
-            'grado_id'     => 'required|exists:grados,id',
-            'seccion_id'   => 'required|exists:secciones,id',
-        ]);
+        'asistencias'                 => 'required|array',
+        'asistencias.*.alumno_id'     => 'required|exists:alumnos,id',
+        'asistencias.*.fecha'         => 'required|date',
+        'asistencias.*.estado'        => 'required|in:P,T,F',
+        'asistencias.*.grado_id'      => 'required|exists:grados,id',
+        'asistencias.*.seccion_id'    => 'required|exists:secciones,id',
+    ]);
 
-        $asistencia = $this->service->crear($datos);
-        return response()->json($asistencia, 201);
+    // Inserción masiva
+    \App\Models\AsistenciaAlumno::insert($datos['asistencias']);
+
+    return response()->json(['success' => true], 201);
     }
 
     public function show($id)
@@ -69,7 +71,7 @@ class AsistenciaAlumnoController extends Controller
             'alumno_id'    => 'sometimes|required|exists:alumnos,id',
             'fecha'        => 'sometimes|required|date',
             'estado'       => 'sometimes|required|in:P,T,F',
-            'hora_registro'=> 'nullable|date_format:H:i:s',
+            
             'grado_id'     => 'sometimes|required|exists:grados,id',
             'seccion_id'   => 'sometimes|required|exists:secciones,id',
         ]);

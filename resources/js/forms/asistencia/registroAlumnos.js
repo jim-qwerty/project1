@@ -27,32 +27,33 @@ export default function initRegistroAlumnos(container = document.querySelector('
   const gradoSelect   = container.querySelector('#gradoSelect');
   const seccionSelect = container.querySelector('#seccionSelect');
   const tbody         = container.querySelector('#ra-tbody');
+  const form          = container.querySelector('form.ra-form');
 
-  // 3) CSRF token para los fetch
+  // 3) CSRF token para las peticiones
   const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-  // 4) Inicializar placeholder de fecha (editable)
+  // 4) Inicializar placeholder de la fecha de hoy
   if (fechaInput) {
     const hoy = new Date();
-    fechaInput.placeholder = hoy.toISOString().slice(0,10);
+    fechaInput.placeholder = hoy.toISOString().slice(0, 10);
   }
 
-  // 5) Helper para poblar un <select>
+  // 5) Helper para poblar un <select> con datos
   function poblarSelect(selectEl, datos) {
     selectEl.innerHTML = '<option value="">--Selecciona--</option>';
     datos.forEach(item => {
-      const o = document.createElement('option');
-      o.value = item.id;
-      o.textContent = item.nombre;
-      selectEl.appendChild(o);
+      const opt = document.createElement('option');
+      opt.value = item.id;
+      opt.textContent = item.nombre;
+      selectEl.appendChild(opt);
     });
   }
 
-  // 6) Poblamos grado y sección con datos estáticos
+  // 6) Poblamos los selects de grado y sección
   poblarSelect(gradoSelect, gradosEstaticos);
   poblarSelect(seccionSelect, seccionesEstaticas);
 
-  // 7) Función real que trae alumnos desde la BD
+  // 7) Función para traer alumnos desde la BD según grado_id y seccion_id
   async function obtenerAlumnosDesdeBD(gradoId, seccionId) {
     const res = await fetch('/alumnos/filtrar', {
       method: 'POST',
@@ -63,67 +64,114 @@ export default function initRegistroAlumnos(container = document.querySelector('
         'X-CSRF-TOKEN': token
       },
       body: JSON.stringify({
-        grado_id: parseInt(gradoId),
-        seccion_id: parseInt(seccionId)
+        grado_id: parseInt(gradoId, 10),
+        seccion_id: parseInt(seccionId, 10),
       })
     });
     if (!res.ok) {
-      console.error('Fallo al cargar alumnos:', res.statusText);
+      console.error('Error cargando alumnos:', res.statusText);
       return [];
     }
-    // El endpoint debe devolver [{id,nombre_completo},…]
-    const data = await res.json();
+    const data = await res.json(); // [{ id, nombre_completo }]
     return data.map(a => ({ id: a.id, nombre: a.nombre_completo }));
   }
 
-  // 8) Cargar la tabla de asistencia
+  // 8) Función que limpia y vuelve a poblar la tabla
   async function cargarTabla() {
-    const grado   = gradoSelect.value;
-    const seccion = seccionSelect.value;
-    const fecha   = fechaInput.value.trim(); // si necesitas usarla
+    tbody.innerHTML = ''; // limpiar siempre primero
 
-    tbody.innerHTML = '';
-    if (!fecha || !grado || !seccion) return;
+    const fecha    = fechaInput.value.trim();
+    const gradoId  = gradoSelect.value;
+    const seccionId= seccionSelect.value;
 
-    // Trae alumnos reales
-    const alumnos = await obtenerAlumnosDesdeBD(grado, seccion);
+    if (!fecha || !gradoId || !seccionId) return;
+
+    const alumnos = await obtenerAlumnosDesdeBD(gradoId, seccionId);
+
     if (alumnos.length === 0) {
       const tr = document.createElement('tr');
-      tr.innerHTML = `<td colspan="5">No hay alumnos para grado "${grado}" sección "${seccion}" el ${fecha}.</td>`;
+      tr.innerHTML = `<td colspan="5">
+        No hay alumnos para grado "${gradoSelect.options[gradoSelect.selectedIndex].text}"
+        sección "${seccionSelect.options[seccionSelect.selectedIndex].text}" el ${fecha}.
+      </td>`;
       tbody.appendChild(tr);
       return;
     }
 
-    // Construye filas
     alumnos.forEach((al, idx) => {
       const tr = document.createElement('tr');
       tr.innerHTML = `<td>${idx + 1}</td><td>${al.nombre}</td>`;
-      // Radios P, T, F
       ['P','T','F'].forEach(estado => {
         const req = estado === 'P' ? 'required' : '';
         tr.innerHTML += `
           <td>
             <label>
-              <input type="radio" name="estado[${al.id}]" value="${estado}" ${req}>
+              <input
+                type="radio"
+                name="estado[${al.id}]"
+                value="${estado}"
+                ${req}
+              >
             </label>
           </td>`;
       });
-      // Campo oculto con el ID
       tr.innerHTML += `<input type="hidden" name="alumno_id[${al.id}]" value="${al.id}">`;
       tbody.appendChild(tr);
     });
   }
 
-  // 9) Disparamos la carga al cambiar fecha, grado o sección
+  // 9) Listeners para recargar la tabla al cambiar fecha, grado o sección
   fechaInput.addEventListener('change', cargarTabla);
   gradoSelect.addEventListener('change', cargarTabla);
   seccionSelect.addEventListener('change', cargarTabla);
 
-  // 10) Si ya vienen valores (edición), cargamos al inicio
+  // 10) Interceptar envío del form y enviar a la BD
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+
+    const fecha    = fechaInput.value.trim();
+    const gradoId  = parseInt(gradoSelect.value, 10);
+    const seccionId= parseInt(seccionSelect.value, 10);
+
+    // Recolectar asistencias
+    const filas = Array.from(tbody.querySelectorAll('tr'));
+    const asistencias = filas.map(tr => {
+      const alumnoId = tr.querySelector('input[type="hidden"]').value;
+      const estadoEl = tr.querySelector(`input[name="estado[${alumnoId}]"]:checked`);
+      return {
+        alumno_id:   parseInt(alumnoId, 10),
+        fecha:       fecha,
+        estado:      estadoEl ? estadoEl.value : null,
+        grado_id:    gradoId,
+        seccion_id:  seccionId
+      };
+    }).filter(a => a.estado);
+
+    // Enviar al controlador
+    try {
+      const res = await fetch('/asistencia-alumnos', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': token
+        },
+        body: JSON.stringify({ asistencias })
+      });
+      if (!res.ok) throw new Error(await res.text());
+      alert('✅ Asistencias guardadas correctamente');
+    } catch (err) {
+      console.error('Error guardando asistencias:', err);
+      alert('❌ Error al guardar');
+    }
+  });
+
+  // 11) Carga inicial si ya hay valores preestablecidos
   if (fechaInput.value && gradoSelect.value && seccionSelect.value) {
     cargarTabla();
   }
 }
 
-// Inicializar cuando el DOM esté listo
+// Inicializar al DOMContentLoaded
 document.addEventListener('DOMContentLoaded', () => initRegistroAlumnos());
