@@ -11,6 +11,10 @@ use App\Http\Controllers\PagoController;
 use App\Http\Controllers\NotaController;
 use App\Http\Controllers\AsistenciaAlumnoController;
 
+use App\Http\Controllers\DocenteController;
+
+use App\Http\Controllers\AsistenciaDocenteController;
+
 
 //Para matricula
 Route::post('/alumnos',      [AlumnoController::class,   'store'])->name('alumnos.store');
@@ -99,7 +103,7 @@ Route::post('/usuarios',       [UsuarioController::class, 'store'])->name('usuar
 Route::resource('usuarios', UsuarioController::class);
 
 
-use App\Http\Controllers\DocenteController;
+
 
 Route::get('/docentes/create', [DocenteController::class, 'create'])
      ->name('docentes.create');
@@ -116,6 +120,13 @@ Route::get('/docentes', [DocenteController::class, 'index'])
 // Autocomplete de docentes por nombre completo para REGISTRAR DOCENTE POR ASISTENCIA
 Route::get('/docentes/filtrar', [DocenteController::class, 'filtrar'])
      ->name('docentes.filtrar');
+
+
+   
+
+// Ruta para registrar la asistencia de un docente (POST /asistencia-docentes)
+Route::post('/asistencia-docentes', [AsistenciaDocenteController::class, 'store'])
+     ->name('asistencia-docentes.store');
 
 
 

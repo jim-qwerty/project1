@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Services\AsistenciaDocenteService;
 use Illuminate\Http\Request;
+use App\Models\AsistenciaDocente;
 
 class AsistenciaDocenteController extends Controller
 {
@@ -31,14 +32,14 @@ class AsistenciaDocenteController extends Controller
     public function store(Request $request)
     {
         $datos = $request->validate([
-            'docente_id'   => 'required|exists:docentes,id',
-            'fecha'        => 'required|date',
-            
-            'hora_registro'=> 'nullable|date_format:H:i:s',
+            'docente_id'    => 'required|exists:docentes,id',
+            'fecha'         => 'required|date',
+            'hora_registro' => 'required|date_format:H:i:s',
         ]);
 
-        $asistencia = $this->service->crear($datos);
-        return response()->json($asistencia, 201);
+        AsistenciaDocente::create($datos);
+
+        return response()->json(['success' => true], 201);
     }
 
     public function show($id)
