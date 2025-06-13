@@ -75,6 +75,11 @@ Route::get('/notas/filtrar', [NotaController::class,'indexJson']);
 Route::post('/asistencia-alumnos', [AsistenciaAlumnoController::class, 'store'])
      ->name('asistencia-alumnos.store');
 
+   //PARA LA LISTA DE ASISTENCIA DE ALUMNOS
+
+Route::get('/asistencia-alumnos/filtrar', [AsistenciaAlumnoController::class, 'filtrar'])
+     ->name('asistencia-alumnos.filtrar');
+
 
 
 

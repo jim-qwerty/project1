@@ -91,4 +91,26 @@ class AsistenciaAlumnoController extends Controller
         }
         return response()->json(['success' => true]);
     }
+
+    public function filtrar(Request $request)
+{
+    $request->validate([
+      'grado_id'   => 'required|exists:grados,id',
+      'seccion_id' => 'required|exists:secciones,id',
+      'mes'        => 'required|date_format:Y-m',
+    ]);
+
+    // Extraemos año y mes
+    [$year, $month] = explode('-', $request->mes);
+
+    // Traemos las asistencias de ese mes, grado y sección
+    $asistencias = \App\Models\AsistenciaAlumno::where('grado_id', $request->grado_id)
+        ->where('seccion_id', $request->seccion_id)
+        ->whereYear('fecha', $year)
+        ->whereMonth('fecha', $month)
+        ->get(['alumno_id','fecha','estado']);
+
+    return response()->json($asistencias);
+}
+
 }

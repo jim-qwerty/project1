@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class AsistenciaAlumno extends Model
 {
+    use HasFactory;
+
     protected $table = 'asistencia_alumnos';
     protected $fillable = ['alumno_id', 'fecha', 'estado', 'grado_id', 'seccion_id'];
 

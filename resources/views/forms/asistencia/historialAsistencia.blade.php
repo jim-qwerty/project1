@@ -1,15 +1,22 @@
+
+<!-- Token CSRF para protección contra CSRF -->
+<meta name="csrf-token" content="{{ csrf_token() }}">
 <div class="ha-wrapper">
   <div class="ha-form">
     <h2 class="ha-titulo">Resumen Mensual de Asistencia</h2>
 
     <div class="ha-form-group">
       <label for="grado" class="ha-label">Grado:</label>
-      <input type="text" id="grado" class="ha-input" placeholder="Ej. 1°">
+      <select id="grado" class="ha-input" required>
+        <option value="">--Selecciona grado--</option>
+      </select>
     </div>
 
     <div class="ha-form-group">
       <label for="seccion" class="ha-label">Sección:</label>
-      <input type="text" id="seccion" class="ha-input" placeholder="Ej. A">
+      <select id="seccion" class="ha-input" required>
+        <option value="">--Selecciona sección--</option>
+      </select>
     </div>
 
     <div class="ha-form-group ha-autocomplete">
@@ -26,7 +33,9 @@
 
     <div class="ha-form-group">
       <label for="mes" class="ha-label">Mes:</label>
-      <input type="month" id="mes" class="ha-input" readonly>
+      <select id="mes" class="ha-input" required>
+        <option value="">--Selecciona mes--</option>
+      </select>
     </div>
 
     <hr>
