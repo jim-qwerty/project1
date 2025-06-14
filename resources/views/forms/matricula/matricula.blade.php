@@ -1,6 +1,5 @@
 <meta name="csrf-token" content="{{ csrf_token() }}">
 
-
 <div class="m-wrapper">
   <!-- FORMULARIO DE MATRÍCULA -->
   <form id="matricula-form" class="m-formulario">
@@ -11,32 +10,69 @@
 
       <div class="m-input-box">
         <span class="m-details">Nombres</span>
-        <input type="text" required pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+" placeholder="Ingrese nombres">
+        <input
+          type="text"
+          id="nombres"
+          name="nombres"
+          required
+          pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+"
+          placeholder="Ingrese nombres"
+        >
       </div>
 
       <div class="m-input-box">
         <span class="m-details">Apellidos</span>
-        <input type="text" required pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+" placeholder="Ingrese apellidos">
+        <input
+          type="text"
+          id="apellidos"
+          name="apellidos"
+          required
+          pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+"
+          placeholder="Ingrese apellidos"
+        >
       </div>
 
       <div class="m-input-box">
         <span class="m-details">DNI</span>
-        <input type="text" required pattern="\d{8}" maxlength="8" placeholder="Ingrese DNI">
+        <input
+          type="text"
+          id="dni"
+          name="dni"
+          required
+          pattern="\d{8}"
+          maxlength="8"
+          placeholder="Ingrese DNI"
+        >
       </div>
 
       <div class="m-input-box">
         <span class="m-details">Fecha de nacimiento</span>
-        <input type="date" id="fecha-nacimiento" required>
+        <input
+          type="date"
+          id="fecha-nacimiento"
+          name="fecha_nacimiento"
+          required
+        >
       </div>
 
       <div class="m-input-box">
         <span class="m-details">Edad</span>
-        <input type="text" id="edad" readonly placeholder="Edad">
+        <input
+          type="text"
+          id="edad"
+          name="edad"
+          readonly
+          placeholder="Edad"
+        >
       </div>
 
       <div class="m-input-box">
         <span class="m-details">Nivel educativo</span>
-        <select id="nivel-educativo" required>
+        <select
+          id="nivel-educativo"
+          name="nivel_educativo"
+          required
+        >
           <option value="">Seleccione</option>
           <option value="Inicial">Inicial</option>
           <option value="Primaria">Primaria</option>
@@ -45,29 +81,55 @@
 
       <div class="m-input-box">
         <span class="m-details">Grado</span>
-        <select id="grado" required>
+        <select
+          id="grado"
+          name="grado_id"
+          required
+        >
           <option value="">Seleccione grado</option>
         </select>
       </div>
 
-      <!-- Nuevo bloque Sección -->
       <div class="m-input-box">
         <span class="m-details">Sección</span>
-        <select id="seccion" required>
+        <select
+          id="seccion"
+          name="seccion_id"
+          required
+        >
           <option value="">Seleccione sección</option>
         </select>
       </div>
 
       <div class="m-input-box">
         <span class="m-details">Dirección</span>
-        <input type="text" required placeholder="Ingrese dirección">
+        <input
+          type="text"
+          id="direccion"
+          name="direccion"
+          required
+          placeholder="Ingrese dirección"
+        >
       </div>
 
       <div class="m-input-box">
         <span class="m-details">Sexo</span>
         <div class="m-radio-group">
-          <label><input type="radio" name="sexo" value="Masculino" required> Masculino</label>
-          <label><input type="radio" name="sexo" value="Femenino"> Femenino</label>
+          <label>
+            <input
+              type="radio"
+              name="sexo"
+              value="Masculino"
+              required
+            > Masculino
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="sexo"
+              value="Femenino"
+            > Femenino
+          </label>
         </div>
       </div>
     </div>
@@ -77,32 +139,75 @@
 
       <div class="m-input-box">
         <span class="m-details">Nombres</span>
-        <input type="text" required pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+" placeholder="Ingrese nombres del apoderado">
+        <input
+          type="text"
+          id="apoderado_nombres"
+          name="apoderado_nombres"
+          required
+          pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+"
+          placeholder="Ingrese nombres del apoderado"
+        >
       </div>
 
       <div class="m-input-box">
         <span class="m-details">Apellidos</span>
-        <input type="text" required pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+" placeholder="Ingrese apellidos del apoderado">
+        <input
+          type="text"
+          id="apoderado_apellidos"
+          name="apoderado_apellidos"
+          required
+          pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+"
+          placeholder="Ingrese apellidos del apoderado"
+        >
       </div>
 
       <div class="m-input-box">
         <span class="m-details">DNI</span>
-        <input type="text" required pattern="\d{8}" maxlength="8" placeholder="Ingrese DNI del apoderado">
+        <input
+          type="text"
+          id="apoderado_dni"
+          name="apoderado_dni"
+          required
+          pattern="\d{8}"
+          maxlength="8"
+          placeholder="Ingrese DNI del apoderado"
+        >
       </div>
 
       <div class="m-input-box">
         <span class="m-details">Parentesco</span>
-        <input type="text" required pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+" placeholder="Padre, Madre, Tutor, etc.">
+        <input
+          type="text"
+          id="parentesco"
+          name="parentesco"
+          required
+          pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+"
+          placeholder="Padre, Madre, Tutor, etc."
+        >
       </div>
 
       <div class="m-input-box">
         <span class="m-details">Celular</span>
-        <input type="text" required pattern="\d{9}" maxlength="9" placeholder="Ingrese celular">
+        <input
+          type="text"
+          id="celular"
+          name="celular"
+          required
+          pattern="\d{9}"
+          maxlength="9"
+          placeholder="Ingrese celular"
+        >
       </div>
 
       <div class="m-input-box">
         <span class="m-details">Correo electrónico</span>
-        <input type="email" required placeholder="Ingrese email">
+        <input
+          type="email"
+          id="correo_electronico"
+          name="correo_electronico"
+          required
+          placeholder="Ingrese email"
+        >
       </div>
     </div>
 
@@ -110,8 +215,6 @@
       <input type="submit" value="Procesar Matrícula">
     </div>
   </form>
-
-  
 
   <!-- CONFIRMACIÓN -->
   <div id="confirmacion" class="m-confirmacion" style="display: none;">
@@ -124,6 +227,6 @@
     </div>
   </div>
 
-  <div id="mensaje" class="m-mensaje" style="display:none; color: green; margin-bottom: 1em;"></div>
+  <div id="mensaje" class="m-mensaje"
+       style="display:none; color: green; margin-bottom: 1em;"></div>
 </div>
-

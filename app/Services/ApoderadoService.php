@@ -2,42 +2,42 @@
 
 namespace App\Services;
 
-use App\DAOs\ApoderadoDAO;
+use App\Contracts\ApoderadoRepositoryInterface;
 use Illuminate\Support\Facades\DB;
 
 class ApoderadoService
 {
-    protected $apoderadoDAO;
+    protected $repository;
 
-    public function __construct(ApoderadoDAO $apoderadoDAO)
+    public function __construct(ApoderadoRepositoryInterface $repository)
     {
-        $this->apoderadoDAO = $apoderadoDAO;
+        $this->repository = $repository;
     }
 
     public function listar()
     {
-        return $this->apoderadoDAO->getAll();
+        return $this->repository->getAll();
     }
 
     public function obtener(int $id)
     {
-        return $this->apoderadoDAO->findById($id);
+        return $this->repository->findById($id);
     }
 
     public function crear(array $datos)
     {
         return DB::transaction(function () use ($datos) {
-            return $this->apoderadoDAO->create($datos);
+            return $this->repository->create($datos);
         });
     }
 
     public function actualizar(int $id, array $datos)
     {
-        return $this->apoderadoDAO->update($id, $datos);
+        return $this->repository->update($id, $datos);
     }
 
     public function eliminar(int $id)
     {
-        return $this->apoderadoDAO->delete($id);
+        return $this->repository->delete($id);
     }
 }

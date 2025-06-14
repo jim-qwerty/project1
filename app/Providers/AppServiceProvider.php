@@ -17,8 +17,8 @@ use App\Services\CursoService;
 use App\Contracts\AlumnoRepositoryInterface;
 use App\DAOs\AlumnoDAO;
 
+use App\Contracts\ApoderadoRepositoryInterface;
 use App\DAOs\ApoderadoDAO;
-use App\Services\ApoderadoService;
 
 use App\DAOs\MatriculaDAO;
 use App\Services\MatriculaService;
@@ -70,19 +70,17 @@ class AppServiceProvider extends ServiceProvider
         });
 
         
-        // Vinculación de la interfaz al DAO concreto
+        // Binding Alumno
         $this->app->bind(
             AlumnoRepositoryInterface::class,
             AlumnoDAO::class
         );
 
-        // Binding ApoderadoDAO → ApoderadoService
-        $this->app->bind(ApoderadoDAO::class, function($app) {
-            return new ApoderadoDAO();
-        });
-        $this->app->bind(ApoderadoService::class, function($app) {
-            return new ApoderadoService($app->make(ApoderadoDAO::class));
-        });
+        // Binding Apoderado
+        $this->app->bind(
+        ApoderadoRepositoryInterface::class,
+        ApoderadoDAO::class
+    );
 
         // Binding MatriculaDAO → MatriculaService
         $this->app->bind(MatriculaDAO::class, function($app) {

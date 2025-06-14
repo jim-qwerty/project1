@@ -2,9 +2,10 @@
 
 namespace App\DAOs;
 
+use App\Contracts\ApoderadoRepositoryInterface;
 use App\Models\Apoderado;
 
-class ApoderadoDAO
+class ApoderadoDAO implements ApoderadoRepositoryInterface
 {
     public function getAll()
     {
@@ -13,7 +14,7 @@ class ApoderadoDAO
 
     public function findById(int $id): ?Apoderado
     {
-        return Apoderado::find($id);
+        return Apoderado::with('alumno')->find($id);
     }
 
     public function create(array $data): Apoderado

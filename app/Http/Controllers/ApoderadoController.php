@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Apoderado\StoreApoderadoRequest;
+use App\Http\Requests\Apoderado\UpdateApoderadoRequest;
 use App\Services\ApoderadoService;
-use Illuminate\Http\Request;
 
 class ApoderadoController extends Controller
 {
@@ -22,24 +23,12 @@ class ApoderadoController extends Controller
 
     public function create()
     {
-        // Si deseas pasar lista de alumnos para el select:
-        // $alumnos = app(\App\Services\AlumnoService::class)->listar();
-        // return view('apoderados.create', compact('alumnos'));
         return view('apoderados.create');
     }
 
-    public function store(Request $request)
+    public function store(StoreApoderadoRequest $request)
     {
-        $datos = $request->validate([
-            'alumno_id'        => 'required|exists:alumnos,id',
-            'nombres'          => 'required|string|max:100',
-            'apellidos'        => 'required|string|max:100',
-            'dni'              => 'nullable|size:8',
-            'parentesco'       => 'nullable|string|max:50',
-            'celular'          => 'nullable|size:9',
-            'correo_electronico'=> 'nullable|email|max:100',
-        ]);
-
+        $datos     = $request->validated();
         $apoderado = $this->service->crear($datos);
         return response()->json($apoderado, 201);
     }
@@ -62,19 +51,10 @@ class ApoderadoController extends Controller
         return view('apoderados.edit', compact('apoderado'));
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdateApoderadoRequest $request, $id)
     {
-        $datos = $request->validate([
-            'alumno_id'        => 'sometimes|required|exists:alumnos,id',
-            'nombres'          => 'sometimes|required|string|max:100',
-            'apellidos'        => 'sometimes|required|string|max:100',
-            'dni'              => 'nullable|size:8',
-            'parentesco'       => 'nullable|string|max:50',
-            'celular'          => 'nullable|size:9',
-            'correo_electronico'=> 'nullable|email|max:100',
-        ]);
-
-        $ok = $this->service->actualizar($id, $datos);
+        $datos = $request->validated();
+        $ok    = $this->service->actualizar($id, $datos);
         if (! $ok) {
             return response()->json(['error' => 'No encontrado o no actualizado'], 404);
         }
