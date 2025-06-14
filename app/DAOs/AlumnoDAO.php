@@ -2,9 +2,10 @@
 
 namespace App\DAOs;
 
+use App\Contracts\AlumnoRepositoryInterface;
 use App\Models\Alumno;
 
-class AlumnoDAO
+class AlumnoDAO implements AlumnoRepositoryInterface
 {
     public function getAll()
     {
