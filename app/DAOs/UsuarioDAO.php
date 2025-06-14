@@ -16,6 +16,11 @@ class UsuarioDAO
         return Usuario::find($id);
     }
 
+    public function findByUsername(string $username): ?Usuario
+    {
+        return Usuario::where('username', $username)->first();
+    }
+
     public function create(array $data): Usuario
     {
         return Usuario::create($data);

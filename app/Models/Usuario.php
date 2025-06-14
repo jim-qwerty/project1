@@ -2,25 +2,42 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 
-class Usuario extends Model
+class Usuario extends Authenticatable
 {
-    // Campos asignables
+    use Notifiable;
+
+    protected $table = 'usuarios';
+
     protected $fillable = [
-      'username','password_hash',
-      'rol','docente_id',
-      'nombres','apellidos'
-      // NOTA: ya no incluimos 'estado' en fillable si no lo enviamos desde el form
+        'username',
+        'password_hash',
+        'rol',
+        'docente_id',
+        'nombres',
+        'apellidos',
     ];
 
-    // Atributos que siempre parten con este valor
+    // Asigna por defecto 'activo' al crear un nuevo registro
     protected $attributes = [
-      'estado' => 'activo',
+        'estado' => 'activo',
     ];
 
-    protected $hidden = ['password_hash'];
+    // Oculta el hash de la respuesta JSON
+    protected $hidden = [
+        'password_hash',
+        'remember_token',
+    ];
 
+    // Laravel Auth usa esta propiedad como password
+    public function getAuthPassword()
+    {
+        return $this->password_hash;
+    }
+
+    // Relación con Docente
     public function docente()
     {
         return $this->belongsTo(Docente::class, 'docente_id');

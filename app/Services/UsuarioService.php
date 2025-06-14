@@ -28,16 +28,18 @@ class UsuarioService
     public function crear(array $datos)
     {
         return DB::transaction(function () use ($datos) {
-            // Hashear contraseña
+            // Hashear la contraseña antes de crear
             $datos['password_hash'] = Hash::make($datos['password_hash']);
-            // Estado por defecto
-            $datos['estado'] = $datos['estado'] ?? 'activo';
             return $this->usuarioDAO->create($datos);
         });
     }
 
     public function actualizar(int $id, array $datos)
     {
+        // Si viene nueva contraseña, la hasheamos
+        if (isset($datos['password_hash'])) {
+            $datos['password_hash'] = Hash::make($datos['password_hash']);
+        }
         return $this->usuarioDAO->update($id, $datos);
     }
 
