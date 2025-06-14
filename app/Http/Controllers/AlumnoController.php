@@ -6,6 +6,8 @@ use App\Models\User;
 use App\Services\AlumnoService;
 use Illuminate\Http\Request;
 use App\Models\Alumno;
+use Illuminate\Support\Str;
+
 
 class AlumnoController extends Controller
 {
@@ -103,18 +105,20 @@ class AlumnoController extends Controller
 
     public function indexJson()
 {
-    /// Trae id, grado_id, seccion_id, nombres y apellidos
-    $alumnos = Alumno::select(['id','grado_id','seccion_id','nombres','apellidos'])
-        ->get()
-        ->map(function($a) {
-            return [
-                'id'              => $a->id,
-                'grado_id'        => $a->grado_id,
-                'seccion_id'      => $a->seccion_id,
-                'nombres'         => $a->nombres,
-                'apellidos'       => $a->apellidos,
-            ];
-        });
+    $alumnos = Alumno::with(['grado','seccion'])
+      ->get()
+      ->map(function($a) {
+        return [
+          'id'        => $a->id,
+          'nombres'   => $a->nombres,
+          'apellidos' => $a->apellidos,
+          // ahora incluyes el nombre de grado y sección
+          'grado'     => $a->grado->nombre,
+          'seccion'   => $a->seccion->nombre,
+          // y su estado de matrícula para el <select>
+          'estado'    => ucfirst($a->estado_matricula),
+        ];
+      });
 
     return response()->json($alumnos);
 }
@@ -140,4 +144,27 @@ class AlumnoController extends Controller
 
     return response()->json($alumnos);
 }
+
+
+
+    public function updateEstados(Request $request)
+{
+    // Valida que venga un array de updates
+    $data = $request->validate([
+        'updates'   => 'required|array',
+        'updates.*.id'     => 'required|integer|exists:alumnos,id',
+        'updates.*.estado' => 'required|string|in:Matriculado,En proceso,Retirado',
+    ]);
+
+    foreach ($data['updates'] as $u) {
+        \App\Models\Alumno::where('id', $u['id'])
+            ->update([
+                'estado_matricula' => Str::slug($u['estado'], '_')
+                // convierte "En proceso" → "en_proceso"
+            ]);
+    }
+
+    return response()->json(['success' => true]);
+}
+
 }

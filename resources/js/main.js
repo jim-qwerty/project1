@@ -1,4 +1,4 @@
-console.log("MAIN.JS CARGADO");
+
 
 document.addEventListener("DOMContentLoaded", () => {
   inicializarSidebar();
@@ -94,7 +94,7 @@ function inicializarSidebar() {
           
           if (typeof modulo.default === "function") {
             modulo.default(container);
-            console.log("ERROR")
+            
           }
 
 

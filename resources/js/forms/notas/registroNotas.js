@@ -17,8 +17,7 @@ export default function initRegistroNotas(container = document.querySelector('.r
   ];
   const seccionesEstaticas = [
     { id: 1, nombre: 'A' },
-    { id: 2, nombre: 'B' },
-    { id: 3, nombre: 'C' }
+    { id: 2, nombre: 'B' }
   ];
   const cursosEstaticos = [
     { id: 1, nombre: 'Matemática' },

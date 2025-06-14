@@ -10,6 +10,9 @@ export default function initListaMatriculas(container = document.querySelector('
   const filtroGrado   = container.querySelector('#filtro-grado');
   const filtroSeccion = container.querySelector('#filtro-seccion');
   const tablaBody     = container.querySelector('#tabla-alumnos tbody');
+  const guardarBtn    = container.querySelector('#guardar-btn');
+  const mensajeOK     = container.querySelector('#mensaje-confirmacion');
+  const csrfToken     = document.querySelector('meta[name="csrf-token"]').content;
 
   let datosAlumnos = [];
 
@@ -27,12 +30,11 @@ export default function initListaMatriculas(container = document.querySelector('
   ];
   const seccionesEstaticas = [
     { id: 1, nombre: 'A' },
-    { id: 2, nombre: 'B' },
-    { id: 3, nombre: 'C' }
+    { id: 2, nombre: 'B' }
   ];
 
   // Población inicial de selects estáticos
-  filtroGrado.innerHTML   = '<option value="">Todos los grados</option>';
+  filtroGrado.innerHTML = '<option value="">Todos los grados</option>';
   gradosEstaticos.forEach(g => {
     filtroGrado.insertAdjacentHTML(
       'beforeend',
@@ -48,22 +50,12 @@ export default function initListaMatriculas(container = document.querySelector('
     );
   });
 
-  // Vacía la tabla inicialmente
-  tablaBody.innerHTML = '';
-
-  // Traer datos de la BD vía endpoint JSON
-  fetch('/alumnos/json')
-    .then(res => res.json())
-    .then(json => {
-      datosAlumnos = json;
-    })
-    .catch(err => console.error('Error cargando alumnos:', err));
-
-  // Renderizar filas
+  // Función para renderizar filas
   const renderizarTabla = filas => {
     tablaBody.innerHTML = '';
     filas.forEach(al => {
       const tr = document.createElement('tr');
+      tr.dataset.id = al.id;
       tr.innerHTML = `
         <td>${al.nombres}</td>
         <td>${al.apellidos}</td>
@@ -71,9 +63,9 @@ export default function initListaMatriculas(container = document.querySelector('
         <td>${al.seccion}</td>
         <td>
           <select class="lm-estado-select">
-            <option ${al.estado==='Matriculado'? 'selected':''}>Matriculado</option>
-            <option ${al.estado==='En proceso'? 'selected':''}>En proceso</option>
-            <option ${al.estado==='Retirado'? 'selected':''}>Retirado</option>
+            <option ${al.estado === 'Matriculado' ? 'selected' : ''}>Matriculado</option>
+            <option ${al.estado === 'En proceso' ? 'selected' : ''}>En proceso</option>
+            <option ${al.estado === 'Retirado' ? 'selected' : ''}>Retirado</option>
           </select>
         </td>
       `;
@@ -81,7 +73,7 @@ export default function initListaMatriculas(container = document.querySelector('
     });
   };
 
-  // Filtrar por grado y sección
+  // Filtrar datos en memoria
   const obtenerFiltrados = () => {
     const g = filtroGrado.value;
     const s = filtroSeccion.value;
@@ -91,26 +83,44 @@ export default function initListaMatriculas(container = document.querySelector('
     );
   };
 
-  // Al cambiar filtros
-  const onFiltroCambio = () => {
+  // Vacía la tabla
+  const limpiarTabla = () => {
     tablaBody.innerHTML = '';
+  };
+
+  // Inicial: trae datos, pero no renderiza hasta que ambos selects tengan valor
+  fetch('/alumnos/json')
+    .then(res => res.json())
+    .then(json => {
+      datosAlumnos = json;
+      // no renderizar aquí
+    })
+    .catch(err => console.error('Error cargando alumnos:', err));
+
+  // Cuando cambian filtros
+  const onFiltroCambio = () => {
     buscador.value = '';
     sugerencias.style.display = 'none';
     if (filtroGrado.value && filtroSeccion.value) {
+      // si ambos seleccionados, mostrar
       renderizarTabla(obtenerFiltrados());
+    } else {
+      // si falta uno, limpiar
+      limpiarTabla();
     }
   };
   filtroGrado.addEventListener('change', onFiltroCambio);
   filtroSeccion.addEventListener('change', onFiltroCambio);
 
-  // Sugerencias de búsqueda
+  // Sugerencias de búsqueda (solo tiene efecto si ya hay filas mostradas)
   buscador.addEventListener('input', () => {
     const texto = buscador.value.trim().toLowerCase();
-    const list = obtenerFiltrados()
+    const filtrados = obtenerFiltrados();
+    const list = filtrados
       .filter(al => (`${al.nombres} ${al.apellidos}`).toLowerCase().includes(texto))
       .slice(0, 5);
 
-    if (texto && list.length) {
+    if (texto && list.length && filtroGrado.value && filtroSeccion.value) {
       sugerencias.innerHTML = '';
       list.forEach(al => {
         const div = document.createElement('div');
@@ -128,11 +138,45 @@ export default function initListaMatriculas(container = document.querySelector('
     }
   });
 
-  // Ocultar sugerencias al click fuera
   document.addEventListener('click', e => {
     if (!container.contains(e.target)) {
       sugerencias.style.display = 'none';
     }
+  });
+
+  // Guardar cambios en BD
+  guardarBtn.addEventListener('click', () => {
+    // solo permitir guardar si ambos filtros están seleccionados
+    if (!(filtroGrado.value && filtroSeccion.value)) {
+      alert('Seleccione grado y sección para guardar cambios.');
+      return;
+    }
+
+    const updates = Array.from(tablaBody.querySelectorAll('tr')).map(tr => ({
+      id:     tr.dataset.id,
+      estado: tr.querySelector('.lm-estado-select').value
+    }));
+
+    fetch('/alumnos/estado', {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': csrfToken
+      },
+      body: JSON.stringify({ updates })
+    })
+    .then(res => {
+      if (!res.ok) throw new Error('Error en servidor');
+      return res.json();
+    })
+    .then(() => {
+      mensajeOK.style.display = 'block';
+      setTimeout(() => mensajeOK.style.display = 'none', 3000);
+    })
+    .catch(err => {
+      console.error(err);
+      alert('No se pudieron guardar los cambios.');
+    });
   });
 }
 

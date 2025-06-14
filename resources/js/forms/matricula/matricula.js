@@ -42,8 +42,7 @@ export default function initMatriculaForm(container = document.getElementById('f
   };
   const secciones = [
     { id:1,nombre:'A' },
-    { id:2,nombre:'B' },
-    { id:3,nombre:'C' }
+    { id:2,nombre:'B' }
   ];
   secciones.forEach(s=>{
     seccionSelect.insertAdjacentHTML(

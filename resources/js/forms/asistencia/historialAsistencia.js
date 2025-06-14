@@ -26,8 +26,7 @@ export default function initHistorialAsistencia(container = document.querySelect
   ];
   const seccionesEstaticas = [
     { id: 1, nombre: 'A' },
-    { id: 2, nombre: 'B' },
-    { id: 3, nombre: 'C' }
+    { id: 2, nombre: 'B' }
   ];
   const mesesEstaticos = [
     { id: '01', nombre: 'Enero' },

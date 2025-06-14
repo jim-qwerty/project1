@@ -78,6 +78,9 @@ Route::middleware('auth')->group(function () {
     Route::match(['get','post'], '/alumnos/filtrar', [AlumnoController::class, 'filtrar'])
          ->name('alumnos.filtrar');
 
+         Route::patch('/alumnos/estado', [AlumnoController::class, 'updateEstados'])
+     ->name('alumnos.updateEstados');
+
     // Notas
     Route::post('/notas', [NotaController::class, 'store'])
          ->name('notas.store');
