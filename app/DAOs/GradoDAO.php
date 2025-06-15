@@ -2,18 +2,20 @@
 
 namespace App\DAOs;
 
+use App\Contracts\GradoRepositoryInterface;
 use App\Models\Grado;
 
-class GradoDAO
+class GradoDAO implements GradoRepositoryInterface
 {
     public function getAll()
     {
-        return Grado::all();
+        // Incluimos relaciones si las hubiera
+        return Grado::with(['secciones', 'docentesAsignados'])->get();
     }
 
     public function findById(int $id): ?Grado
     {
-        return Grado::find($id);
+        return Grado::with(['secciones', 'docentesAsignados'])->find($id);
     }
 
     public function create(array $data): Grado

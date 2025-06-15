@@ -2,9 +2,10 @@
 
 namespace App\DAOs;
 
+use App\Contracts\SeccionRepositoryInterface;
 use App\Models\Seccion;
 
-class SeccionDAO
+class SeccionDAO implements SeccionRepositoryInterface
 {
     public function getAll()
     {

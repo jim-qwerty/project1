@@ -2,12 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AsistenciaAlumno\StoreAsistenciaAlumnoRequest;
+use App\Http\Requests\AsistenciaAlumno\UpdateAsistenciaAlumnoRequest;
+use App\Http\Requests\AsistenciaAlumno\FiltrarAsistenciaAlumnoRequest;
 use App\Services\AsistenciaAlumnoService;
-use Illuminate\Http\Request;
+use App\Models\AsistenciaAlumno;
+use Illuminate\Support\Facades\Log;
 
 class AsistenciaAlumnoController extends Controller
 {
-    protected $service;
+    protected AsistenciaAlumnoService $service;
 
     public function __construct(AsistenciaAlumnoService $service)
     {
@@ -16,35 +20,20 @@ class AsistenciaAlumnoController extends Controller
 
     public function index()
     {
-        $asistencias = $this->service->listar();
-        return response()->json($asistencias);
+        return response()->json($this->service->listar());
     }
 
     public function create()
     {
-        // Puedes pasar lista de alumnos, grados, secciones si necesitas selects:
-        // $alumnos   = app(\App\Services\AlumnoService::class)->listar();
-        // $grados    = app(\App\Services\GradoService::class)->listar();
-        // $secciones = app(\App\Services\SeccionService::class)->listar();
-        // return view('asistencia-alumnos.create', compact('alumnos','grados','secciones'));
         return view('asistencia-alumnos.create');
     }
 
-    public function store(Request $request)
+    public function store(StoreAsistenciaAlumnoRequest $request)
     {
-        $datos = $request->validate([
-        'asistencias'                 => 'required|array',
-        'asistencias.*.alumno_id'     => 'required|exists:alumnos,id',
-        'asistencias.*.fecha'         => 'required|date',
-        'asistencias.*.estado'        => 'required|in:P,T,F',
-        'asistencias.*.grado_id'      => 'required|exists:grados,id',
-        'asistencias.*.seccion_id'    => 'required|exists:secciones,id',
-    ]);
-
-    // Inserción masiva
-    \App\Models\AsistenciaAlumno::insert($datos['asistencias']);
-
-    return response()->json(['success' => true], 201);
+        foreach ($request->validated()['asistencias'] as $item) {
+            $this->service->crear($item);
+        }
+        return response()->json(['success' => true], 201);
     }
 
     public function show($id)
@@ -65,18 +54,9 @@ class AsistenciaAlumnoController extends Controller
         return view('asistencia-alumnos.edit', compact('asistencia'));
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdateAsistenciaAlumnoRequest $request, $id)
     {
-        $datos = $request->validate([
-            'alumno_id'    => 'sometimes|required|exists:alumnos,id',
-            'fecha'        => 'sometimes|required|date',
-            'estado'       => 'sometimes|required|in:P,T,F',
-            
-            'grado_id'     => 'sometimes|required|exists:grados,id',
-            'seccion_id'   => 'sometimes|required|exists:secciones,id',
-        ]);
-
-        $ok = $this->service->actualizar($id, $datos);
+        $ok = $this->service->actualizar($id, $request->validated());
         if (! $ok) {
             return response()->json(['error' => 'No encontrado o no actualizado'], 404);
         }
@@ -92,25 +72,17 @@ class AsistenciaAlumnoController extends Controller
         return response()->json(['success' => true]);
     }
 
-    public function filtrar(Request $request)
-{
-    $request->validate([
-      'grado_id'   => 'required|exists:grados,id',
-      'seccion_id' => 'required|exists:secciones,id',
-      'mes'        => 'required|date_format:Y-m',
-    ]);
+    public function filtrar(FiltrarAsistenciaAlumnoRequest $request)
+    {
+        $data = $request->validated();
+        [$year, $month] = explode('-', $data['mes']);
 
-    // Extraemos año y mes
-    [$year, $month] = explode('-', $request->mes);
+        $asistencias = AsistenciaAlumno::where('grado_id', $data['grado_id'])
+            ->where('seccion_id', $data['seccion_id'])
+            ->whereYear('fecha', $year)
+            ->whereMonth('fecha', $month)
+            ->get(['alumno_id','fecha','estado']);
 
-    // Traemos las asistencias de ese mes, grado y sección
-    $asistencias = \App\Models\AsistenciaAlumno::where('grado_id', $request->grado_id)
-        ->where('seccion_id', $request->seccion_id)
-        ->whereYear('fecha', $year)
-        ->whereMonth('fecha', $month)
-        ->get(['alumno_id','fecha','estado']);
-
-    return response()->json($asistencias);
-}
-
+        return response()->json($asistencias);
+    }
 }

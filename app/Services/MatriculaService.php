@@ -2,43 +2,40 @@
 
 namespace App\Services;
 
-use App\DAOs\MatriculaDAO;
+use App\Contracts\MatriculaRepositoryInterface;
 use Illuminate\Support\Facades\DB;
 
 class MatriculaService
 {
-    protected $matriculaDAO;
+    protected MatriculaRepositoryInterface $repository;
 
-    public function __construct(MatriculaDAO $matriculaDAO)
+    public function __construct(MatriculaRepositoryInterface $repository)
     {
-        $this->matriculaDAO = $matriculaDAO;
+        $this->repository = $repository;
     }
 
     public function listar()
     {
-        return $this->matriculaDAO->getAll();
+        return $this->repository->getAll();
     }
 
     public function obtener(int $id)
     {
-        return $this->matriculaDAO->findById($id);
+        return $this->repository->findById($id);
     }
 
     public function crear(array $datos)
     {
-        return DB::transaction(function () use ($datos) {
-            return $this->matriculaDAO->create($datos);
-        });
+        return DB::transaction(fn() => $this->repository->create($datos));
     }
 
     public function actualizar(int $id, array $datos)
     {
-        return $this->matriculaDAO->update($id, $datos);
+        return $this->repository->update($id, $datos);
     }
 
     public function eliminar(int $id)
     {
-        return $this->matriculaDAO->delete($id);
+        return $this->repository->delete($id);
     }
 }
-

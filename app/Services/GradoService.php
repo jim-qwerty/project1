@@ -2,42 +2,42 @@
 
 namespace App\Services;
 
-use App\DAOs\GradoDAO;
+use App\Contracts\GradoRepositoryInterface;
 use Illuminate\Support\Facades\DB;
 
 class GradoService
 {
-    protected $gradoDAO;
+    protected $repository;
 
-    public function __construct(GradoDAO $gradoDAO)
+    public function __construct(GradoRepositoryInterface $repository)
     {
-        $this->gradoDAO = $gradoDAO;
+        $this->repository = $repository;
     }
 
     public function listar()
     {
-        return $this->gradoDAO->getAll();
+        return $this->repository->getAll();
     }
 
     public function obtener(int $id)
     {
-        return $this->gradoDAO->findById($id);
+        return $this->repository->findById($id);
     }
 
     public function crear(array $datos)
     {
         return DB::transaction(function () use ($datos) {
-            return $this->gradoDAO->create($datos);
+            return $this->repository->create($datos);
         });
     }
 
     public function actualizar(int $id, array $datos)
     {
-        return $this->gradoDAO->update($id, $datos);
+        return $this->repository->update($id, $datos);
     }
 
     public function eliminar(int $id)
     {
-        return $this->gradoDAO->delete($id);
+        return $this->repository->delete($id);
     }
 }

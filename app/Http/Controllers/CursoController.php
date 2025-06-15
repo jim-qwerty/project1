@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Curso\StoreCursoRequest;
+use App\Http\Requests\Curso\UpdateCursoRequest;
 use App\Services\CursoService;
-use Illuminate\Http\Request;
 
 class CursoController extends Controller
 {
-    protected $service;
+    protected CursoService $service;
 
     public function __construct(CursoService $service)
     {
@@ -16,8 +17,7 @@ class CursoController extends Controller
 
     public function index()
     {
-        $cursos = $this->service->listar();
-        return response()->json($cursos);
+        return response()->json($this->service->listar());
     }
 
     public function create()
@@ -25,13 +25,9 @@ class CursoController extends Controller
         return view('cursos.create');
     }
 
-    public function store(Request $request)
+    public function store(StoreCursoRequest $request)
     {
-        $datos = $request->validate([
-            'nombre' => 'required|string|max:100',
-        ]);
-
-        $curso = $this->service->crear($datos);
+        $curso = $this->service->crear($request->validated());
         return response()->json($curso, 201);
     }
 
@@ -53,13 +49,9 @@ class CursoController extends Controller
         return view('cursos.edit', compact('curso'));
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdateCursoRequest $request, $id)
     {
-        $datos = $request->validate([
-            'nombre' => 'sometimes|required|string|max:100',
-        ]);
-
-        $ok = $this->service->actualizar($id, $datos);
+        $ok = $this->service->actualizar($id, $request->validated());
         if (! $ok) {
             return response()->json(['error' => 'No encontrado o no actualizado'], 404);
         }

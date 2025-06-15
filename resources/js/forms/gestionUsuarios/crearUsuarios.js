@@ -5,61 +5,53 @@ import axios from 'axios';
 export default function initCrearUsuarios(container = document.querySelector('.cu-wrapper')) {
   if (!container) return;
 
-  // Array que luego llenaremos desde la API
   let profesores = [];
 
   // Referencias UI
-  const rolSel        = container.querySelector('#rolUsuario');
-  const buscadorInp   = container.querySelector('#buscadorNombre');
-  const sugerDiv      = container.querySelector('#sugerenciasNombres');
-  const inputDocente  = container.querySelector('#inputDocenteId');
-  const inputNombres  = container.querySelector('#inputNombres');
-  const inputApellidos= container.querySelector('#inputApellidos');
-  const inputUsuario  = container.querySelector('#inputUsuario');
-  const passInp       = container.querySelector('#inputPassword');
-  const form          = container.querySelector('#formularioCrearUsuario');
-  const mensajeP      = container.querySelector('#mensaje');
+  const rolSel         = container.querySelector('#rolUsuario');
+  const buscadorInp    = container.querySelector('#buscadorNombre');
+  const sugerDiv       = container.querySelector('#sugerenciasNombres');
+  const inputDocente   = container.querySelector('#inputDocenteId');
+  const inputNombres   = container.querySelector('#inputNombres');
+  const inputApellidos = container.querySelector('#inputApellidos');
+  const inputUsuario   = container.querySelector('#inputUsuario');
+  const passInp        = container.querySelector('#inputPassword');
+  const form           = container.querySelector('#formularioCrearUsuario');
+  const mensajeP       = container.querySelector('#mensaje');
 
-  // Deshabilita o habilita el buscador según rol
+  // Activa o desactiva el buscador según rol
   const toggleBuscador = () => {
     const esProfesor = rolSel.value === 'profesor';
     buscadorInp.disabled = !esProfesor;
     if (!esProfesor) {
       buscadorInp.value = '';
       inputDocente.value = '';
-      limpiarSugerencias();
+      inputNombres.value = '';
+      inputApellidos.value = '';
+      sugerDiv.innerHTML = '';
     }
   };
 
-  // Limpia el contenedor de sugerencias
-  const limpiarSugerencias = () => {
-    sugerDiv.innerHTML = '';
-  };
-
-  // Filtra los nombres de profesores según el término
+  // Muestra las sugerencias
   const mostrarSugerencias = () => {
-    limpiarSugerencias();
+    sugerDiv.innerHTML = '';
     if (rolSel.value !== 'profesor') return;
 
     const term = buscadorInp.value.trim().toLowerCase();
     if (!term) return;
 
     profesores
-      .map(p => p.nombre)
-      .filter(nombre => nombre.toLowerCase().includes(term))
-      .forEach(nombre => {
+      .filter(p => p.nombre.toLowerCase().includes(term))
+      .forEach(p => {
         const div = document.createElement('div');
-        div.textContent = nombre;
+        div.textContent = p.nombre;
         div.addEventListener('click', () => {
-          buscadorInp.value = nombre;
-          // Busca el objeto completo para obtener el id
-          const docente = profesores.find(p => p.nombre === nombre);
-          inputDocente.value = docente?.id || '';
-          // Rellena los campos de nombre y apellido
-          const partes = nombre.split(' ');
-          inputApellidos.value = partes.pop();
-          inputNombres.value  = partes.join(' ');
-          limpiarSugerencias();
+          buscadorInp.value    = p.nombre;
+          inputDocente.value   = p.id;
+          // Ahora copiamos directamente los campos separados:
+          inputNombres.value   = p.nombres;
+          inputApellidos.value = p.apellidos;
+          sugerDiv.innerHTML   = '';
         });
         sugerDiv.appendChild(div);
       });
@@ -74,35 +66,43 @@ export default function initCrearUsuarios(container = document.querySelector('.c
   // Eventos
   rolSel.addEventListener('change', toggleBuscador);
   buscadorInp.addEventListener('input', mostrarSugerencias);
-  buscadorInp.addEventListener('blur', () => setTimeout(limpiarSugerencias, 150));
+  buscadorInp.addEventListener('blur', () => setTimeout(() => sugerDiv.innerHTML = '', 150));
 
-  // Inicializa el estado del buscador
+  // Inicializar
   toggleBuscador();
 
-  // ==== 1) Carga los profesores desde la API ====
+  // Cargar profesores
   axios.get('/docentes')
     .then(({ data }) => {
-      // data debe ser un array de objetos { id, nombres, apellidos, ... }
-      // Aquí transformamos en [{ id, nombre: "Nombres Apellidos" }, ...]
+      // Guardamos nombres y apellidos por separado para evitar errores de split
       profesores = data.map(d => ({
-        id: d.id,
-        nombre: `${d.nombres} ${d.apellidos}`
+        id:        d.id,
+        nombres:   d.nombres,
+        apellidos: d.apellidos,
+        nombre:    `${d.nombres} ${d.apellidos}`
       }));
     })
     .catch(err => console.error('Error cargando docentes:', err));
-  // ==============================================
 
   // Envío del formulario
   form.addEventListener('submit', e => {
     e.preventDefault();
+    mensajeP.textContent = '';
+
+    // Validación de contraseña
+    if (passInp.value.length < 6) {
+      mensajeP.textContent = 'La contraseña debe tener al menos 6 caracteres.';
+      mensajeP.style.color   = 'red';
+      return;
+    }
 
     const payload = {
-      rol:           rolSel.value,
-      nombres:       inputNombres.value.trim(),
-      apellidos:     inputApellidos.value.trim(),
-      username:      inputUsuario.value.trim(),
-      password_hash: passInp.value,
-      estado:        'activo'
+      rol:       rolSel.value,
+      nombres:   inputNombres.value.trim(),
+      apellidos: inputApellidos.value.trim(),
+      username:  inputUsuario.value.trim(),
+      password:  passInp.value,
+      estado:    'activo'
     };
 
     if (rolSel.value === 'profesor') {
@@ -119,7 +119,7 @@ export default function initCrearUsuarios(container = document.querySelector('.c
         setTimeout(() => mensajeP.textContent = '', 3000);
       })
       .catch(err => {
-        console.error('Error completo:', JSON.stringify(err.response?.data, null, 2));
+        console.error('Error completo:', err.response?.data);
         const errs = err.response?.data?.errors;
         if (errs) {
           mensajeP.innerHTML = Object.values(errs).flat().join('<br>');

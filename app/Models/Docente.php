@@ -3,8 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Grado;    // ← importa tu modelo Grado
-use App\Models\Seccion;  // ← importa tu modelo Seccion
+use App\Models\Grado;
+use App\Models\Seccion;
 
 class Docente extends Model
 {
@@ -14,7 +14,6 @@ class Docente extends Model
       'correo_electronico','celular','direccion','sexo','estado',
     ];
 
-    // Un docente asignado a un grado y sección
     public function gradoAsignado()
     {
         return $this->belongsTo(Grado::class, 'grado_asignado_id');
@@ -25,19 +24,16 @@ class Docente extends Model
         return $this->belongsTo(Seccion::class, 'seccion_asignada_id');
     }
 
-    // Asistencia del docente
     public function asistencias()
     {
         return $this->hasMany(AsistenciaDocente::class, 'docente_id');
     }
 
-    // Notas que registra
     public function notasRegistradas()
     {
         return $this->hasMany(Nota::class, 'docente_id');
     }
 
-    // Usuario (si tiene cuenta)
     public function usuario()
     {
         return $this->hasOne(Usuario::class, 'docente_id');

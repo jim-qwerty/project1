@@ -10,7 +10,10 @@ class AsistenciaAlumno extends Model
     use HasFactory;
 
     protected $table = 'asistencia_alumnos';
-    protected $fillable = ['alumno_id', 'fecha', 'estado', 'grado_id', 'seccion_id'];
+    protected $fillable = [
+        'alumno_id', 'fecha', 'estado',
+        'grado_id', 'seccion_id'
+    ];
 
     public function alumno()
     {

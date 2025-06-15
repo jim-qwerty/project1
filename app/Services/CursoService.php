@@ -2,42 +2,40 @@
 
 namespace App\Services;
 
-use App\DAOs\CursoDAO;
+use App\Contracts\CursoRepositoryInterface;
 use Illuminate\Support\Facades\DB;
 
 class CursoService
 {
-    protected $cursoDAO;
+    protected CursoRepositoryInterface $repository;
 
-    public function __construct(CursoDAO $cursoDAO)
+    public function __construct(CursoRepositoryInterface $repository)
     {
-        $this->cursoDAO = $cursoDAO;
+        $this->repository = $repository;
     }
 
     public function listar()
     {
-        return $this->cursoDAO->getAll();
+        return $this->repository->getAll();
     }
 
     public function obtener(int $id)
     {
-        return $this->cursoDAO->findById($id);
+        return $this->repository->findById($id);
     }
 
     public function crear(array $datos)
     {
-        return DB::transaction(function () use ($datos) {
-            return $this->cursoDAO->create($datos);
-        });
+        return DB::transaction(fn() => $this->repository->create($datos));
     }
 
     public function actualizar(int $id, array $datos)
     {
-        return $this->cursoDAO->update($id, $datos);
+        return $this->repository->update($id, $datos);
     }
 
     public function eliminar(int $id)
     {
-        return $this->cursoDAO->delete($id);
+        return $this->repository->delete($id);
     }
 }

@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Seccion\StoreSeccionRequest;
+use App\Http\Requests\Seccion\UpdateSeccionRequest;
 use App\Services\SeccionService;
-use Illuminate\Http\Request;
 
 class SeccionController extends Controller
 {
@@ -22,20 +23,14 @@ class SeccionController extends Controller
 
     public function create()
     {
-        // Si necesitas pasar la lista de grados para el select, obténla aquí:
-        // $grados = app(\App\Services\GradoService::class)->listar();
-        // return view('secciones.create', compact('grados'));
         return view('secciones.create');
     }
 
-    public function store(Request $request)
+    public function store(StoreSeccionRequest $request)
     {
-        $datos = $request->validate([
-        'nombre' => 'required|string|max:10',
-    ]);
-
-    $seccion = $this->service->crear($datos);
-    return response()->json($seccion, 201);
+        $datos    = $request->validated();
+        $seccion  = $this->service->crear($datos);
+        return response()->json($seccion, 201);
     }
 
     public function show($id)
@@ -56,13 +51,10 @@ class SeccionController extends Controller
         return view('secciones.edit', compact('seccion'));
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdateSeccionRequest $request, $id)
     {
-        $datos = $request->validate([
-        'nombre' => 'sometimes|required|string|max:10',
-    ]);
-
-    $ok = $this->service->actualizar($id, $datos);
+        $datos = $request->validated();
+        $ok    = $this->service->actualizar($id, $datos);
         if (! $ok) {
             return response()->json(['error' => 'No encontrado o no actualizado'], 404);
         }

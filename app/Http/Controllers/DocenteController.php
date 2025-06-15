@@ -2,14 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Docente\StoreDocenteRequest;
+use App\Http\Requests\Docente\UpdateDocenteRequest;
+use App\Http\Requests\Docente\FiltrarDocenteRequest;
 use App\Services\DocenteService;
 use App\Models\Docente;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class DocenteController extends Controller
 {
-    protected $service;
+    protected DocenteService $service;
 
     public function __construct(DocenteService $service)
     {
@@ -18,49 +20,19 @@ class DocenteController extends Controller
 
     public function index()
     {
-        $docentes = $this->service->listar();
-        return response()->json($docentes);
+        return response()->json($this->service->listar());
     }
 
     public function create()
     {
-        // Si requieres listas de grados/secciones:
-        // $grados    = app(\App\Services\GradoService::class)->listar();
-        // $secciones = app(\App\Services\SeccionService::class)->listar();
-        // return view('docentes.create', compact('grados', 'secciones'));
         return view('docentes.create');
     }
 
-    public function store(Request $request)
-{
-    // 1) Validación
-    $datos = $request->validate([
-        'nombres'             => 'required|string|max:100',
-        'apellidos'           => 'required|string|max:100',
-        'dni'                 => 'required|size:8|unique:docentes,dni',
-        'fecha_nacimiento'    => 'required|date',
-        'edad'                => 'nullable|integer',
-        'grado_asignado_id'   => 'required|exists:grados,id',
-        'seccion_asignada_id' => 'required|exists:secciones,id',
-        'correo_electronico'  => 'required|email|max:100',
-        'celular'             => 'required|size:9',
-        'direccion'           => 'required|string|max:200',
-        'sexo'                => 'required|in:M,F',
-        'estado'              => 'required|in:activo,inactivo',
-    ]);
-
-    // 2) Persistencia a través de tu servicio
-    $docente = $this->service->crear($datos);
-
-    // 3) ¿Cómo respondes?
-    // - Si es formulario tradicional: rediriges con mensaje de éxito
-    return redirect()
-        ->back()
-        ->with('success', 'Docente registrado correctamente.');
-
-    // - Si es AJAX (JSON): devuelves el objeto y código 201
-    // return response()->json($docente, 201);
-}
+    public function store(StoreDocenteRequest $request)
+    {
+        $this->service->crear($request->validated());
+        return redirect()->back()->with('success', 'Docente registrado correctamente.');
+    }
 
     public function show($id)
     {
@@ -80,24 +52,9 @@ class DocenteController extends Controller
         return view('docentes.edit', compact('docente'));
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdateDocenteRequest $request, $id)
     {
-        $datos = $request->validate([
-            'nombres'               => 'sometimes|required|string|max:100',
-            'apellidos'             => 'sometimes|required|string|max:100',
-            'dni'                   => "sometimes|required|size:8|unique:docentes,dni,$id",
-            'fecha_nacimiento'      => 'sometimes|required|date',
-            'edad'                  => 'nullable|integer',
-            'grado_asignado_id'     => 'nullable|exists:grados,id',
-            'seccion_asignada_id'   => 'nullable|exists:secciones,id',
-            'correo_electronico'    => 'nullable|email|max:100',
-            'celular'               => 'nullable|size:9',
-            'direccion'             => 'nullable|string|max:200',
-            'sexo'                  => 'sometimes|required|in:M,F',
-            'estado'                => 'in:activo,inactivo',
-        ]);
-
-        $ok = $this->service->actualizar($id, $datos);
+        $ok = $this->service->actualizar($id, $request->validated());
         if (! $ok) {
             return response()->json(['error' => 'No encontrado o no actualizado'], 404);
         }
@@ -113,39 +70,28 @@ class DocenteController extends Controller
         return response()->json(['success' => true]);
     }
 
-    public function filtrar(Request $request)
+    public function filtrar(FiltrarDocenteRequest $request)
     {
-         $request->validate([
-        'nombre' => 'required|string|max:100',
-    ]);
+        $q = $request->validated()['nombre'];
 
-    $q = $request->input('nombre');
+        try {
+            $docentes = Docente::where('apellidos', 'like', "%{$q}%")
+                ->orWhere('nombres', 'like', "%{$q}%")
+                ->with(['gradoAsignado', 'seccionAsignada'])
+                ->get();
 
-    try {
-        $docentes = Docente::where('apellidos', 'like', "%{$q}%")
-            ->orWhere('nombres', 'like', "%{$q}%")
-            ->with(['gradoAsignado', 'seccionAsignada'])
-            ->get();
-
-        $result = $docentes->map(function($d) {
-            return [
+            $result = $docentes->map(fn($d) => [
                 'id'             => $d->id,
                 'apellidos'      => $d->apellidos,
                 'nombres'        => $d->nombres,
                 'grado_nombre'   => optional($d->gradoAsignado)->nombre,
                 'seccion_nombre' => optional($d->seccionAsignada)->nombre,
-            ];
-        });
+            ]);
 
-        return response()->json($result);
-
-    } catch (\Throwable $e) {
-        Log::error('Error en DocenteController@filtrar: '.$e->getMessage());
-        return response()->json([
-            'error' => 'Error interno al buscar docentes'
-        ], 500);
+            return response()->json($result);
+        } catch (\Throwable $e) {
+            Log::error('Error en DocenteController@filtrar: '.$e->getMessage());
+            return response()->json(['error' => 'Error interno al buscar docentes'], 500);
+        }
     }
-    }
-
-
 }

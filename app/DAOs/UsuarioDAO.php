@@ -2,11 +2,13 @@
 
 namespace App\DAOs;
 
+use App\Contracts\UsuarioRepositoryInterface;
 use App\Models\Usuario;
+use Illuminate\Support\Collection;
 
-class UsuarioDAO
+class UsuarioDAO implements UsuarioRepositoryInterface
 {
-    public function getAll()
+    public function getAll(): Collection
     {
         return Usuario::with('docente')->get();
     }
@@ -28,19 +30,13 @@ class UsuarioDAO
 
     public function update(int $id, array $data): bool
     {
-        $usuario = Usuario::find($id);
-        if (! $usuario) {
-            return false;
-        }
-        return $usuario->update($data);
+        $usuario = $this->findById($id);
+        return $usuario ? $usuario->update($data) : false;
     }
 
     public function delete(int $id): bool
     {
-        $usuario = Usuario::find($id);
-        if (! $usuario) {
-            return false;
-        }
-        return $usuario->delete();
+        $usuario = $this->findById($id);
+        return $usuario ? $usuario->delete() : false;
     }
 }

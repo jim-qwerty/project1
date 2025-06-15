@@ -2,9 +2,10 @@
 
 namespace App\DAOs;
 
+use App\Contracts\MatriculaRepositoryInterface;
 use App\Models\Matricula;
 
-class MatriculaDAO
+class MatriculaDAO implements MatriculaRepositoryInterface
 {
     public function getAll()
     {
@@ -13,7 +14,7 @@ class MatriculaDAO
 
     public function findById(int $id): ?Matricula
     {
-        return Matricula::find($id);
+        return Matricula::with('alumno')->find($id);
     }
 
     public function create(array $data): Matricula

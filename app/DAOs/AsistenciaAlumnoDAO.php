@@ -2,9 +2,10 @@
 
 namespace App\DAOs;
 
+use App\Contracts\AsistenciaAlumnoRepositoryInterface;
 use App\Models\AsistenciaAlumno;
 
-class AsistenciaAlumnoDAO
+class AsistenciaAlumnoDAO implements AsistenciaAlumnoRepositoryInterface
 {
     public function getAll()
     {
@@ -13,7 +14,7 @@ class AsistenciaAlumnoDAO
 
     public function findById(int $id): ?AsistenciaAlumno
     {
-        return AsistenciaAlumno::find($id);
+        return AsistenciaAlumno::with(['alumno','grado','seccion'])->find($id);
     }
 
     public function create(array $data): AsistenciaAlumno
@@ -39,4 +40,3 @@ class AsistenciaAlumnoDAO
         return $asistencia->delete();
     }
 }
-

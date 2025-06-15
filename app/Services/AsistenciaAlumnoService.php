@@ -2,42 +2,40 @@
 
 namespace App\Services;
 
-use App\DAOs\AsistenciaAlumnoDAO;
+use App\Contracts\AsistenciaAlumnoRepositoryInterface;
 use Illuminate\Support\Facades\DB;
 
 class AsistenciaAlumnoService
 {
-    protected $asistenciaDAO;
+    protected AsistenciaAlumnoRepositoryInterface $repository;
 
-    public function __construct(AsistenciaAlumnoDAO $asistenciaDAO)
+    public function __construct(AsistenciaAlumnoRepositoryInterface $repository)
     {
-        $this->asistenciaDAO = $asistenciaDAO;
+        $this->repository = $repository;
     }
 
     public function listar()
     {
-        return $this->asistenciaDAO->getAll();
+        return $this->repository->getAll();
     }
 
     public function obtener(int $id)
     {
-        return $this->asistenciaDAO->findById($id);
+        return $this->repository->findById($id);
     }
 
     public function crear(array $datos)
     {
-        return DB::transaction(function () use ($datos) {
-            return $this->asistenciaDAO->create($datos);
-        });
+        return DB::transaction(fn() => $this->repository->create($datos));
     }
 
     public function actualizar(int $id, array $datos)
     {
-        return $this->asistenciaDAO->update($id, $datos);
+        return $this->repository->update($id, $datos);
     }
 
     public function eliminar(int $id)
     {
-        return $this->asistenciaDAO->delete($id);
+        return $this->repository->delete($id);
     }
 }

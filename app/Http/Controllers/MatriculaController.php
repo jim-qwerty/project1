@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Matricula\StoreMatriculaRequest;
+use App\Http\Requests\Matricula\UpdateMatriculaRequest;
 use App\Services\MatriculaService;
 use Illuminate\Http\Request;
 
 class MatriculaController extends Controller
 {
-    protected $service;
+    protected MatriculaService $service;
 
     public function __construct(MatriculaService $service)
     {
@@ -22,25 +24,12 @@ class MatriculaController extends Controller
 
     public function create()
     {
-        // Si necesitas listas de alumnos para el select:
-        // $alumnos = app(\App\Services\AlumnoService::class)->listar();
-        // return view('matriculas.create', compact('alumnos'));
         return view('matriculas.create');
     }
 
-    public function store(Request $request)
+    public function store(StoreMatriculaRequest $request)
     {
-        $datos = $request->validate([
-            'alumno_id'       => 'required|exists:alumnos,id',
-            
-            'monto'           => 'required|numeric',
-            'metodo_pago'     => 'nullable|string|max:50',
-            'fecha_pago'      => 'nullable|date',
-            'observacion'     => 'nullable|string',
-            'estado_pago'     => 'in:pagado,pendiente',
-        ]);
-
-        $matricula = $this->service->crear($datos);
+        $matricula = $this->service->crear($request->validated());
         return response()->json($matricula, 201);
     }
 
@@ -62,19 +51,13 @@ class MatriculaController extends Controller
         return view('matriculas.edit', compact('matricula'));
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdateMatriculaRequest $request, $id)
     {
-        $datos = $request->validate([
-            'alumno_id'   => 'required|exists:alumnos,id',
-        'monto'       => 'required|numeric',
-        'metodo_pago' => 'nullable|string|max:50',
-        'fecha_pago'  => 'required|date',
-        'observacion' => 'nullable|string',
-        'estado_pago' => 'required|in:pagado,pendiente',
-        ]);
-
-        $matricula = $this->service->crear($datos);
-    return response()->json($matricula, 201);;
+        $ok = $this->service->actualizar($id, $request->validated());
+        if (! $ok) {
+            return response()->json(['error' => 'No encontrado o no actualizado'], 404);
+        }
+        return response()->json(['success' => true]);
     }
 
     public function destroy($id)

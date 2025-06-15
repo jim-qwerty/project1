@@ -2,49 +2,74 @@
 
 namespace App\Services;
 
-use App\DAOs\UsuarioDAO;
+use App\Contracts\UsuarioRepositoryInterface;
+use App\Models\Usuario;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class UsuarioService
 {
-    protected $usuarioDAO;
+    protected UsuarioRepositoryInterface $repo;
 
-    public function __construct(UsuarioDAO $usuarioDAO)
+    public function __construct(UsuarioRepositoryInterface $repo)
     {
-        $this->usuarioDAO = $usuarioDAO;
+        $this->repo = $repo;
     }
 
-    public function listar()
+    /**
+     * Devuelve todos los usuarios.
+     */
+    public function listar(): Collection
     {
-        return $this->usuarioDAO->getAll();
+        return $this->repo->getAll();
     }
 
-    public function obtener(int $id)
+    /**
+     * Obtiene un usuario por su ID.
+     */
+    public function obtener(int $id): ?Usuario
     {
-        return $this->usuarioDAO->findById($id);
+        return $this->repo->findById($id);
     }
 
-    public function crear(array $datos)
+    /**
+     * Crea un nuevo usuario.
+     * Espera recibir 'password' en el array de datos.
+     * Se encarga de hashear y asignar 'password_hash'.
+     */
+    public function crear(array $datos): Usuario
     {
         return DB::transaction(function () use ($datos) {
-            // Hashear la contraseña antes de crear
-            $datos['password_hash'] = Hash::make($datos['password_hash']);
-            return $this->usuarioDAO->create($datos);
+            // Hasheamos la contraseña
+            $datos['password_hash'] = Hash::make($datos['password']);
+            // Eliminamos el campo 'password' para que no exista conflicto
+            unset($datos['password']);
+
+            return $this->repo->create($datos);
         });
     }
 
-    public function actualizar(int $id, array $datos)
+    /**
+     * Actualiza un usuario existente.
+     * Si se envía 'password', lo hashea y actualiza 'password_hash'.
+     */
+    public function actualizar(int $id, array $datos): bool
     {
-        // Si viene nueva contraseña, la hasheamos
-        if (isset($datos['password_hash'])) {
-            $datos['password_hash'] = Hash::make($datos['password_hash']);
+        // Si viene nueva contraseña, la procesamos
+        if (isset($datos['password'])) {
+            $datos['password_hash'] = Hash::make($datos['password']);
+            unset($datos['password']);
         }
-        return $this->usuarioDAO->update($id, $datos);
+
+        return $this->repo->update($id, $datos);
     }
 
-    public function eliminar(int $id)
+    /**
+     * Elimina un usuario por su ID.
+     */
+    public function eliminar(int $id): bool
     {
-        return $this->usuarioDAO->delete($id);
+        return $this->repo->delete($id);
     }
 }

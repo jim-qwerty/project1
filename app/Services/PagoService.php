@@ -2,42 +2,37 @@
 
 namespace App\Services;
 
-use App\DAOs\PagoDAO;
+use App\Contracts\PagoRepositoryInterface;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Collection;
+use App\Models\Pago;
 
 class PagoService
 {
-    protected $pagoDAO;
+    public function __construct(protected PagoRepositoryInterface $repo) {}
 
-    public function __construct(PagoDAO $pagoDAO)
+    public function listar(): Collection
     {
-        $this->pagoDAO = $pagoDAO;
+        return $this->repo->getAll();
     }
 
-    public function listar()
+    public function obtener(int $id): ?Pago
     {
-        return $this->pagoDAO->getAll();
+        return $this->repo->findById($id);
     }
 
-    public function obtener(int $id)
+    public function crear(array $datos): Pago
     {
-        return $this->pagoDAO->findById($id);
+        return DB::transaction(fn() => $this->repo->create($datos));
     }
 
-    public function crear(array $datos)
+    public function actualizar(int $id, array $datos): bool
     {
-        return DB::transaction(function () use ($datos) {
-            return $this->pagoDAO->create($datos);
-        });
+        return $this->repo->update($id, $datos);
     }
 
-    public function actualizar(int $id, array $datos)
+    public function eliminar(int $id): bool
     {
-        return $this->pagoDAO->update($id, $datos);
-    }
-
-    public function eliminar(int $id)
-    {
-        return $this->pagoDAO->delete($id);
+        return $this->repo->delete($id);
     }
 }

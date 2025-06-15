@@ -4,15 +4,15 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 
-// Importa las clases DAO y Service
+// Importa las clases DAO e Interface
 use App\DAOs\GradoDAO;
-use App\Services\GradoService;
+use App\Contracts\GradoRepositoryInterface;
 
 use App\DAOs\SeccionDAO;
-use App\Services\SeccionService;
+use App\Contracts\SeccionRepositoryInterface;
 
 use App\DAOs\CursoDAO;
-use App\Services\CursoService;
+use App\Contracts\CursoRepositoryInterface;
 
 use App\Contracts\AlumnoRepositoryInterface;
 use App\DAOs\AlumnoDAO;
@@ -21,53 +21,47 @@ use App\Contracts\ApoderadoRepositoryInterface;
 use App\DAOs\ApoderadoDAO;
 
 use App\DAOs\MatriculaDAO;
-use App\Services\MatriculaService;
+use App\Contracts\MatriculaRepositoryInterface;
 
 use App\DAOs\DocenteDAO;
-use App\Services\DocenteService;
+use App\Contracts\DocenteRepositoryInterface;
 
 use App\DAOs\UsuarioDAO;
-use App\Services\UsuarioService;
+use App\Contracts\UsuarioRepositoryInterface;
 
 use App\DAOs\AsistenciaAlumnoDAO;
-use App\Services\AsistenciaAlumnoService;
+use App\Contracts\AsistenciaAlumnoRepositoryInterface;
 
 use App\DAOs\AsistenciaDocenteDAO;
-use App\Services\AsistenciaDocenteService;
+use App\Contracts\AsistenciaDocenteRepositoryInterface;
 
 use App\DAOs\NotaDAO;
-use App\Services\NotaService;
+use App\Contracts\NotaRepositoryInterface;
 
 use App\DAOs\PagoDAO;
-use App\Services\PagoService;
+use App\Contracts\PagoRepositoryInterface;
 
 class AppServiceProvider extends ServiceProvider
 {
     public function register()
     {
-        // Binding GradoDAO → GradoService
-        $this->app->bind(GradoDAO::class, function($app) {
-            return new GradoDAO();
-        });
-        $this->app->bind(GradoService::class, function($app) {
-            return new GradoService($app->make(GradoDAO::class));
-        });
+        // Binding Grado
+        $this->app->bind(
+            GradoRepositoryInterface::class,
+            GradoDAO::class
+        );
 
-        // Binding SeccionDAO → SeccionService
-        $this->app->bind(SeccionDAO::class, function($app) {
-            return new SeccionDAO();
-        });
-        $this->app->bind(SeccionService::class, function($app) {
-            return new SeccionService($app->make(SeccionDAO::class));
-        });
+        // Binding Seccion
+        $this->app->bind(
+        SeccionRepositoryInterface::class,
+        SeccionDAO::class
+    );
 
-        // Binding CursoDAO → CursoService
-        $this->app->bind(CursoDAO::class, function($app) {
-            return new CursoDAO();
-        });
-        $this->app->bind(CursoService::class, function($app) {
-            return new CursoService($app->make(CursoDAO::class));
-        });
+        // Binding Curso
+        $this->app->bind(
+            CursoRepositoryInterface::class,
+            CursoDAO::class
+        );
 
         
         // Binding Alumno
@@ -82,61 +76,47 @@ class AppServiceProvider extends ServiceProvider
         ApoderadoDAO::class
     );
 
-        // Binding MatriculaDAO → MatriculaService
-        $this->app->bind(MatriculaDAO::class, function($app) {
-            return new MatriculaDAO();
-        });
-        $this->app->bind(MatriculaService::class, function($app) {
-            return new MatriculaService($app->make(MatriculaDAO::class));
-        });
+        // Binding Matricula 
+        $this->app->bind(
+            MatriculaRepositoryInterface::class,
+            MatriculaDAO::class
+        );
 
-        // Binding DocenteDAO → DocenteService
-        $this->app->bind(DocenteDAO::class, function($app) {
-            return new DocenteDAO();
-        });
-        $this->app->bind(DocenteService::class, function($app) {
-            return new DocenteService($app->make(DocenteDAO::class));
-        });
+        // Binding Docente
+        $this->app->bind(
+            DocenteRepositoryInterface::class,
+            DocenteDAO::class
+        );
 
-        // Binding UsuarioDAO → UsuarioService
-        $this->app->bind(UsuarioDAO::class, function($app) {
-            return new UsuarioDAO();
-        });
-        $this->app->bind(UsuarioService::class, function($app) {
-            return new UsuarioService($app->make(UsuarioDAO::class));
-        });
+        // Binding Usuario
+        $this->app->bind(
+            UsuarioRepositoryInterface::class,
+            UsuarioDAO::class
+    );
 
-        // Binding AsistenciaAlumnoDAO → AsistenciaAlumnoService
-        $this->app->bind(AsistenciaAlumnoDAO::class, function($app) {
-            return new AsistenciaAlumnoDAO();
-        });
-        $this->app->bind(AsistenciaAlumnoService::class, function($app) {
-            return new AsistenciaAlumnoService($app->make(AsistenciaAlumnoDAO::class));
-        });
+        // Binding AsistenciaAlumno
+        $this->app->bind(
+            AsistenciaAlumnoRepositoryInterface::class,
+            AsistenciaAlumnoDAO::class
+        );
 
-        // Binding AsistenciaDocenteDAO → AsistenciaDocenteService
-        $this->app->bind(AsistenciaDocenteDAO::class, function($app) {
-            return new AsistenciaDocenteDAO();
-        });
-        $this->app->bind(AsistenciaDocenteService::class, function($app) {
-            return new AsistenciaDocenteService($app->make(AsistenciaDocenteDAO::class));
-        });
+        // Binding AsistenciaDocente
+        $this->app->bind(
+            AsistenciaDocenteRepositoryInterface::class,
+            AsistenciaDocenteDAO::class
+        );
 
-        // Binding NotaDAO → NotaService
-        $this->app->bind(NotaDAO::class, function($app) {
-            return new NotaDAO();
-        });
-        $this->app->bind(NotaService::class, function($app) {
-            return new NotaService($app->make(NotaDAO::class));
-        });
+        // Binding Nota
+        $this->app->bind(
+            NotaRepositoryInterface::class,
+            NotaDAO::class
+    );
 
-        // Binding PagoDAO → PagoService
-        $this->app->bind(PagoDAO::class, function($app) {
-            return new PagoDAO();
-        });
-        $this->app->bind(PagoService::class, function($app) {
-            return new PagoService($app->make(PagoDAO::class));
-        });
+        // Binding Pago
+        $this->app->bind(
+            PagoRepositoryInterface::class,
+            PagoDAO::class
+    );
     }
 
     public function boot()

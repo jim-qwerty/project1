@@ -2,9 +2,10 @@
 
 namespace App\DAOs;
 
+use App\Contracts\AsistenciaDocenteRepositoryInterface;
 use App\Models\AsistenciaDocente;
 
-class AsistenciaDocenteDAO
+class AsistenciaDocenteDAO implements AsistenciaDocenteRepositoryInterface
 {
     public function getAll()
     {
@@ -13,7 +14,7 @@ class AsistenciaDocenteDAO
 
     public function findById(int $id): ?AsistenciaDocente
     {
-        return AsistenciaDocente::find($id);
+        return AsistenciaDocente::with('docente')->find($id);
     }
 
     public function create(array $data): AsistenciaDocente

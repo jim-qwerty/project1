@@ -2,9 +2,10 @@
 
 namespace App\DAOs;
 
+use App\Contracts\CursoRepositoryInterface;
 use App\Models\Curso;
 
-class CursoDAO
+class CursoDAO implements CursoRepositoryInterface
 {
     public function getAll()
     {

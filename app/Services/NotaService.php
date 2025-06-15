@@ -2,42 +2,42 @@
 
 namespace App\Services;
 
-use App\DAOs\NotaDAO;
+use App\Contracts\NotaRepositoryInterface;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Collection;
+use App\Models\Nota;
 
 class NotaService
 {
-    protected $notaDAO;
+    public function __construct(protected NotaRepositoryInterface $repo) {}
 
-    public function __construct(NotaDAO $notaDAO)
+    public function listar(): Collection
     {
-        $this->notaDAO = $notaDAO;
+        return $this->repo->getAll();
     }
 
-    public function listar()
+    public function obtener(int $id): ?Nota
     {
-        return $this->notaDAO->getAll();
+        return $this->repo->findById($id);
     }
 
-    public function obtener(int $id)
+    public function crear(array $datos): Nota
     {
-        return $this->notaDAO->findById($id);
+        return DB::transaction(fn() => $this->repo->create($datos));
     }
 
-    public function crear(array $datos)
+    public function actualizar(int $id, array $datos): bool
     {
-        return DB::transaction(function () use ($datos) {
-            return $this->notaDAO->create($datos);
-        });
+        return $this->repo->update($id, $datos);
     }
 
-    public function actualizar(int $id, array $datos)
+    public function eliminar(int $id): bool
     {
-        return $this->notaDAO->update($id, $datos);
+        return $this->repo->delete($id);
     }
 
-    public function eliminar(int $id)
+    public function listarPorFiltros(array $filters): Collection
     {
-        return $this->notaDAO->delete($id);
+        return $this->repo->getByFilters($filters);
     }
 }

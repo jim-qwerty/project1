@@ -1,13 +1,14 @@
 <?php
 
-
 namespace App\DAOs;
 
+use App\Contracts\PagoRepositoryInterface;
 use App\Models\Pago;
+use Illuminate\Support\Collection;
 
-class PagoDAO
+class PagoDAO implements PagoRepositoryInterface
 {
-    public function getAll()
+    public function getAll(): Collection
     {
         return Pago::with(['alumno', 'grado', 'seccion'])->get();
     }
@@ -24,19 +25,13 @@ class PagoDAO
 
     public function update(int $id, array $data): bool
     {
-        $pago = Pago::find($id);
-        if (! $pago) {
-            return false;
-        }
-        return $pago->update($data);
+        $pago = $this->findById($id);
+        return $pago ? $pago->update($data) : false;
     }
 
     public function delete(int $id): bool
     {
-        $pago = Pago::find($id);
-        if (! $pago) {
-            return false;
-        }
-        return $pago->delete();
+        $pago = $this->findById($id);
+        return $pago ? $pago->delete() : false;
     }
 }

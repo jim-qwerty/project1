@@ -3,56 +3,27 @@
 namespace App\Http\Controllers;
 
 use App\Services\NotaService;
-use Illuminate\Http\Request;
-use App\Models\Nota;
+use App\Http\Requests\Nota\StoreNotaRequest;
+use App\Http\Requests\Nota\UpdateNotaRequest;
 use Illuminate\Validation\Rule;
 
 class NotaController extends Controller
 {
-    protected $service;
-
-    public function __construct(NotaService $service)
-    {
-        $this->service = $service;
-    }
+    public function __construct(protected NotaService $service) {}
 
     public function index()
     {
-        $notas = $this->service->listar();
-        return response()->json($notas);
+        return response()->json($this->service->listar());
     }
 
     public function create()
     {
-        // Si necesitas listas de alumnos, grados, secciones, cursos o docentes:
-        // $alumnos = app(\App\Services\AlumnoService::class)->listar();
-        // $grados = app(\App\Services\GradoService::class)->listar();
-        // $secciones = app(\App\Services\SeccionService::class)->listar();
-        // $cursos = app(\App\Services\CursoService::class)->listar();
-        // $docentes = app(\App\Services\DocenteService::class)->listar();
-        // return view('notas.create', compact('alumnos','grados','secciones','cursos','docentes'));
         return view('notas.create');
     }
 
-    public function store(Request $request)
+    public function store(StoreNotaRequest $request)
     {
-        // Validamos que venga un array 'notas'
-        $validated = $request->validate([
-            'notas'                   => 'required|array',
-            'notas.*.alumno_id'       => 'required|integer|exists:alumnos,id',
-            'notas.*.grado_id'        => 'required|integer|exists:grados,id',
-            'notas.*.seccion_id'      => 'required|integer|exists:secciones,id',
-            'notas.*.curso_id'        => 'required|integer|exists:cursos,id',
-            'notas.*.bimestre'        => ['required', Rule::in(['I','II','III','IV'])],
-            'notas.*.competencia1'    => ['required', Rule::in(['A','B','C'])],
-            'notas.*.competencia2'    => ['required', Rule::in(['A','B','C'])],
-            'notas.*.competencia3'    => ['required', Rule::in(['A','B','C'])],
-            'notas.*.nota_final'      => ['required', Rule::in(['A','B','C'])],
-        ]);
-
-        // Inserción masiva; si ya existe, el UNIQUE impedirá duplicados
-        Nota::insert($validated['notas']);
-
+        $this->service->crear($request->validated());
         return response()->json(['success' => true], 201);
     }
 
@@ -74,23 +45,9 @@ class NotaController extends Controller
         return view('notas.edit', compact('nota'));
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdateNotaRequest $request, $id)
     {
-        $datos = $request->validate([
-            'alumno_id'     => 'sometimes|required|exists:alumnos,id',
-            'grado_id'      => 'sometimes|required|exists:grados,id',
-            'seccion_id'    => 'sometimes|required|exists:secciones,id',
-            'curso_id'      => 'sometimes|required|exists:cursos,id',
-            'bimestre'      => 'sometimes|required|in:I,II,III,IV',
-            'competencia1'  => 'sometimes|required|in:A,B,C',
-            'competencia2'  => 'sometimes|required|in:A,B,C',
-            'competencia3'  => 'sometimes|required|in:A,B,C',
-            'nota_final'    => 'sometimes|required|in:A,B,C',
-            
-        ]);
-
-        $ok = $this->service->actualizar($id, $datos);
-        if (! $ok) {
+        if (! $this->service->actualizar($id, $request->validated())) {
             return response()->json(['error' => 'No encontrado o no actualizado'], 404);
         }
         return response()->json(['success' => true]);
@@ -98,26 +55,16 @@ class NotaController extends Controller
 
     public function destroy($id)
     {
-        $ok = $this->service->eliminar($id);
-        if (! $ok) {
+        if (! $this->service->eliminar($id)) {
             return response()->json(['error' => 'No encontrado o no eliminado'], 404);
         }
         return response()->json(['success' => true]);
     }
 
-    public function indexJson(Request $request)
-{
-  $request->validate([
-    'grado_id'   => 'required|exists:grados,id',
-    'seccion_id' => 'required|exists:secciones,id',
-    'curso_id'   => 'required|exists:cursos,id',
-    'bimestre'   => ['required', Rule::in(['I','II','III','IV'])],
-  ]);
-
-  return Nota::where('grado_id',$request->grado_id)
-             ->where('seccion_id',$request->seccion_id)
-             ->where('curso_id',$request->curso_id)
-             ->where('bimestre',$request->bimestre)
-             ->get(['alumno_id','competencia1','competencia2','competencia3','nota_final']);
-}
+    public function indexJson(UpdateNotaRequest $request)
+    {
+        // reutiliza la validación del UpdateNotaRequest:
+        $filters = $request->validated();
+        return $this->service->listarPorFiltros($filters);
+    }
 }

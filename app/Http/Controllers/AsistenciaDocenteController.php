@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AsistenciaDocente\StoreAsistenciaDocenteRequest;
+use App\Http\Requests\AsistenciaDocente\UpdateAsistenciaDocenteRequest;
 use App\Services\AsistenciaDocenteService;
-use Illuminate\Http\Request;
 use App\Models\AsistenciaDocente;
 
 class AsistenciaDocenteController extends Controller
 {
-    protected $service;
+    protected AsistenciaDocenteService $service;
 
     public function __construct(AsistenciaDocenteService $service)
     {
@@ -17,29 +18,18 @@ class AsistenciaDocenteController extends Controller
 
     public function index()
     {
-        $asistencias = $this->service->listar();
-        return response()->json($asistencias);
+        return response()->json($this->service->listar());
     }
 
     public function create()
     {
-        // Si requieres lista de docentes:
-        // $docentes = app(\App\Services\DocenteService::class)->listar();
-        // return view('asistencia-docentes.create', compact('docentes'));
         return view('asistencia-docentes.create');
     }
 
-    public function store(Request $request)
+    public function store(StoreAsistenciaDocenteRequest $request)
     {
-        $datos = $request->validate([
-            'docente_id'    => 'required|exists:docentes,id',
-            'fecha'         => 'required|date',
-            'hora_registro' => 'required|date_format:H:i:s',
-        ]);
-
-        AsistenciaDocente::create($datos);
-
-        return response()->json(['success' => true], 201);
+        $asistencia = $this->service->crear($request->validated());
+        return response()->json($asistencia, 201);
     }
 
     public function show($id)
@@ -60,16 +50,9 @@ class AsistenciaDocenteController extends Controller
         return view('asistencia-docentes.edit', compact('asistencia'));
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdateAsistenciaDocenteRequest $request, $id)
     {
-        $datos = $request->validate([
-            'docente_id'   => 'sometimes|required|exists:docentes,id',
-            'fecha'        => 'sometimes|required|date',
-            
-            'hora_registro'=> 'nullable|date_format:H:i:s',
-        ]);
-
-        $ok = $this->service->actualizar($id, $datos);
+        $ok = $this->service->actualizar($id, $request->validated());
         if (! $ok) {
             return response()->json(['error' => 'No encontrado o no actualizado'], 404);
         }
