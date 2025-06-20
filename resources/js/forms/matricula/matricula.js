@@ -1,9 +1,12 @@
-// resources/js/forms/matricula/matricula.js
-
 import '/resources/css/forms/matricula/matricula.css';
 import axios from 'axios';
+import {
+  fetchGrados,
+  fetchSecciones,
+  poblarSelect
+} from '../utils/loadGradosSecciones.js';
 
-export default function initMatriculaForm(container = document.getElementById('form-container')) {
+export default async function initMatriculaForm(container = document.getElementById('form-container')) {
   const wrapper = container.querySelector('.m-wrapper');
   if (!wrapper) return;
 
@@ -26,34 +29,6 @@ export default function initMatriculaForm(container = document.getElementById('f
   const btnSi           = wrapper.querySelector('#btn-si');
   const btnNo           = wrapper.querySelector('#btn-no');
   const confirmMsg      = wrapper.querySelector('#confirmacion-mensaje');
-
-  // Datos estáticos
-  const gradosPorNivel = {
-    Inicial: [
-      { id:1, nombre:'3 años' },
-      { id:2, nombre:'4 años' },
-      { id:3, nombre:'5 años' }
-    ],
-    Primaria: [
-      { id:4, nombre:'Primero' },
-      { id:5, nombre:'Segundo' },
-      { id:6, nombre:'Tercero' },
-      { id:7, nombre:'Cuarto' },
-      { id:8, nombre:'Quinto' },
-      { id:9, nombre:'Sexto' }
-    ]
-  };
-  const secciones = [
-    { id:1, nombre:'A' },
-    { id:2, nombre:'B' }
-  ];
-
-  // Carga select de secciones
-  secciones.forEach(s => {
-    seccionSelect.insertAdjacentHTML('beforeend',
-      `<option value="${s.id}">${s.nombre}</option>`
-    );
-  });
 
   // Utilitarios
   const mostrarMensaje = txt => {
@@ -79,15 +54,36 @@ export default function initMatriculaForm(container = document.getElementById('f
     edadInput.value = isNaN(age) ? '' : age;
   });
 
-  // Carga dinámica de grados por nivel
+  // === Carga dinámica de secciones ===
+  try {
+    const secciones = await fetchSecciones();
+    poblarSelect(seccionSelect, secciones, 'Seleccione sección');
+  } catch (err) {
+    console.error('Error cargando secciones:', err);
+    poblarSelect(seccionSelect, [], 'Error cargando sección');
+  }
+
+  // === Obtén todos los grados para filtrar ===
+  let grados = [];
+  try {
+    grados = await fetchGrados();
+  } catch (err) {
+    console.error('Error cargando grados:', err);
+    poblarSelect(gradoSelect, [], 'Error cargando grado');
+  }
+
+  // Mapa estático de IDs de grado por nivel
+  const mapaGradosPorNivel = {
+    Inicial:  [1, 2, 3],
+    Primaria: [4, 5, 6, 7, 8, 9]
+  };
+
+  // Carga dinámica de grados según el nivel seleccionado
   nivelSelect?.addEventListener('change', () => {
     const nivel = nivelSelect.value;
-    gradoSelect.innerHTML = '<option value="">Seleccione grado</option>';
-    (gradosPorNivel[nivel] || []).forEach(g => {
-      gradoSelect.insertAdjacentHTML('beforeend',
-        `<option value="${g.id}">${g.nombre}</option>`
-      );
-    });
+    const ids   = mapaGradosPorNivel[nivel] || [];
+    const filtrados = grados.filter(g => ids.includes(g.id));
+    poblarSelect(gradoSelect, filtrados, 'Seleccione grado');
   });
 
   // Lectura de datos de alumno
@@ -101,7 +97,7 @@ export default function initMatriculaForm(container = document.getElementById('f
       apellidos:        get('apellidos'),
       dni:              get('dni'),
       fecha_nacimiento: get('fecha_nacimiento'),
-      sexo:             sexo,
+      sexo,
       direccion:        get('direccion'),
       nivel_educativo:  get('nivel_educativo'),
       grado_id:         get('grado_id'),
@@ -114,7 +110,6 @@ export default function initMatriculaForm(container = document.getElementById('f
   // Lectura de datos de apoderado
   const leerDatosApoderado = alumno_id => {
     const get = field => wrapper.querySelector(`[name="${field}"]`)?.value || null;
-
     return {
       alumno_id,
       nombres:            get('apoderado_nombres'),
@@ -152,9 +147,7 @@ export default function initMatriculaForm(container = document.getElementById('f
           container.querySelector('#resumen-nombre').value = nombreVal;
           container.querySelector('#resumen-dni').value    = dniVal;
           const pagoMod = await import('./pagoMatricula.js');
-          if (typeof pagoMod.default === 'function') {
-            pagoMod.default(container);
-          }
+          if (typeof pagoMod.default === 'function') pagoMod.default(container);
         } catch(err) {
           console.error('Error cargando pago:', err);
           container.innerHTML = '<p>Error cargando pago.</p>';

@@ -1,65 +1,54 @@
 import axios from 'axios';
 import '/resources/css/forms/pagos/pagoMensual.css';
+import { initGradosSecciones } from '../utils/loadGradosSecciones.js';
 
-export default function initPagoMensual(container = document.querySelector('.pm-wrapper')) {
+export default async function initPagoMensual(container = document.querySelector('.pm-wrapper')) {
   if (!container) return;
   console.log("Inicializando Pago Mensual");
 
   // Configurar CSRF para Axios
-  axios.defaults.headers.common['X-CSRF-TOKEN'] = document
-    .querySelector('meta[name="csrf-token"]')
-    .getAttribute('content');
-
-  // Valores estáticos de grados y secciones (según BD)
-  const gradosEstaticos = [
-    { id: 1, nombre: '3 años' },
-    { id: 2, nombre: '4 años' },
-    { id: 3, nombre: '5 años' },
-    { id: 4, nombre: 'Primero' },
-    { id: 5, nombre: 'Segundo' },
-    { id: 6, nombre: 'Tercero' },
-    { id: 7, nombre: 'Cuarto' },
-    { id: 8, nombre: 'Quinto' },
-    { id: 9, nombre: 'Sexto' }
-  ];
-  const seccionesEstaticas = [
-    { id: 1, nombre: 'A' },
-    { id: 2, nombre: 'B' }
-  ];
+  axios.defaults.headers.common['X-CSRF-TOKEN'] =
+    document.querySelector('meta[name="csrf-token"]').content;
 
   // Referencias al DOM
-  const gradoSelect        = container.querySelector('#gradoSelect');
-  const seccionSelect      = container.querySelector('#seccionSelect');
-  const mesSelect          = container.querySelector('#mesSelect');
-  const fechaInput         = container.querySelector('#fechaSistema');
-  const alumnoInput        = container.querySelector('#alumnoInput');
-  const listaCoincidencias = container.querySelector('#listaCoincidencias');
-  const montoInput         = container.querySelector('#montoPago');
-  const metodoSelect       = container.querySelector('#metodoPago');
-  const observacionInput   = container.querySelector('#observaciones');
-  const mensajePago        = container.querySelector('#mensajeConfirmacion');
-  const form               = container.querySelector('#formularioPagos');
+  const gradoSelect       = container.querySelector('#gradoSelect');
+  const seccionSelect     = container.querySelector('#seccionSelect');
+  const mesSelect         = container.querySelector('#mesSelect');
+  const fechaInput        = container.querySelector('#fechaSistema');
+  const alumnoInput       = container.querySelector('#alumnoInput');
+  const listaCoincidencias= container.querySelector('#listaCoincidencias');
+  const montoInput        = container.querySelector('#montoPago');
+  const metodoSelect      = container.querySelector('#metodoPago');
+  const observacionInput  = container.querySelector('#observaciones');
+  const mensajePago       = container.querySelector('#mensajeConfirmacion');
+  const form              = container.querySelector('#formularioPagos');
 
   let alumnos = [];
 
-  // Poblar select de grados
-  gradosEstaticos.forEach(g => {
-    const opt = document.createElement('option');
-    opt.value = g.id;
-    opt.textContent = g.nombre;
-    gradoSelect.appendChild(opt);
+  // === 1) Carga dinámica de grados y secciones ===
+  try {
+    await initGradosSecciones(gradoSelect, seccionSelect);
+  } catch (err) {
+    console.error('Error cargando grados o secciones:', err);
+    gradoSelect.innerHTML   = '<option value="">Error cargando grados</option>';
+    seccionSelect.innerHTML = '<option value="">Error cargando secciones</option>';
+  }
+
+  // === 2) Poblar meses estáticos ===
+  const mesesEstaticos = [
+    'Enero','Febrero','Marzo','Abril','Mayo','Junio',
+    'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'
+  ];
+  mesSelect.innerHTML = '<option value="">Seleccione mes</option>';
+  mesesEstaticos.forEach((m, i) => {
+    mesSelect.insertAdjacentHTML(
+      'beforeend',
+      `<option value="${i+1}">${m}</option>`
+    );
   });
 
-  // Poblar select de secciones
-  seccionesEstaticas.forEach(s => {
-    const opt = document.createElement('option');
-    opt.value = s.id;
-    opt.textContent = s.nombre;
-    seccionSelect.appendChild(opt);
-  });
-
-  // Cargar alumnos del servidor según grado y sección
-  const cargarAlumnos = async () => {
+  // === 3) Cargar alumnos del servidor según grado y sección ===
+  async function cargarAlumnos() {
     const gradoId   = gradoSelect.value;
     const seccionId = seccionSelect.value;
     alumnoInput.value = '';
@@ -78,10 +67,10 @@ export default function initPagoMensual(container = document.querySelector('.pm-
       console.error('Error cargando alumnos:', err);
       alumnos = [];
     }
-  };
+  }
 
-  // Mostrar sugerencias de autocompletado
-  const actualizarListaCoincidencias = () => {
+  // === 4) Autocompletado ===
+  function actualizarListaCoincidencias() {
     const texto = alumnoInput.value.trim().toLowerCase();
     listaCoincidencias.innerHTML = '';
     delete alumnoInput.dataset.id;
@@ -92,7 +81,7 @@ export default function initPagoMensual(container = document.querySelector('.pm-
       .forEach(a => {
         const li = document.createElement('li');
         li.textContent = a.nombre_completo;
-        li.dataset.id = a.id;
+        li.dataset.id  = a.id;
         li.addEventListener('click', () => {
           alumnoInput.value = a.nombre_completo;
           alumnoInput.dataset.id = a.id;
@@ -100,14 +89,14 @@ export default function initPagoMensual(container = document.querySelector('.pm-
         });
         listaCoincidencias.appendChild(li);
       });
-  };
+  }
 
-  // Listeners para cargar y autocompletar alumnos
+  // === 5) Listeners de carga y autocompletado ===
   gradoSelect.addEventListener('change', cargarAlumnos);
   seccionSelect.addEventListener('change', cargarAlumnos);
   alumnoInput.addEventListener('input', actualizarListaCoincidencias);
 
-  // Envío del formulario vía AJAX con manejo de errores de validación
+  // === 6) Envío del formulario ===
   form.addEventListener('submit', async e => {
     e.preventDefault();
     mensajePago.textContent = '';
@@ -118,17 +107,16 @@ export default function initPagoMensual(container = document.querySelector('.pm-
       return;
     }
 
-    // Convertimos mes a integer (1-12) y extraemos año de la fecha
     const mesInt = parseInt(mesSelect.value, 10);
     const fecha  = new Date(fechaInput.value);
-    const anio   = fecha.getFullYear();
+    const año    = fecha.getFullYear();
 
     const payload = {
       alumno_id:   alumnoId,
       grado_id:    parseInt(gradoSelect.value, 10),
       seccion_id:  parseInt(seccionSelect.value, 10),
       mes:         mesInt,
-      año:         anio,
+      año,          
       fecha_pago:  fechaInput.value,
       monto:       parseFloat(montoInput.value),
       metodo_pago: metodoSelect.value,
@@ -142,9 +130,8 @@ export default function initPagoMensual(container = document.querySelector('.pm-
       alumnos = [];
       listaCoincidencias.innerHTML = '';
     } catch (err) {
-      if (err.response && err.response.status === 422) {
-        const errors = err.response.data.errors;
-        mensajePago.innerHTML = Object.values(errors)
+      if (err.response?.status === 422) {
+        mensajePago.innerHTML = Object.values(err.response.data.errors)
           .flat()
           .map(msg => `❌ ${msg}`)
           .join('<br>');
@@ -155,10 +142,12 @@ export default function initPagoMensual(container = document.querySelector('.pm-
     }
   });
 
-  // Ocultar sugerencias al hacer clic fuera
+  // === 7) Ocultar sugerencias al hacer clic fuera ===
   document.addEventListener('click', e => {
     if (!container.contains(e.target)) {
       listaCoincidencias.innerHTML = '';
     }
   });
 }
+
+document.addEventListener('DOMContentLoaded', () => initPagoMensual());

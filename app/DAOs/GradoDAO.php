@@ -1,4 +1,5 @@
 <?php
+// app/DAOs/GradoDAO.php
 
 namespace App\DAOs;
 
@@ -9,13 +10,14 @@ class GradoDAO implements GradoRepositoryInterface
 {
     public function getAll()
     {
-        // Incluimos relaciones si las hubiera
-        return Grado::with(['secciones', 'docentesAsignados'])->get();
+        // Sin eager-load de secciones (no existe relación)
+        return Grado::all();
     }
 
     public function findById(int $id): ?Grado
     {
-        return Grado::with(['secciones', 'docentesAsignados'])->find($id);
+        // Sólo cargamos la relación de docentesAsignados
+        return Grado::with('docentesAsignados')->find($id);
     }
 
     public function create(array $data): Grado

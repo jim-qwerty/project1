@@ -1,76 +1,61 @@
-// resources/js/forms/pagos/historialPagos.js
 import axios from 'axios';
 import '/resources/css/forms/pagos/historialPagos.css';
+import { initGradosSecciones, poblarSelect } from '../utils/loadGradosSecciones.js';
 
-export default function initHistorialPagos(container = document.querySelector('.hp-wrapper')) {
+export default async function initHistorialPagos(container = document.querySelector('.hp-wrapper')) {
   if (!container) return;
+
+  // Configura CSRF para Axios
   axios.defaults.headers.common['X-CSRF-TOKEN'] =
     document.querySelector('meta[name="csrf-token"]').content;
 
-  // 1) Arrays para poblar selects
-  const gradosEstaticos = [
-    { id: 1, nombre: '3 años' },
-    { id: 2, nombre: '4 años' },
-    { id: 3, nombre: '5 años' },
-    { id: 4, nombre: 'Primero' },
-    { id: 5, nombre: 'Segundo' },
-    { id: 6, nombre: 'Tercero' },
-    { id: 7, nombre: 'Cuarto' },
-    { id: 8, nombre: 'Quinto' },
-    { id: 9, nombre: 'Sexto' }
-  ];
-  const seccionesEstaticas = [
-    { id: 1, nombre: 'A' },
-    { id: 2, nombre: 'B' }
-  ];
-  const mesesEstaticos = [
-    'Enero','Febrero','Marzo','Abril','Mayo','Junio',
-    'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'
-  ];
+  // Referencias al DOM
+  const gradoSelect    = container.querySelector('#gradoHistorial');
+  const seccionSelect  = container.querySelector('#seccionHistorial');
+  const mesSelect      = container.querySelector('#mesHistorial');
+  const buscadorInput  = container.querySelector('#buscadorAlumno');
+  const sugerenciasDiv = container.querySelector('#sugerenciasAlumnos');
+  const tablaBody      = container.querySelector('#tablaPagos tbody');
+  const btnDeudores    = container.querySelector('#btnDeudores');
 
-  // 2) Referencias al DOM
-  const gradoSelect      = container.querySelector('#gradoHistorial');
-  const seccionSelect    = container.querySelector('#seccionHistorial');
-  const mesSelect        = container.querySelector('#mesHistorial');
-  const buscadorInput    = container.querySelector('#buscadorAlumno');
-  const sugerenciasDiv   = container.querySelector('#sugerenciasAlumnos');
-  const tablaBody        = container.querySelector('#tablaPagos tbody');
-  const btnDeudores      = container.querySelector('#btnDeudores');
-
-  // 3) Datos traídos de la BD
   let pagosData   = [];
   let alumnosData = [];
   let resultados  = [];
 
-  // 4) Función para poblar selects
-  function poblarSelect(selectEl, items, textKey='nombre', valueKey='id', placeholder='') {
-    selectEl.innerHTML = `<option value="">${placeholder}</option>`;
-    items.forEach(i => {
-      const opt = document.createElement('option');
-      opt.value       = i[valueKey];
-      opt.textContent = i[textKey];
-      selectEl.appendChild(opt);
-    });
+  // 1) Carga dinámica de grados y secciones desde la BD
+  try {
+    await initGradosSecciones(gradoSelect, seccionSelect, 'Grado', 'Sección');
+  } catch (err) {
+    console.error('Error cargando grados o secciones:', err);
+    gradoSelect.innerHTML   = '<option value="">No se cargaron grados</option>';
+    seccionSelect.innerHTML = '<option value="">No se cargaron secciones</option>';
   }
 
-  poblarSelect(gradoSelect, gradosEstaticos, 'nombre','id','Seleccione grado');
-  poblarSelect(seccionSelect, seccionesEstaticas, 'nombre','id','Seleccione sección');
-  mesSelect.innerHTML = `<option value="">Seleccione mes</option>`;
-  mesesEstaticos.forEach(m => {
-    const opt = document.createElement('option');
-    opt.value = m;
-    opt.textContent = m;
-    mesSelect.appendChild(opt);
-  });
+  // 2) Población de meses (estático)
+  const mesesEstaticos = [
+    { id: 1, nombre: 'Enero' },
+    { id: 2, nombre: 'Febrero' },
+    { id: 3, nombre: 'Marzo' },
+    { id: 4, nombre: 'Abril' },
+    { id: 5, nombre: 'Mayo' },
+    { id: 6, nombre: 'Junio' },
+    { id: 7, nombre: 'Julio' },
+    { id: 8, nombre: 'Agosto' },
+    { id: 9, nombre: 'Septiembre' },
+    { id: 10, nombre: 'Octubre' },
+    { id: 11, nombre: 'Noviembre' },
+    { id: 12, nombre: 'Diciembre' }
+  ];
+  poblarSelect(mesSelect, mesesEstaticos, 'Seleccione mes');
 
-  // 5) Traer datos iniciales de la API
+  // 3) Traer datos iniciales de la API
   async function cargarDatosBD() {
     try {
       const [rPagos, rAlumnos] = await Promise.all([
         axios.get('/pagos'),
         axios.get('/alumnos/json')
       ]);
-      pagosData   = rPagos.data;
+      pagosData = rPagos.data;
       alumnosData = rAlumnos.data.map(a => ({
         id: a.id,
         grado_id: a.grado_id,
@@ -82,12 +67,12 @@ export default function initHistorialPagos(container = document.querySelector('.
     }
   }
 
-  // 6) Renderizar la tabla
+  // 4) Renderizar la tabla
   function mostrarTabla(lista) {
     tablaBody.innerHTML = '';
     if (!lista.length) {
       const tr = document.createElement('tr');
-      tr.innerHTML = `<td colspan="4">No hay pagos registrados para esta combinación.</td>`;
+      tr.innerHTML = `<td colspan="4">No hay pagos para esta combinación.</td>`;
       tablaBody.appendChild(tr);
       return;
     }
@@ -96,67 +81,56 @@ export default function initHistorialPagos(container = document.querySelector('.
       tr.innerHTML = `
         <td>${r.alumno}</td>
         <td>${r.mes}</td>
-        <td>${r.fecha_pago}</td>
-        <td>${r.monto.toFixed(2)}</td>
+        <td>${r.fecha_pago || ''}</td>
+        <td>${(r.monto||0).toFixed(2)}</td>
       `;
       tablaBody.appendChild(tr);
     });
   }
 
-  // 7) Actualizar resultados según filtros
+  // 5) Actualizar resultados según filtros
   function actualizarResultados() {
-    const g       = gradoSelect.value;
-    const s       = seccionSelect.value;
-    const mesText = mesSelect.value;
-    if (!g || !s || !mesText) {
+    const g = gradoSelect.value;
+    const s = seccionSelect.value;
+    const m = mesSelect.value;
+    if (!g || !s || !m) {
       resultados = [];
       return mostrarTabla([]);
     }
-
-    // Convertir mesText a entero 1-12
-    const mesInt = mesesEstaticos.indexOf(mesText) + 1;
-
-    // Filtrar alumnos por grado/sección
-    const alumnosFiltro = alumnosData.filter(a =>
-      String(a.grado_id) === String(g) &&
-      String(a.seccion_id) === String(s)
-    );
-
-    resultados = alumnosFiltro.map(a => {
-      const pago = pagosData.find(p =>
-        String(p.grado_id)   === String(g) &&
-        String(p.seccion_id) === String(s) &&
-        p.alumno.id          == a.id &&
-        p.mes                === mesInt
-      );
-      return {
-        alumno:     a.nombre_completo,
-        mes:        mesText,
-        fecha_pago: pago ? pago.fecha_pago : '',
-        monto:      pago ? Number(pago.monto)      : 0   // <-- convertimos a número
-      };
-    });
-
+    resultados = alumnosData
+      .filter(a => String(a.grado_id) === g && String(a.seccion_id) === s)
+      .map(a => {
+        const pago = pagosData.find(p =>
+          String(p.grado_id)   === g &&
+          String(p.seccion_id) === s &&
+          p.alumno.id          == a.id &&
+          String(p.mes)        === m
+        );
+        return {
+          alumno:     a.nombre_completo,
+          mes:        mesesEstaticos[m-1].nombre,
+          fecha_pago: pago?.fecha_pago,
+          monto:      pago ? Number(pago.monto) : 0
+        };
+      });
     mostrarTabla(resultados);
   }
 
-  // 8) Mostrar solo deudores
+  // 6) Mostrar solo deudores
   function mostrarDeudores() {
     mostrarTabla(resultados.filter(r => r.monto === 0));
   }
 
-  // 9) Autocompletar buscador
+  // 7) Autocompletar buscador
   function actualizarSugerencias() {
     const term = buscadorInput.value.trim().toLowerCase();
     sugerenciasDiv.innerHTML = '';
     if (!term) return;
-
     const nombres = [...new Set(
       resultados
         .filter(r => r.alumno.toLowerCase().includes(term))
         .map(r => r.alumno)
     )];
-
     nombres.forEach(n => {
       const div = document.createElement('div');
       div.textContent = n;
@@ -164,17 +138,13 @@ export default function initHistorialPagos(container = document.querySelector('.
       div.addEventListener('click', () => {
         buscadorInput.value = n;
         sugerenciasDiv.innerHTML = '';
-        mostrarTabla(
-          resultados.filter(r =>
-            r.alumno.toLowerCase() === n.toLowerCase()
-          )
-        );
+        mostrarTabla(resultados.filter(r => r.alumno === n));
       });
       sugerenciasDiv.appendChild(div);
     });
   }
 
-  // 10) Listeners
+  // 8) Listeners
   gradoSelect  .addEventListener('change', actualizarResultados);
   seccionSelect.addEventListener('change', actualizarResultados);
   mesSelect    .addEventListener('change', actualizarResultados);
@@ -184,11 +154,9 @@ export default function initHistorialPagos(container = document.querySelector('.
     setTimeout(() => sugerenciasDiv.innerHTML = '', 150);
   });
 
-  // 11) Inicialización
-  (async () => {
-    await cargarDatosBD();
-    mostrarTabla([]);  // tabla vacía al inicio
-  })();
+  // 9) Inicialización
+  await cargarDatosBD();
+  mostrarTabla([]);
 }
 
 document.addEventListener('DOMContentLoaded', () => initHistorialPagos());

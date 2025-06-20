@@ -10,6 +10,8 @@ use App\Http\Controllers\NotaController;
 use App\Http\Controllers\AsistenciaAlumnoController;
 use App\Http\Controllers\DocenteController;
 use App\Http\Controllers\AsistenciaDocenteController;
+use App\Http\Controllers\GradoController;
+use App\Http\Controllers\SeccionController;
 use App\Http\Controllers\Auth\LoginController;
 
 /*
@@ -113,6 +115,23 @@ Route::middleware('auth')->group(function () {
     Route::post('/usuarios', [UsuarioController::class, 'store'])
          ->name('usuarios.store');
     Route::resource('usuarios', UsuarioController::class);
+
+
+    //Grados y secciones
+    // 1) API para consumo por JS
+Route::prefix('api')->group(function() {
+    Route::get('grados',    [GradoController::class,   'index'])
+         ->name('api.grados.index');
+    Route::get('secciones', [SeccionController::class, 'index'])
+         ->name('api.secciones.index');
+});
+
+// 2) Rutas CRUD "web" para administración de Grados y Secciones
+//    Excluimos 'index' porque ya lo definimos como API arriba
+Route::resource('grados', GradoController::class)
+     ->except(['index']);
+Route::resource('secciones', SeccionController::class)
+     ->except(['index']);
 
     // Catch-all para vistas de forms dentro de /resources/views/forms/…
     Route::get('/forms/{carpeta}/{formulario}', function ($carpeta, $formulario) {

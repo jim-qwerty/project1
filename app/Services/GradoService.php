@@ -1,4 +1,5 @@
 <?php
+// app/Services/GradoService.php
 
 namespace App\Services;
 
@@ -7,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 
 class GradoService
 {
-    protected $repository;
+    protected GradoRepositoryInterface $repository;
 
     public function __construct(GradoRepositoryInterface $repository)
     {
@@ -26,9 +27,7 @@ class GradoService
 
     public function crear(array $datos)
     {
-        return DB::transaction(function () use ($datos) {
-            return $this->repository->create($datos);
-        });
+        return DB::transaction(fn() => $this->repository->create($datos));
     }
 
     public function actualizar(int $id, array $datos)

@@ -1,4 +1,5 @@
 <?php
+// app/Models/Grado.php
 
 namespace App\Models;
 
@@ -13,10 +14,8 @@ class Grado extends Model
         'nivel_educativo',
     ];
 
-    
-
     /**
-     * Un grado puede tener varios docentes asignados
+     * Un grado puede tener varios docentes asignados.
      */
     public function docentesAsignados()
     {

@@ -1,39 +1,11 @@
 import '/resources/css/forms/notas/registroNotas.css';
+import axios from 'axios';
+import { initGradosSecciones, poblarSelect } from '../utils/loadGradosSecciones.js';
 
-export default function initRegistroNotas(container = document.querySelector('.rn-wrapper')) {
+export default async function initRegistroNotas(container = document.querySelector('.rn-wrapper')) {
   if (!container) return;
 
-  // 1) Datos estáticos para los selects
-  const gradosEstaticos = [
-    { id: 1, nombre: '3 años' },
-    { id: 2, nombre: '4 años' },
-    { id: 3, nombre: '5 años' },
-    { id: 4, nombre: 'Primero' },
-    { id: 5, nombre: 'Segundo' },
-    { id: 6, nombre: 'Tercero' },
-    { id: 7, nombre: 'Cuarto' },
-    { id: 8, nombre: 'Quinto' },
-    { id: 9, nombre: 'Sexto' }
-  ];
-  const seccionesEstaticas = [
-    { id: 1, nombre: 'A' },
-    { id: 2, nombre: 'B' }
-  ];
-  const cursosEstaticos = [
-    { id: 1, nombre: 'Matemática' },
-    { id: 2, nombre: 'Comunicación' },
-    { id: 3, nombre: 'Ciencia y Tecnología' },
-    { id: 4, nombre: 'Personal Social' },
-    { id: 5, nombre: 'Educación Física' }
-  ];
-  const bimestresEstaticos = [
-    { id: 'I', nombre: 'I° Bimestre' },
-    { id: 'II', nombre: 'II° Bimestre' },
-    { id: 'III', nombre: 'III° Bimestre' },
-    { id: 'IV', nombre: 'IV° Bimestre' }
-  ];
-
-  // 2) Referencias del DOM
+  // 1) Referencias del DOM
   const gradoSelect    = container.querySelector('#gradoSelect');
   const seccionSelect  = container.querySelector('#seccionSelect');
   const cursoSelect    = container.querySelector('#cursoSelect');
@@ -44,112 +16,74 @@ export default function initRegistroNotas(container = document.querySelector('.r
   const btnSiguiente   = container.querySelector('#btnSiguiente');
   const form           = container.querySelector('#formularioNotas');
   const mensaje        = container.querySelector('#mensajeConfirmacion');
+  const csrfToken      = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-  // 3) Token CSRF y configuración de fetch
-  const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-  const fetchOptions = {
-    credentials: 'same-origin',
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-      'X-CSRF-TOKEN': token
-    }
-  };
+  // 2) Datos estáticos para cursos y bimestres
+  const cursosEstaticos = [
+    { id: 1, nombre: 'Matemática' },
+    { id: 2, nombre: 'Comunicación' },
+    { id: 3, nombre: 'Ciencia y Tecnología' },
+    { id: 4, nombre: 'Personal Social' },
+    { id: 5, nombre: 'Educación Física' }
+  ];
+  const bimestresEstaticos = [
+    { id: 'I',   nombre: 'I° Bimestre' },
+    { id: 'II',  nombre: 'II° Bimestre' },
+    { id: 'III', nombre: 'III° Bimestre' },
+    { id: 'IV',  nombre: 'IV° Bimestre' }
+  ];
 
-  // Estado de los datos
-  let alumnosData = []; // [{id, nombre_completo}]
-  let alumnos = [];
-
-  // 4) Helper para poblar un <select>
-  function poblarSelect(selectEl, datos) {
-    selectEl.innerHTML = '<option value="">Seleccionar</option>';
-    datos.forEach(item => {
-      const option = document.createElement('option');
-      option.value = item.id;
-      option.textContent = item.nombre;
-      selectEl.appendChild(option);
-    });
+  // 3) Inicializar selects de grados y secciones
+  try {
+    await initGradosSecciones(gradoSelect, seccionSelect, 'Grado', 'Sección');
+  } catch (err) {
+    console.error('Error cargando grados o secciones:', err);
+    mensaje.textContent = '❌ No se pudieron cargar grados o secciones.';
+    return;
   }
 
-  // 5) Poblamos los selects al iniciar
-  poblarSelect(gradoSelect, gradosEstaticos);
-  poblarSelect(seccionSelect, seccionesEstaticas);
-  poblarSelect(cursoSelect, cursosEstaticos);
-  poblarSelect(bimestreSelect, bimestresEstaticos);
+  // 4) Helper para poblar cursos y bimestres
+  poblarSelect(cursoSelect,    cursosEstaticos,    'Seleccione curso');
+  poblarSelect(bimestreSelect, bimestresEstaticos, 'Seleccione bimestre');
 
-  // 6) Generar HTML de radios con precarga de notas
-  function competenciasHTML(idx, nota = {}) {
-    return ['c1', 'c2', 'c3', 'final']
-      .map(campo => {
-        const key = campo === 'final'
-          ? 'nota_final'
-          : `competencia${campo.charAt(1)}`;
-        return `
-          <td>
-            <div class="rn-radio-group">
-              <label>
-                <input
-                  type="radio"
-                  name="${campo}[${idx}]"
-                  value="A"
-                  ${nota[key] === 'A' ? 'checked' : ''}
-                >A
-              </label>
-              <label>
-                <input
-                  type="radio"
-                  name="${campo}[${idx}]"
-                  value="B"
-                  ${nota[key] === 'B' ? 'checked' : ''}
-                >B
-              </label>
-              <label>
-                <input
-                  type="radio"
-                  name="${campo}[${idx}]"
-                  value="C"
-                  ${nota[key] === 'C' ? 'checked' : ''}
-                >C
-              </label>
-            </div>
-          </td>`;
-      })
-      .join('');
-  }
-
-  // 7) Fetch alumnos de la BD según grado y sección
-  async function fetchAlumnosBD() {
-    const res = await fetch('/alumnos/filtrar', {
-      ...fetchOptions,
-      method: 'POST',
-      body: JSON.stringify({
-        grado_id: parseInt(gradoSelect.value),
-        seccion_id: parseInt(seccionSelect.value)
-      })
-    });
-    if (!res.ok) throw new Error('Error al cargar alumnos: ' + res.status);
-    const data = await res.json();
-    alumnosData = data.map(a => ({ id: a.id, nombre_completo: a.nombre_completo }));
-    alumnos = alumnosData.map(a => a.nombre_completo);
-  }
-
-  // 8) Fetch notas guardadas según filtros
-  async function fetchNotasBD() {
-    const params = new URLSearchParams({
-      grado_id: gradoSelect.value,
-      seccion_id: seccionSelect.value,
-      curso_id: cursoSelect.value,
-      bimestre: bimestreSelect.value
-    });
-    const res = await fetch(`/notas/filtrar?${params}`, {
+  // 5) Opciones de fetch genérico
+  async function fetchJSON(url, options = {}) {
+    const res = await fetch(url, {
       credentials: 'same-origin',
-      headers: { 'Accept': 'application/json' }
+      headers: { 'Accept': 'application/json', ...options.headers },
+      ...options
     });
-    if (!res.ok) throw new Error('Error al cargar notas: ' + res.status);
+    if (!res.ok) throw new Error(`Error en fetch ${url}: ${res.status}`);
     return res.json();
   }
 
-  // 9) Renderizar tabla de alumnos y notas
+  // 6) Fetch alumnos y notas de BD
+  async function fetchAlumnosBD() {
+    const data = await fetchJSON('/alumnos/filtrar', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': csrfToken
+      },
+      body: JSON.stringify({
+        grado_id:   parseInt(gradoSelect.value, 10),
+        seccion_id: parseInt(seccionSelect.value, 10)
+      })
+    });
+    return data.map(a => ({ id: a.id, nombre_completo: a.nombre_completo }));
+  }
+
+  async function fetchNotasBD() {
+    const params = new URLSearchParams({
+      grado_id:   gradoSelect.value,
+      seccion_id: seccionSelect.value,
+      curso_id:   cursoSelect.value,
+      bimestre:   bimestreSelect.value
+    });
+    return await fetchJSON(`/notas/filtrar?${params.toString()}`);
+  }
+
+  // 7) Renderizar tabla de alumnos con notas
   async function cargarAlumnos() {
     tbody.innerHTML = '';
     resultadosUl.innerHTML = '';
@@ -161,101 +95,119 @@ export default function initRegistroNotas(container = document.querySelector('.r
       cursoSelect.value &&
       bimestreSelect.value
     ) {
-      await fetchAlumnosBD();
-      const notas = await fetchNotasBD();
+      try {
+        const alumnos = await fetchAlumnosBD();
+        const notas   = await fetchNotasBD();
 
-      alumnos.forEach((nombre, idx) => {
-        const alumno = alumnosData[idx];
-        const notaObj = notas.find(n => n.alumno_id === alumno.id) || {};
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${idx + 1}</td>
-          <td>${nombre}</td>
-          ${competenciasHTML(idx, notaObj)}
-        `;
-        tbody.appendChild(tr);
-      });
+        alumnos.forEach((al, idx) => {
+          const notaObj = notas.find(n => n.alumno_id === al.id) || {};
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${idx + 1}</td>
+            <td>${al.nombre_completo}</td>
+            <td>
+              <div class="rn-radio-group">
+                <label><input type="radio" name="c1[${idx}]" value="A" ${notaObj.competencia1==='A'?'checked':''}>A</label>
+                <label><input type="radio" name="c1[${idx}]" value="B" ${notaObj.competencia1==='B'?'checked':''}>B</label>
+                <label><input type="radio" name="c1[${idx}]" value="C" ${notaObj.competencia1==='C'?'checked':''}>C</label>
+              </div>
+            </td>
+            <td>
+              <div class="rn-radio-group">
+                <label><input type="radio" name="c2[${idx}]" value="A" ${notaObj.competencia2==='A'?'checked':''}>A</label>
+                <label><input type="radio" name="c2[${idx}]" value="B" ${notaObj.competencia2==='B'?'checked':''}>B</label>
+                <label><input type="radio" name="c2[${idx}]" value="C" ${notaObj.competencia2==='C'?'checked':''}>C</label>
+              </div>
+            </td>
+            <td>
+              <div class="rn-radio-group">
+                <label><input type="radio" name="c3[${idx}]" value="A" ${notaObj.competencia3==='A'?'checked':''}>A</label>
+                <label><input type="radio" name="c3[${idx}]" value="B" ${notaObj.competencia3==='B'?'checked':''}>B</label>
+                <label><input type="radio" name="c3[${idx}]" value="C" ${notaObj.competencia3==='C'?'checked':''}>C</label>
+              </div>
+            </td>
+            <td>
+              <div class="rn-radio-group">
+                <label><input type="radio" name="final[${idx}]" value="A" ${notaObj.nota_final==='A'?'checked':''}>A</label>
+                <label><input type="radio" name="final[${idx}]" value="B" ${notaObj.nota_final==='B'?'checked':''}>B</label>
+                <label><input type="radio" name="final[${idx}]" value="C" ${notaObj.nota_final==='C'?'checked':''}>C</label>
+              </div>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      } catch (err) {
+        console.error('Error en cargarAlumnos:', err);
+      }
     }
   }
 
-  // 10) Buscar sugerencias de alumno
-  function buscarAlumno() {
+  // 8) Sugerencias y navegación
+  let alumnosList = [];
+  buscarInput.addEventListener('input', () => {
     const term = buscarInput.value.trim().toLowerCase();
     resultadosUl.innerHTML = '';
-    if (!term) return;
-    alumnos
-      .filter(n => n.toLowerCase().includes(term))
-      .forEach(nom => {
+    alumnosList = Array.from(tbody.querySelectorAll('tr')).map(tr => tr.children[1].textContent);
+    alumnosList
+      .filter(name => name.toLowerCase().includes(term))
+      .forEach(name => {
         const li = document.createElement('li');
-        li.textContent = nom;
-        li.onclick = () => mostrarAlumno(nom);
+        li.textContent = name;
+        li.onclick = () => {
+          tbody.innerHTML = '';
+          const idx = alumnosList.indexOf(name);
+          cargarAlumnos().then(() => {
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            rows.forEach((r, i) => { if (i !== idx) r.remove(); });
+          });
+        };
         resultadosUl.appendChild(li);
       });
-  }
+  });
 
-  // 11) Mostrar un solo alumno con su nota precargada
-  function mostrarAlumno(nombre) {
-    const idx = alumnos.indexOf(nombre);
-    if (idx < 0) return;
-    const alumno = alumnosData[idx];
-    alumnos = [nombre];
-    alumnosData = [alumno];
-    const notaObj = {};
-    // Podrías reusar fetchNotasBD para encontrar notaObj aquí
-    tbody.innerHTML = `
-      <tr>
-        <td>1</td>
-        <td>${nombre}</td>
-        ${competenciasHTML(0, notaObj)}
-      </tr>
-    `;
-  }
+  let indiceAlumno = 0;
+  btnSiguiente.addEventListener('click', () => {
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+    if (!rows.length) return;
+    indiceAlumno = (indiceAlumno + 1) % rows.length;
+    rows.forEach((r,i) => { r.style.display = i === indiceAlumno ? '' : 'none'; });
+  });
 
-  // 12) Siguiente alumno
-  function siguienteAlumno() {
-    if (!alumnos.length) return;
-    indiceAlumno = (indiceAlumno + 1) % alumnos.length;
-    mostrarAlumno(alumnos[indiceAlumno]);
-  }
-
-  // 13) Enviar notas a la BD
-  async function registrarNotas(e) {
+  // 9) Registrar notas en BD
+  form.addEventListener('submit', async e => {
     e.preventDefault();
-    if (!alumnos.length) return;
-    const payload = alumnos.map((_, i) => ({
-      alumno_id:    alumnosData[i].id,
-      grado_id:     parseInt(gradoSelect.value),
-      seccion_id:   parseInt(seccionSelect.value),
-      curso_id:     parseInt(cursoSelect.value),
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+    const payload = rows.map((tr, idx) => ({
+      alumno_id:    alumnosList[idx]?.id,
+      grado_id:     parseInt(gradoSelect.value, 10),
+      seccion_id:   parseInt(seccionSelect.value, 10),
+      curso_id:     parseInt(cursoSelect.value, 10),
       bimestre:     bimestreSelect.value,
-      competencia1: document.querySelector(`input[name="c1[${i}]"]:checked`)?.value || null,
-      competencia2: document.querySelector(`input[name="c2[${i}]"]:checked`)?.value || null,
-      competencia3: document.querySelector(`input[name="c3[${i}]"]:checked`)?.value || null,
-      nota_final:   document.querySelector(`input[name="final[${i}]"]:checked`)?.value || null
+      competencia1: tr.querySelector(`input[name="c1[${idx}]"]:checked`)?.value,
+      competencia2: tr.querySelector(`input[name="c2[${idx}]"]:checked`)?.value,
+      competencia3: tr.querySelector(`input[name="c3[${idx}]"]:checked`)?.value,
+      nota_final:   tr.querySelector(`input[name="final[${idx}]"]:checked`)?.value
     }));
-
     try {
-      const res = await fetch('/notas', {
-        ...fetchOptions,
+      await fetchJSON('/notas', {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': csrfToken
+        },
         body: JSON.stringify({ notas: payload })
       });
-      if (!res.ok) throw new Error(await res.text());
       mensaje.textContent = '✅ Notas guardadas correctamente';
     } catch (error) {
       mensaje.textContent = '❌ Error al guardar notas';
-      console.error('Error registrarNotas:', error);
+      console.error(error);
     }
-  }
+  });
 
-  // 14) Listeners de eventos
+  // 10) Listeners de filtros
   [gradoSelect, seccionSelect, cursoSelect, bimestreSelect].forEach(el =>
     el.addEventListener('change', cargarAlumnos)
   );
-  buscarInput.addEventListener('input', buscarAlumno);
-  btnSiguiente.addEventListener('click', siguienteAlumno);
-  form.addEventListener('submit', registrarNotas);
 }
 
-// Inicializar al cargar DOM
-document.addEventListener('DOMContentLoaded', initRegistroNotas);
+document.addEventListener('DOMContentLoaded', () => initRegistroNotas());

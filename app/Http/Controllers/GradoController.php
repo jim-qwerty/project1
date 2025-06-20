@@ -1,39 +1,59 @@
 <?php
+// app/Http/Controllers/GradoController.php
 
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Grado\StoreGradoRequest;
 use App\Http\Requests\Grado\UpdateGradoRequest;
 use App\Services\GradoService;
+use Illuminate\Http\JsonResponse;
 
 class GradoController extends Controller
 {
-    protected $service;
+    protected GradoService $service;
 
     public function __construct(GradoService $service)
     {
         $this->service = $service;
     }
 
-    public function index()
+    /**
+     * GET /api/grados
+     * Devuelve sólo id y nombre en JSON para el frontend.
+     */
+    public function index(): JsonResponse
     {
-        $grados = $this->service->listar();
+        $grados = collect($this->service->listar())
+            ->map(fn($g) => [
+                'id'     => $g['id']     ?? $g->id,
+                'nombre' => $g['nombre'] ?? $g->nombre,
+            ]);
+
         return response()->json($grados);
     }
 
+    /**
+     * GET /grados/create
+     */
     public function create()
     {
         return view('grados.create');
     }
 
-    public function store(StoreGradoRequest $request)
+    /**
+     * POST /grados
+     */
+    public function store(StoreGradoRequest $request): JsonResponse
     {
         $datos = $request->validated();
         $grado = $this->service->crear($datos);
         return response()->json($grado, 201);
     }
 
-    public function show($id)
+    /**
+     * GET /grados/{id}
+     */
+    public function show(int $id): JsonResponse
     {
         $grado = $this->service->obtener($id);
         if (! $grado) {
@@ -42,7 +62,10 @@ class GradoController extends Controller
         return response()->json($grado);
     }
 
-    public function edit($id)
+    /**
+     * GET /grados/{id}/edit
+     */
+    public function edit(int $id)
     {
         $grado = $this->service->obtener($id);
         if (! $grado) {
@@ -51,7 +74,10 @@ class GradoController extends Controller
         return view('grados.edit', compact('grado'));
     }
 
-    public function update(UpdateGradoRequest $request, $id)
+    /**
+     * PUT/PATCH /grados/{id}
+     */
+    public function update(UpdateGradoRequest $request, int $id): JsonResponse
     {
         $datos = $request->validated();
         $ok    = $this->service->actualizar($id, $datos);
@@ -61,7 +87,10 @@ class GradoController extends Controller
         return response()->json(['success' => true]);
     }
 
-    public function destroy($id)
+    /**
+     * DELETE /grados/{id}
+     */
+    public function destroy(int $id): JsonResponse
     {
         $ok = $this->service->eliminar($id);
         if (! $ok) {

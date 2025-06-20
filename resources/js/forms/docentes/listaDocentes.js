@@ -1,8 +1,9 @@
 // resources/js/forms/docentes/listaDocentes.js
 import '/resources/css/forms/docentes/listaDocentes.css';
 import axios from 'axios';
+import { fetchGrados } from '../utils/loadGradosSecciones.js';
 
-export default function initListaProfesores(
+export default async function initListaProfesores(
   container = document.querySelector('#lista-profesores')
 ) {
   if (!container) return;
@@ -11,75 +12,118 @@ export default function initListaProfesores(
   const buscador    = container.querySelector('#buscador');
   const cuerpoTabla = container.querySelector('#cuerpoTabla');
 
-  // Array que rellenaremos desde la API
+  // Crear y posicionar el contenedor de sugerencias
+  const sugerencias = document.createElement('div');
+  sugerencias.className = 'lp-sugerencias';
+  // Asegurar que el padre tenga position: relative
+  const wrapperBuscador = buscador.parentNode;
+  wrapperBuscador.style.position = 'relative';
+  wrapperBuscador.appendChild(sugerencias);
+  // Posición absoluta justo debajo del input
+  sugerencias.style.position = 'absolute';
+  sugerencias.style.top = `${buscador.offsetTop + buscador.offsetHeight + 4}px`;
+  sugerencias.style.left = `${buscador.offsetLeft}px`;
+  sugerencias.style.width = `${buscador.offsetWidth}px`;
+  sugerencias.style.background = '#fff';
+  sugerencias.style.border = '1px solid #ccc';
+  sugerencias.style.zIndex = '1000';
+
   let profesores = [];
 
-  // Función que renderiza la tabla
-  const renderTabla = (filtrados) => {
+  // 1) Carga dinámica de grados
+  try {
+    const gradosBD = await fetchGrados();
+    gradoFiltro.innerHTML = '<option value="">Seleccione grado</option>';
+    gradosBD.forEach(g => {
+      gradoFiltro.insertAdjacentHTML(
+        'beforeend',
+        `<option value="${g.nombre}">${g.nombre}</option>`
+      );
+    });
+  } catch (err) {
+    console.error('No se pudieron cargar los grados:', err);
+  }
+
+  // 2) Carga inicial de profesores en memoria
+  try {
+    const { data } = await axios.get('/docentes');
+    profesores = data;
+  } catch (err) {
+    console.error('Error cargando docentes:', err);
+  }
+
+  // 3) Renderizar tabla con lista dada
+  const renderTabla = lista => {
     cuerpoTabla.innerHTML = '';
-    filtrados.forEach((profesor, index) => {
+    lista.forEach((profesor, index) => {
       const fila = document.createElement('tr');
       fila.innerHTML = `
         <td>${profesor.nombres}</td>
         <td>${profesor.apellidos}</td>
-        <td>${profesor.grado_asignado?.nombre   ?? ''}</td>
+        <td>${profesor.grado_asignado?.nombre ?? ''}</td>
         <td>${profesor.seccion_asignada?.nombre ?? ''}</td>
         <td>${profesor.correo_electronico}</td>
         <td>${profesor.celular}</td>
         <td class="estado-radio">
-          <label>
-            <input
-              type="radio"
-              name="estado${index}"
-              value="activo"
-              ${profesor.estado === 'activo' ? 'checked' : ''}>
-            Activo
-          </label>
-          <label>
-            <input
-              type="radio"
-              name="estado${index}"
-              value="inactivo"
-              ${profesor.estado === 'inactivo' ? 'checked' : ''}>
-            Inactivo
-          </label>
+          <label><input type="radio" name="estado${index}" value="activo" ${profesor.estado==='activo'?'checked':''}>Activo</label>
+          <label><input type="radio" name="estado${index}" value="inactivo" ${profesor.estado==='inactivo'?'checked':''}>Inactivo</label>
         </td>
-        <td>
-          <button type="button" class="editar">Editar</button>
-        </td>
+        <td><button type="button" class="editar">Editar</button></td>
       `;
       cuerpoTabla.appendChild(fila);
     });
   };
 
-  // Filtrado por grado y texto
-  const filtrarProfesores = () => {
-    const gradoSel = gradoFiltro.value.toLowerCase();
-    const text     = buscador.value.toLowerCase();
-
-    const filtrados = profesores.filter(p => {
-      const matchNombre   = p.nombres.toLowerCase().includes(text);
-      const matchApellido = p.apellidos.toLowerCase().includes(text);
-      const matchGrado    = !gradoSel || (p.grado_asignado?.nombre.toLowerCase() === gradoSel);
-      return (matchNombre || matchApellido) && matchGrado;
-    });
-
-    renderTabla(filtrados);
+  // 4) Filtrar profesores por grado
+  const filtrarPorGrado = () => {
+    const gradoSel = gradoFiltro.value;
+    if (!gradoSel) {
+      cuerpoTabla.innerHTML = '';
+      return [];
+    }
+    return profesores.filter(p => p.grado_asignado?.nombre === gradoSel);
   };
 
-  // Eventos de filtro
-  gradoFiltro.addEventListener('change', filtrarProfesores);
-  buscador.addEventListener('input', filtrarProfesores);
+  gradoFiltro.addEventListener('change', () => {
+    buscador.value = '';
+    sugerencias.innerHTML = '';
+    const lista = filtrarPorGrado();
+    renderTabla(lista);
+  });
 
-  // Carga inicial desde el endpoint /docentes
-  axios.get('/docentes')
-    .then(({ data }) => {
-      profesores = data;
-      renderTabla(profesores);
-    })
-    .catch(err => {
-      console.error('Error cargando docentes:', err);
+  // 5) Autocompletar búsqueda por nombre o apellido
+  buscador.addEventListener('input', () => {
+    const texto = buscador.value.trim().toLowerCase();
+    const gradoSel = gradoFiltro.value;
+    if (!texto || !gradoSel) {
+      sugerencias.style.display = 'none';
+      return;
+    }
+    const candidatos = profesores.filter(p =>
+      p.grado_asignado?.nombre === gradoSel &&
+      (`${p.nombres} ${p.apellidos}`).toLowerCase().includes(texto)
+    ).slice(0, 5);
+    sugerencias.innerHTML = '';
+    candidatos.forEach(p => {
+      const div = document.createElement('div');
+      div.textContent = `${p.nombres} ${p.apellidos}`;
+      div.style.padding = '4px 8px';
+      div.style.cursor = 'pointer';
+      div.addEventListener('click', () => {
+        renderTabla([p]);
+        sugerencias.innerHTML = '';
+        buscador.value = div.textContent;
+      });
+      sugerencias.appendChild(div);
     });
+    sugerencias.style.display = candidatos.length ? 'block' : 'none';
+  });
+
+  document.addEventListener('click', e => {
+    if (!container.contains(e.target) && e.target !== buscador) {
+      sugerencias.style.display = 'none';
+    }
+  });
 }
 
 // Inicialización al cargar el DOM

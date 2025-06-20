@@ -1,8 +1,8 @@
-// resources/js/forms/docentes/agregarDocentes.js
 import '/resources/css/forms/docentes/agregarDocentes.css';
 import axios from 'axios';
+import { initGradosSecciones } from '../utils/loadGradosSecciones.js';
 
-export default function initAgregarProfesores(
+export default async function initAgregarProfesores(
   container = document.querySelector('#agregar-profesores')
 ) {
   if (!container) {
@@ -22,50 +22,24 @@ export default function initAgregarProfesores(
     return;
   }
 
-  // Configura CSRF para Axios (solo si existe el meta)
+  // Configura CSRF para Axios
   const csrfMeta = document.querySelector('meta[name="csrf-token"]');
   if (csrfMeta) {
     axios.defaults.headers.common['X-CSRF-TOKEN'] = csrfMeta.getAttribute('content');
   } else {
-    console.warn("No se encontró <meta name=\"csrf-token\">");
+    console.warn("No se encontró <meta name=\"csrf-token\" >");
   }
 
-  // === 1) Sección de valores estáticos ===
-  // Si quieres asegurar siempre unas opciones mínimas, rellena aquí:
-  const gradosEstaticos = [
-    { id: 1, nombre: '3 años' },
-    { id: 2, nombre: '4 años' },
-    { id: 3, nombre: '5 años' },
-    { id: 4, nombre: 'Primero' },
-    { id: 5, nombre: 'Segundo' },
-    { id: 6, nombre: 'Tercero' },
-    { id: 7, nombre: 'Cuarto' },
-    { id: 8, nombre: 'Quinto' },
-    { id: 9, nombre: 'Sexto' },
-    
-  ];
-  const seccionesEstaticas = [
-    { id: '1', nombre: 'A' },
-    { id: '2', nombre: 'B' }
-    
-  ];
+  // === 1) Carga dinámica de grados y secciones desde la BD ===
+  try {
+    await initGradosSecciones(gradoSelect, seccionSelect);
+  } catch (err) {
+    console.error('Error cargando grados o secciones:', err);
+    mensaje.textContent = '❌ No se pudieron cargar grados y/o secciones.';
+    mensaje.style.color = 'red';
+  }
 
-  // Inserta los valores estáticos
-  gradosEstaticos.forEach(g =>
-    gradoSelect.insertAdjacentHTML(
-      'beforeend',
-      `<option value="${g.id}">${g.nombre}</option>`
-    )
-  );
-  seccionesEstaticas.forEach(s =>
-    seccionSelect.insertAdjacentHTML(
-      'beforeend',
-      `<option value="${s.id}">${s.nombre}</option>`
-    )
-  );
-  // ======================================
-
-  // Calcular edad al cambiar fecha
+  // 2) Calcular edad al cambiar fecha
   fechaNacimiento.addEventListener('change', () => {
     const fecha = new Date(fechaNacimiento.value);
     const hoy   = new Date();
@@ -75,11 +49,8 @@ export default function initAgregarProfesores(
     edadInput.value = isNaN(edad) ? '' : edad;
   });
 
-
-  
-
-  // ====== Envío del formulario ======
-  form.addEventListener('submit', e => {
+  // 3) Envío del formulario
+  form.addEventListener('submit', async e => {
     e.preventDefault();
 
     const datos = {
@@ -88,8 +59,8 @@ export default function initAgregarProfesores(
       dni:                 form.dni.value.trim(),
       fecha_nacimiento:    form.fecha_nacimiento.value,
       edad:                form.edad.value || null,
-      grado_asignado_id:   form.grado_asignado_id.value.trim(),
-      seccion_asignada_id: form.seccion_asignada_id.value.trim(),
+      grado_asignado_id:   gradoSelect.value,
+      seccion_asignada_id: seccionSelect.value,
       correo_electronico:  form.correo_electronico.value.trim(),
       celular:             form.celular.value.trim(),
       direccion:           form.direccion.value.trim(),
@@ -97,25 +68,25 @@ export default function initAgregarProfesores(
       estado:              'activo'
     };
 
-    axios.post('/docentes', datos)
-      .then(({ data }) => {
-        mensaje.textContent = '✅ Profesor registrado correctamente.';
-        mensaje.style.color = 'green';
-        form.reset();
-        edadInput.value = '';
-        setTimeout(() => mensaje.textContent = '', 3000);
-      })
-      .catch(err => {
-        console.error('Error completo:', JSON.stringify(err.response?.data, null, 2));
-        const errs = err.response?.data?.errors;
-        if (errs) {
-          mensaje.innerHTML = Object.values(errs).flat().join('<br>');
-        } else {
-          mensaje.textContent = '❌ Error: ' +
-            (err.response?.data?.message || err.message);
-        }
-        mensaje.style.color = 'red';
-      });
+    try {
+      const { data } = await axios.post('/docentes', datos);
+      mensaje.textContent = '✅ Profesor registrado correctamente.';
+      mensaje.style.color = 'green';
+      form.reset();
+      edadInput.value = '';
+      // Recargar grados y secciones en caso de que hayan cambiado
+      await initGradosSecciones(gradoSelect, seccionSelect);
+      setTimeout(() => mensaje.textContent = '', 3000);
+    } catch (err) {
+      console.error('Error completo:', err.response?.data || err);
+      const errs = err.response?.data?.errors;
+      if (errs) {
+        mensaje.innerHTML = Object.values(errs).flat().join('<br>');
+      } else {
+        mensaje.textContent = '❌ Error: ' + (err.response?.data?.message || err.message);
+      }
+      mensaje.style.color = 'red';
+    }
   });
 }
 

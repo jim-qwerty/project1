@@ -1,58 +1,35 @@
-// resources/js/forms/asistencia/registroAlumnos.js
 import '/resources/css/forms/asistencia/registroAlumnos.css';
+import { initGradosSecciones } from '../utils/loadGradosSecciones.js';
 
-export default function initRegistroAlumnos(container = document.querySelector('.ra-wrapper')) {
+export default async function initRegistroAlumnos(container = document.querySelector('.ra-wrapper')) {
   if (!container) return;
 
-  // 1) Arrays estáticos para los selects
-  const gradosEstaticos = [
-    { id: 1, nombre: '3 años' },
-    { id: 2, nombre: '4 años' },
-    { id: 3, nombre: '5 años' },
-    { id: 4, nombre: 'Primero' },
-    { id: 5, nombre: 'Segundo' },
-    { id: 6, nombre: 'Tercero' },
-    { id: 7, nombre: 'Cuarto' },
-    { id: 8, nombre: 'Quinto' },
-    { id: 9, nombre: 'Sexto' }
-  ];
-  const seccionesEstaticas = [
-    { id: 1, nombre: 'A' },
-    { id: 2, nombre: 'B' }
-  ];
-
-  // 2) Referencias al DOM
+  // 1) Referencias al DOM
   const fechaInput    = container.querySelector('#fechaActual');
   const gradoSelect   = container.querySelector('#gradoSelect');
   const seccionSelect = container.querySelector('#seccionSelect');
   const tbody         = container.querySelector('#ra-tbody');
   const form          = container.querySelector('form.ra-form');
 
-  // 3) CSRF token para las peticiones
+  // 2) CSRF token para las peticiones
   const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-  // 4) Inicializar placeholder de la fecha de hoy
+  // 3) Inicializar placeholder de la fecha de hoy
   if (fechaInput) {
     const hoy = new Date();
     fechaInput.placeholder = hoy.toISOString().slice(0, 10);
   }
 
-  // 5) Helper para poblar un <select> con datos
-  function poblarSelect(selectEl, datos) {
-    selectEl.innerHTML = '<option value="">--Selecciona--</option>';
-    datos.forEach(item => {
-      const opt = document.createElement('option');
-      opt.value = item.id;
-      opt.textContent = item.nombre;
-      selectEl.appendChild(opt);
-    });
+  // 4) Carga dinámica de grados y secciones
+  try {
+    await initGradosSecciones(gradoSelect, seccionSelect);
+  } catch (err) {
+    console.error('Error cargando grados o secciones:', err);
+    gradoSelect.innerHTML   = '<option value="">Error cargando grados</option>';
+    seccionSelect.innerHTML = '<option value="">Error cargando secciones</option>';
   }
 
-  // 6) Poblamos los selects de grado y sección
-  poblarSelect(gradoSelect, gradosEstaticos);
-  poblarSelect(seccionSelect, seccionesEstaticas);
-
-  // 7) Función para traer alumnos desde la BD según grado_id y seccion_id
+  // 5) Función para traer alumnos según grado y sección
   async function obtenerAlumnosDesdeBD(gradoId, seccionId) {
     const res = await fetch('/alumnos/filtrar', {
       method: 'POST',
@@ -63,8 +40,8 @@ export default function initRegistroAlumnos(container = document.querySelector('
         'X-CSRF-TOKEN': token
       },
       body: JSON.stringify({
-        grado_id: parseInt(gradoId, 10),
-        seccion_id: parseInt(seccionId, 10),
+        grado_id:   parseInt(gradoId, 10),
+        seccion_id: parseInt(seccionId, 10)
       })
     });
     if (!res.ok) {
@@ -75,24 +52,22 @@ export default function initRegistroAlumnos(container = document.querySelector('
     return data.map(a => ({ id: a.id, nombre: a.nombre_completo }));
   }
 
-  // 8) Función que limpia y vuelve a poblar la tabla
+  // 6) Función que limpia y vuelve a poblar la tabla
   async function cargarTabla() {
-    tbody.innerHTML = ''; // limpiar siempre primero
-
-    const fecha    = fechaInput.value.trim();
-    const gradoId  = gradoSelect.value;
-    const seccionId= seccionSelect.value;
-
+    tbody.innerHTML = '';
+    const fecha     = fechaInput.value.trim();
+    const gradoId   = gradoSelect.value;
+    const seccionId = seccionSelect.value;
     if (!fecha || !gradoId || !seccionId) return;
 
     const alumnos = await obtenerAlumnosDesdeBD(gradoId, seccionId);
-
     if (alumnos.length === 0) {
       const tr = document.createElement('tr');
-      tr.innerHTML = `<td colspan="5">
-        No hay alumnos para grado "${gradoSelect.options[gradoSelect.selectedIndex].text}"
-        sección "${seccionSelect.options[seccionSelect.selectedIndex].text}" el ${fecha}.
-      </td>`;
+      tr.innerHTML = `
+        <td colspan="5">
+          No hay alumnos para grado "${gradoSelect.options[gradoSelect.selectedIndex].text}"
+          sección "${seccionSelect.options[seccionSelect.selectedIndex].text}" el ${fecha}.
+        </td>`;
       tbody.appendChild(tr);
       return;
     }
@@ -119,20 +94,18 @@ export default function initRegistroAlumnos(container = document.querySelector('
     });
   }
 
-  // 9) Listeners para recargar la tabla al cambiar fecha, grado o sección
+  // 7) Listeners para recargar la tabla al cambiar fecha, grado o sección
   fechaInput.addEventListener('change', cargarTabla);
   gradoSelect.addEventListener('change', cargarTabla);
   seccionSelect.addEventListener('change', cargarTabla);
 
-  // 10) Interceptar envío del form y enviar a la BD
+  // 8) Interceptar envío del form y enviar a la BD
   form.addEventListener('submit', async e => {
     e.preventDefault();
+    const fecha     = fechaInput.value.trim();
+    const gradoId   = parseInt(gradoSelect.value, 10);
+    const seccionId = parseInt(seccionSelect.value, 10);
 
-    const fecha    = fechaInput.value.trim();
-    const gradoId  = parseInt(gradoSelect.value, 10);
-    const seccionId= parseInt(seccionSelect.value, 10);
-
-    // Recolectar asistencias
     const filas = Array.from(tbody.querySelectorAll('tr'));
     const asistencias = filas.map(tr => {
       const alumnoId = tr.querySelector('input[type="hidden"]').value;
@@ -146,7 +119,6 @@ export default function initRegistroAlumnos(container = document.querySelector('
       };
     }).filter(a => a.estado);
 
-    // Enviar al controlador
     try {
       const res = await fetch('/asistencia-alumnos', {
         method: 'POST',
@@ -166,7 +138,7 @@ export default function initRegistroAlumnos(container = document.querySelector('
     }
   });
 
-  // 11) Carga inicial si ya hay valores preestablecidos
+  // 9) Carga inicial si ya hay valores preestablecidos
   if (fechaInput.value && gradoSelect.value && seccionSelect.value) {
     cargarTabla();
   }
