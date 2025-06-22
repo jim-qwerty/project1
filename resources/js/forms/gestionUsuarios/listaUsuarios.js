@@ -1,4 +1,3 @@
-// resources/js/forms/gestionUsuarios/listaUsuarios.js
 import '/resources/css/forms/gestionUsuarios/listaUsuarios.css';
 import axios from 'axios';
 
@@ -9,16 +8,12 @@ export default function initListaUsuarios(container = document.querySelector('.l
   const buscador       = container.querySelector('#buscador');
   const sugerenciasDiv = container.querySelector('#sugerenciasNombres');
   const tbody          = container.querySelector('#tablaUsuarios tbody');
+  const currentUserRol = document.querySelector('meta[name="rol-usuario"]')?.content || '';
 
-  // Donde guardaremos los usuarios traídos de la API
   let usuarios = [];
 
-  // Limpiar sugerencias
-  const limpiarSugerencias = () => {
-    sugerenciasDiv.innerHTML = '';
-  };
+  const limpiarSugerencias = () => sugerenciasDiv.innerHTML = '';
 
-  // Mostrar sugerencias filtradas
   const mostrarSugerencias = () => {
     limpiarSugerencias();
     const term = buscador.value.trim().toLowerCase();
@@ -39,7 +34,6 @@ export default function initListaUsuarios(container = document.querySelector('.l
       });
   };
 
-  // Renderizar la tabla
   const renderUsuarios = ({ porNombre = null } = {}) => {
     const rol = selectRol.value.toLowerCase();
     tbody.innerHTML = '';
@@ -53,27 +47,76 @@ export default function initListaUsuarios(container = document.querySelector('.l
 
     filtrados.forEach(u => {
       const tr = document.createElement('tr');
+      const isAdmin = currentUserRol === 'admin';
+
       tr.innerHTML = `
         <td>${u.nombres} ${u.apellidos}</td>
         <td>${u.rol}</td>
         <td>
-          <span class="pass-mask" data-real="••••••">••••••</span>
+          ${isAdmin ? `<input type="password" class="nueva-pass" placeholder="Nueva contraseña" disabled>` : '••••••'}
         </td>
         <td>
-          <button type="button" class="ver-btn">Ver</button>
+          ${isAdmin ? `<button type="button" class="restablecer-btn">Restablecer</button>` : ''}
         </td>
       `;
-      // Toggle de contraseña
-      const span = tr.querySelector('.pass-mask');
-      const btn  = tr.querySelector('.ver-btn');
-      btn.addEventListener('click', () => {
-        const visible = span.textContent !== '••••••';
-        span.textContent = visible ? '••••••' : span.dataset.real;
-        btn.textContent = visible ? 'Ver' : 'Ocultar';
-      });
+
+      if (isAdmin) {
+        const btn = tr.querySelector('.restablecer-btn');
+        const input = tr.querySelector('.nueva-pass');
+
+        btn.addEventListener('click', () => {
+          if (btn.textContent === 'Restablecer') {
+            input.disabled = false;
+            input.focus();
+            btn.textContent = 'Aceptar';
+          } else {
+            const nueva = input.value.trim();
+            if (!nueva || nueva.length < 6) {
+              mostrarMensaje('La contraseña debe tener al menos 6 caracteres.', true);
+              return;
+            }
+
+            // Mostrar modal de confirmación
+            const confirmacion = document.getElementById('confirmacion');
+            const btnSi = document.getElementById('btn-si');
+            const btnNo = document.getElementById('btn-no');
+            confirmacion.style.display = 'flex';
+
+            btnSi.onclick = async () => {
+              confirmacion.style.display = 'none';
+              try {
+                await axios.put(`/usuarios/${u.id}`, { password: nueva });
+                mostrarMensaje('Contraseña actualizada correctamente.');
+                input.value = '';
+                input.disabled = true;
+                btn.textContent = 'Restablecer';
+              } catch (e) {
+                mostrarMensaje('Error al actualizar la contraseña.', true);
+              }
+            };
+
+            btnNo.onclick = () => {
+              confirmacion.style.display = 'none';
+            };
+          }
+        });
+      }
 
       tbody.appendChild(tr);
     });
+  };
+
+  const mostrarMensaje = (texto, error = false) => {
+    const mensajeDiv = document.getElementById('mensaje');
+    mensajeDiv.textContent = texto;
+    mensajeDiv.style.background = error ? '#f8d7da' : '#d4edda';
+    mensajeDiv.style.color = error ? '#721c24' : '#155724';
+    mensajeDiv.style.borderColor = error ? '#f5c6cb' : '#c3e6cb';
+    mensajeDiv.style.display = 'block';
+
+    setTimeout(() => {
+      mensajeDiv.style.display = 'none';
+    }, 3000);
   };
 
   // Eventos de filtro
@@ -82,13 +125,13 @@ export default function initListaUsuarios(container = document.querySelector('.l
     limpiarSugerencias();
     renderUsuarios();
   });
+
   buscador.addEventListener('input', mostrarSugerencias);
   buscador.addEventListener('blur', () => setTimeout(limpiarSugerencias, 150));
 
-  // Carga inicial de usuarios desde la BD
+  // Carga inicial
   axios.get('/usuarios')
     .then(({ data }) => {
-      // data contiene [{nombres,apellidos,rol,…},…]
       usuarios = data.map(u => ({
         id: u.id,
         nombres: u.nombres,
@@ -102,5 +145,4 @@ export default function initListaUsuarios(container = document.querySelector('.l
     });
 }
 
-// Inicialización
 document.addEventListener('DOMContentLoaded', () => initListaUsuarios());

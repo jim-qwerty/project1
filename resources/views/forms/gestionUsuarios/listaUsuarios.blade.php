@@ -1,7 +1,7 @@
 {{-- resources/views/usuarios/listaUsuarios.blade.php --}}
 <div class="lu-wrapper">
   <meta name="csrf-token" content="{{ csrf_token() }}">
-
+<meta name="rol-usuario" content="{{ auth()->user()->rol }}">
   <form id="formUsuarios" class="lu-form">
     <h2 class="lu-titulo">Lista de Usuarios</h2>
 
@@ -41,3 +41,16 @@
     </table>
   </form>
 </div>
+<!-- Mensaje de confirmación -->
+<div id="confirmacion" class="m-confirmacion" style="display: none;">
+  <div class="m-confirmacion-contenido">
+    <p id="confirmacion-mensaje">¿Deseas actualizar la contraseña?</p>
+    <div class="m-confirmacion-botones">
+      <button id="btn-si">Sí</button>
+      <button id="btn-no">No</button>
+    </div>
+  </div>
+</div>
+
+<!-- Mensaje de éxito -->
+<div id="mensaje" class="m-mensaje" style="display: none;">Contraseña actualizada correctamente.</div>
