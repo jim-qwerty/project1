@@ -5,158 +5,144 @@ import { initGradosSecciones, poblarSelect } from '../utils/loadGradosSecciones.
 export default async function initHistorialPagos(container = document.querySelector('.hp-wrapper')) {
   if (!container) return;
 
-  // Configura CSRF para Axios
-  axios.defaults.headers.common['X-CSRF-TOKEN'] =
-    document.querySelector('meta[name="csrf-token"]').content;
+  axios.defaults.headers.common['X-CSRF-TOKEN'] = document.querySelector('meta[name="csrf-token"]').content;
 
-  // Referencias al DOM
-  const gradoSelect    = container.querySelector('#gradoHistorial');
-  const seccionSelect  = container.querySelector('#seccionHistorial');
-  const mesSelect      = container.querySelector('#mesHistorial');
-  const buscadorInput  = container.querySelector('#buscadorAlumno');
-  const sugerenciasDiv = container.querySelector('#sugerenciasAlumnos');
-  const tablaBody      = container.querySelector('#tablaPagos tbody');
-  const btnDeudores    = container.querySelector('#btnDeudores');
+  const gradoSelect   = container.querySelector('#gradoHistorial');
+  const seccionSelect = container.querySelector('#seccionHistorial');
+  const mesSelect     = container.querySelector('#mesHistorial');
+  const buscadorInput = container.querySelector('#buscadorAlumno');
+  const sugerenciasDiv= container.querySelector('#sugerenciasAlumnos');
+  const tablaBody     = container.querySelector('#tablaPagos tbody');
+  const btnToggle     = container.querySelector('#btnDeudores');
 
-  let pagosData   = [];
   let alumnosData = [];
-  let resultados  = [];
+  let pagos = [];
+  let deudores = [];
+  let isDeudoresMode = false;
 
-  // 1) Carga dinámica de grados y secciones desde la BD
-  try {
-    await initGradosSecciones(gradoSelect, seccionSelect, 'Grado', 'Sección');
-  } catch (err) {
-    console.error('Error cargando grados o secciones:', err);
-    gradoSelect.innerHTML   = '<option value="">No se cargaron grados</option>';
-    seccionSelect.innerHTML = '<option value="">No se cargaron secciones</option>';
-  }
+  // 1) Inicializar selects de grado y sección
+  await initGradosSecciones(gradoSelect, seccionSelect);
 
-  // 2) Población de meses (estático)
-  const mesesEstaticos = [
-    { id: 1, nombre: 'Enero' },
-    { id: 2, nombre: 'Febrero' },
-    { id: 3, nombre: 'Marzo' },
-    { id: 4, nombre: 'Abril' },
-    { id: 5, nombre: 'Mayo' },
-    { id: 6, nombre: 'Junio' },
-    { id: 7, nombre: 'Julio' },
-    { id: 8, nombre: 'Agosto' },
-    { id: 9, nombre: 'Septiembre' },
-    { id: 10, nombre: 'Octubre' },
-    { id: 11, nombre: 'Noviembre' },
-    { id: 12, nombre: 'Diciembre' }
+  // 2) Cargar alumnos una sola vez
+  await loadAlumnos();
+
+  // 3) Meses
+  const meses = [
+    { id:1,nombre:'Enero' },{ id:2,nombre:'Febrero' },{ id:3,nombre:'Marzo' },
+    { id:4,nombre:'Abril' },{ id:5,nombre:'Mayo' },{ id:6,nombre:'Junio' },
+    { id:7,nombre:'Julio' },{ id:8,nombre:'Agosto' },{ id:9,nombre:'Septiembre' },
+    { id:10,nombre:'Octubre' },{ id:11,nombre:'Noviembre' },{ id:12,nombre:'Diciembre' }
   ];
-  poblarSelect(mesSelect, mesesEstaticos, 'Seleccione mes');
+  poblarSelect(mesSelect, meses, 'Seleccione mes');
 
-  // 3) Traer datos iniciales de la API
-  async function cargarDatosBD() {
+  // Funciones internas
+  async function loadAlumnos() {
     try {
-      const [rPagos, rAlumnos] = await Promise.all([
-        axios.get('/pagos'),
-        axios.get('/alumnos/json')
-      ]);
-      pagosData = rPagos.data;
-      alumnosData = rAlumnos.data.map(a => ({
+      const { data } = await axios.get('/alumnos/json');
+      alumnosData = data.map(a => ({
         id: a.id,
-        grado_id: a.grado_id,
-        seccion_id: a.seccion_id,
-        nombre_completo: `${a.nombres} ${a.apellidos}`
+        nombre: `${a.nombres} ${a.apellidos}`,
+        grado_id: Number(a.grado_id),
+        seccion_id: Number(a.seccion_id)
       }));
-    } catch(err) {
-      console.error('Error cargando pagos o alumnos:', err);
+      console.log('Alumnos cargados:', alumnosData);
+    } catch (err) {
+      console.error('Error cargando alumnos:', err);
     }
   }
 
-  // 4) Renderizar la tabla
-  function mostrarTabla(lista) {
+  function renderTabla(items) {
     tablaBody.innerHTML = '';
-    if (!lista.length) {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `<td colspan="4">No hay pagos para esta combinación.</td>`;
-      tablaBody.appendChild(tr);
+    if (!items.length) {
+      tablaBody.innerHTML = '<tr><td colspan="4">No hay registros para esta combinación.</td></tr>';
       return;
     }
-    lista.forEach(r => {
+    items.forEach(r => {
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td>${r.alumno}</td>
         <td>${r.mes}</td>
-        <td>${r.fecha_pago || ''}</td>
-        <td>${(r.monto||0).toFixed(2)}</td>
+        <td>${r.fecha_pago}</td>
+        <td>${r.monto}</td>
       `;
       tablaBody.appendChild(tr);
     });
   }
 
-  // 5) Actualizar resultados según filtros
-  function actualizarResultados() {
-    const g = gradoSelect.value;
-    const s = seccionSelect.value;
-    const m = mesSelect.value;
-    if (!g || !s || !m) {
-      resultados = [];
-      return mostrarTabla([]);
+  async function fetchYMostrarPagos() {
+    const grado   = gradoSelect.value;
+    const seccion = seccionSelect.value;
+    const mes     = mesSelect.value;
+    if (!grado || !seccion || !mes) return renderTabla([]);
+
+    try {
+      const { data } = await axios.get('/pagos/filtrar', { params: { grado_id: grado, seccion_id: seccion, mes } });
+      pagos = data.map(p => ({ alumno: p.alumno, mes: meses.find(m=>m.id==p.mes).nombre, fecha_pago: p.fecha_pago||'-', monto: Number(p.monto).toFixed(2) }));
+      renderTabla(pagos);
+    } catch (err) {
+      console.error('Error cargando pagos:', err);
+      renderTabla([]);
     }
-    resultados = alumnosData
-      .filter(a => String(a.grado_id) === g && String(a.seccion_id) === s)
-      .map(a => {
-        const pago = pagosData.find(p =>
-          String(p.grado_id)   === g &&
-          String(p.seccion_id) === s &&
-          p.alumno.id          == a.id &&
-          String(p.mes)        === m
-        );
-        return {
-          alumno:     a.nombre_completo,
-          mes:        mesesEstaticos[m-1].nombre,
-          fecha_pago: pago?.fecha_pago,
-          monto:      pago ? Number(pago.monto) : 0
-        };
-      });
-    mostrarTabla(resultados);
   }
 
-  // 6) Mostrar solo deudores
-  function mostrarDeudores() {
-    mostrarTabla(resultados.filter(r => r.monto === 0));
+  async function fetchDeudores() {
+    const grado   = gradoSelect.value;
+    const seccion = seccionSelect.value;
+    const mes     = mesSelect.value;
+    if (!grado || !seccion || !mes) return renderTabla([]);
+
+    try {
+      const { data } = await axios.get('/pagos/deudores', { params: { grado_id: grado, seccion_id: seccion, mes } });
+      deudores = data.map(d => ({ alumno: d.alumno, mes: meses.find(m=>m.id==mes).nombre, fecha_pago: '-', monto: '-' }));
+      renderTabla(deudores);
+    } catch (err) {
+      console.error('Error cargando deudores:', err);
+      renderTabla([]);
+    }
   }
 
-  // 7) Autocompletar buscador
-  function actualizarSugerencias() {
+  function updateSuggestions() {
     const term = buscadorInput.value.trim().toLowerCase();
     sugerenciasDiv.innerHTML = '';
     if (!term) return;
-    const nombres = [...new Set(
-      resultados
-        .filter(r => r.alumno.toLowerCase().includes(term))
-        .map(r => r.alumno)
-    )];
-    nombres.forEach(n => {
+
+    const grado   = Number(gradoSelect.value);
+    const seccion = Number(seccionSelect.value);
+    if (!grado || !seccion) return;
+
+    const source = isDeudoresMode ? deudores : pagos;
+    // Sugerencias de alumnos de la vista actual
+    const list = source
+      .filter(item => item.alumno.toLowerCase().includes(term))
+      .map(item => item.alumno);
+
+    new Set(list).forEach(nombre => {
       const div = document.createElement('div');
-      div.textContent = n;
+      div.textContent = nombre;
       div.classList.add('hp-sugerencia-item');
-      div.addEventListener('click', () => {
-        buscadorInput.value = n;
-        sugerenciasDiv.innerHTML = '';
-        mostrarTabla(resultados.filter(r => r.alumno === n));
-      });
+      div.addEventListener('click', () => { buscadorInput.value = nombre; sugerenciasDiv.innerHTML=''; renderTabla([source.find(i=>i.alumno===nombre)]); });
       sugerenciasDiv.appendChild(div);
     });
   }
 
-  // 8) Listeners
-  gradoSelect  .addEventListener('change', actualizarResultados);
-  seccionSelect.addEventListener('change', actualizarResultados);
-  mesSelect    .addEventListener('change', actualizarResultados);
-  btnDeudores  .addEventListener('click', mostrarDeudores);
-  buscadorInput.addEventListener('input', actualizarSugerencias);
-  buscadorInput.addEventListener('blur', () => {
-    setTimeout(() => sugerenciasDiv.innerHTML = '', 150);
+  // Eventos
+  btnToggle.addEventListener('click', async () => {
+    isDeudoresMode = !isDeudoresMode;
+    btnToggle.textContent = isDeudoresMode ? 'Mostrar pagos' : 'Mostrar solo deudores';
+    buscadorInput.value = '';
+    sugerenciasDiv.innerHTML = '';
+    isDeudoresMode ? await fetchDeudores() : await fetchYMostrarPagos();
   });
 
-  // 9) Inicialización
-  await cargarDatosBD();
-  mostrarTabla([]);
+  gradoSelect.addEventListener('change', async () => { buscadorInput.value=''; sugerenciasDiv.innerHTML=''; await fetchYMostrarPagos(); });
+  seccionSelect.addEventListener('change', async () => { buscadorInput.value=''; sugerenciasDiv.innerHTML=''; await fetchYMostrarPagos(); });
+  mesSelect.addEventListener('change', async () => { buscadorInput.value=''; sugerenciasDiv.innerHTML=''; await fetchYMostrarPagos(); });
+
+  buscadorInput.addEventListener('input', updateSuggestions);
+  buscadorInput.addEventListener('blur', () => setTimeout(() => sugerenciasDiv.innerHTML = '', 150));
+
+  // Arranque inicial
+  await fetchYMostrarPagos();
 }
 
 document.addEventListener('DOMContentLoaded', () => initHistorialPagos());

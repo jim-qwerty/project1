@@ -15,7 +15,7 @@ class PagoDAO implements PagoRepositoryInterface
 
     public function findById(int $id): ?Pago
     {
-        return Pago::find($id);
+        return Pago::with(['alumno', 'grado', 'seccion'])->find($id);
     }
 
     public function create(array $data): Pago
@@ -33,5 +33,14 @@ class PagoDAO implements PagoRepositoryInterface
     {
         $pago = $this->findById($id);
         return $pago ? $pago->delete() : false;
+    }
+
+    public function filtrar(array $filtros): Collection
+    {
+        return Pago::with('alumno')
+            ->where('grado_id',   $filtros['grado_id'])
+            ->where('seccion_id', $filtros['seccion_id'])
+            ->where('mes',        $filtros['mes'])
+            ->get();
     }
 }

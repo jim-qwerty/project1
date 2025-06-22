@@ -74,6 +74,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/pagos', [PagoController::class, 'index'])
          ->name('pagos.index');
 
+     Route::get('/pagos/filtrar', [PagoController::class, 'filtrar']);
+     Route::get('/pagos/deudores', [PagoController::class, 'deudores']);
+
+
     // Alumnos (JSON y filtros)
     Route::get('/alumnos/json', [AlumnoController::class, 'indexJson'])
          ->name('alumnos.json');

@@ -5,58 +5,165 @@ namespace App\Http\Controllers;
 use App\Services\PagoService;
 use App\Http\Requests\Pago\StorePagoRequest;
 use App\Http\Requests\Pago\UpdatePagoRequest;
+use App\Http\Requests\Pago\FiltrarPagoRequest;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 
 class PagoController extends Controller
 {
-    public function __construct(protected PagoService $service) {}
+    protected PagoService $service;
 
-    public function index()
+    public function __construct(PagoService $service)
     {
-        return response()->json($this->service->listar());
+        $this->service = $service;
     }
 
+    /**
+     * Lista todos los pagos.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function index()
+    {
+        return response()->json(
+            $this->service->listar()
+        );
+    }
+
+    /**
+     * Filtra pagos por grado, sección y mes.
+     *
+     * @param  FiltrarPagoRequest  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function filtrar(FiltrarPagoRequest $request)
+    {
+        $filtros = $request->validated(); // ['grado_id','seccion_id','mes']
+        $pagos   = $this->service->filtrar($filtros);
+
+        return response()->json($pagos);
+    }
+
+    /**
+     * Muestra el formulario de creación de pago.
+     *
+     * @return \Illuminate\View\View
+     */
     public function create()
     {
         return view('pagos.create');
     }
 
+    /**
+     * Almacena un nuevo pago.
+     *
+     * @param  StorePagoRequest  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function store(StorePagoRequest $request)
     {
         $pago = $this->service->crear($request->validated());
-        return response()->json($pago, 201);
+
+        return response()->json($pago, Response::HTTP_CREATED);
     }
 
-    public function show($id)
+    /**
+     * Obtiene un pago por ID.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function show(int $id)
     {
         $pago = $this->service->obtener($id);
+
         if (! $pago) {
-            return response()->json(['error' => 'No encontrado'], 404);
+            return response()->json(['error' => 'No encontrado'], Response::HTTP_NOT_FOUND);
         }
+
         return response()->json($pago);
     }
 
-    public function edit($id)
+    /**
+     * Muestra el formulario de edición de un pago.
+     *
+     * @param  int  $id
+     * @return \Illuminate\View\View
+     */
+    public function edit(int $id)
     {
         $pago = $this->service->obtener($id);
+
         if (! $pago) {
-            abort(404);
+            abort(Response::HTTP_NOT_FOUND);
         }
+
         return view('pagos.edit', compact('pago'));
     }
 
-    public function update(UpdatePagoRequest $request, $id)
+    /**
+     * Actualiza un pago existente.
+     *
+     * @param  UpdatePagoRequest  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function update(UpdatePagoRequest $request, int $id)
     {
-        if (! $this->service->actualizar($id, $request->validated())) {
-            return response()->json(['error' => 'No encontrado o no actualizado'], 404);
+        $updated = $this->service->actualizar($id, $request->validated());
+
+        if (! $updated) {
+            return response()->json(['error' => 'No encontrado o no actualizado'], Response::HTTP_NOT_FOUND);
         }
+
         return response()->json(['success' => true]);
     }
 
-    public function destroy($id)
+    /**
+     * Elimina un pago.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function destroy(int $id)
     {
-        if (! $this->service->eliminar($id)) {
-            return response()->json(['error' => 'No encontrado o no eliminado'], 404);
+        $deleted = $this->service->eliminar($id);
+
+        if (! $deleted) {
+            return response()->json(['error' => 'No encontrado o no eliminado'], Response::HTTP_NOT_FOUND);
         }
+
         return response()->json(['success' => true]);
+    }
+
+    /**
+     * Devuelve los alumnos que no tienen registro de pago para el grado, sección y mes indicados.
+     *
+     * @param  FiltrarPagoRequest  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function deudores(FiltrarPagoRequest $request)
+    {
+        $g = $request->grado_id;
+        $s = $request->seccion_id;
+        $m = $request->mes;
+
+        $deudores = DB::table('alumnos as a')
+            ->leftJoin('pagos as p', function($join) use ($g, $s, $m) {
+                $join->on('p.alumno_id', '=', 'a.id')
+                     ->where('p.grado_id',   $g)
+                     ->where('p.seccion_id', $s)
+                     ->where('p.mes',        $m);
+            })
+            ->where('a.grado_id',   $g)
+            ->where('a.seccion_id', $s)
+            ->whereNull('p.id')
+            ->select(
+                'a.id',
+                DB::raw("CONCAT(a.nombres, ' ', a.apellidos) AS alumno")
+            )
+            ->get();
+
+        return response()->json($deudores);
     }
 }

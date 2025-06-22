@@ -112,8 +112,8 @@
 .lm-wrapper .lm-tabla {
   width: 100%;
   table-layout: fixed;
-  border-collapse: separate;
-  border-spacing: 0 5px;
+  border-collapse: collapse;   /* Cambiado a collapse */
+  /* border-spacing: 0 5px; */ /* Eliminado espaciado vertical */
   background: #FFFFFF; /* Blanco para la tabla */
   border-radius: 8px;
   overflow: hidden;
@@ -140,21 +140,19 @@
   background-color: #F5F5F5;
 }
 
-/* Anchos personalizados para columnas */
+/* Anchos personalizados para columnas (6 columnas) */
 .lm-wrapper .lm-tabla th:nth-child(1),
-.lm-wrapper .lm-tabla td:nth-child(1) { width: 30%; }
-
+.lm-wrapper .lm-tabla td:nth-child(1) { width: 5%; }   /* N° */
 .lm-wrapper .lm-tabla th:nth-child(2),
-.lm-wrapper .lm-tabla td:nth-child(2) { width: 25%; }
-
+.lm-wrapper .lm-tabla td:nth-child(2) { width: 25%; }  /* Nombres */
 .lm-wrapper .lm-tabla th:nth-child(3),
-.lm-wrapper .lm-tabla td:nth-child(3) { width: 15%; }
-
+.lm-wrapper .lm-tabla td:nth-child(3) { width: 25%; }  /* Apellidos */
 .lm-wrapper .lm-tabla th:nth-child(4),
-.lm-wrapper .lm-tabla td:nth-child(4) { width: 15%; }
-
+.lm-wrapper .lm-tabla td:nth-child(4) { width: 15%; }  /* Grado */
 .lm-wrapper .lm-tabla th:nth-child(5),
-.lm-wrapper .lm-tabla td:nth-child(5) { width: 15%; }
+.lm-wrapper .lm-tabla td:nth-child(5) { width: 15%; }  /* Sección */
+.lm-wrapper .lm-tabla th:nth-child(6),
+.lm-wrapper .lm-tabla td:nth-child(6) { width: 15%; }  /* Estado */
 
 /*========== Botón de acción (Enviar, Guardar, etc.) ==========*/
 .lm-wrapper .lm-btn {

@@ -3,13 +3,15 @@
 namespace App\Services;
 
 use App\Contracts\PagoRepositoryInterface;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Collection;
 use App\Models\Pago;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 class PagoService
 {
-    public function __construct(protected PagoRepositoryInterface $repo) {}
+    public function __construct(
+        protected PagoRepositoryInterface $repo
+    ) {}
 
     public function listar(): Collection
     {
@@ -34,5 +36,17 @@ class PagoService
     public function eliminar(int $id): bool
     {
         return $this->repo->delete($id);
+    }
+
+    public function filtrar(array $filtros): Collection
+    {
+        return $this->repo->filtrar($filtros)
+            ->map(fn($pago) => [
+                'alumno_id'  => $pago->alumno->id,
+                'alumno'     => $pago->alumno->nombres . ' ' . $pago->alumno->apellidos,
+                'mes'        => $pago->mes,
+                'fecha_pago' => $pago->fecha_pago,
+                'monto'      => $pago->monto,
+            ]);
     }
 }

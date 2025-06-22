@@ -36,7 +36,6 @@ export default async function initListaMatriculas(container = document.querySele
       fetchGrados(),
       fetchSecciones()
     ]);
-    // Poblar selects manteniendo value = nombre para filtrar por nombre
     filtroGrado.innerHTML = '<option value="">Todos los grados</option>';
     gradosBD.forEach(g => {
       filtroGrado.insertAdjacentHTML(
@@ -77,13 +76,14 @@ export default async function initListaMatriculas(container = document.querySele
     renderizarTabla(datosAlumnos);
   }
 
-  // 4) Renderizado de la tabla
+  // 4) Renderizado de la tabla, ahora con índice
   function renderizarTabla(filas) {
     tablaBody.innerHTML = '';
-    filas.forEach(al => {
+    filas.forEach((al, idx) => {
       const tr = document.createElement('tr');
       tr.dataset.id = al.id;
       tr.innerHTML = `
+        <td>${idx + 1}</td>
         <td>${al.nombres}</td>
         <td>${al.apellidos}</td>
         <td>${al.grado}</td>
@@ -108,7 +108,7 @@ export default async function initListaMatriculas(container = document.querySele
     })
   );
 
-  // 6) Autocompletar búsqueda desde el conjunto filtrado
+  // 6) Autocompletar búsqueda
   buscador.addEventListener('input', () => {
     const texto = buscador.value.trim().toLowerCase();
     if (!texto || datosAlumnos.length === 0) {

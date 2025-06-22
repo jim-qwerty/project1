@@ -23,7 +23,6 @@ export default function initPagoForm(container = document.querySelector('.pago-w
 
   // Mostrar mensajes breves
   const mostrarMensaje = txt => {
-    if (!mensajeBox) return;
     mensajeBox.textContent = txt;
     mensajeBox.style.display = 'block';
     setTimeout(() => mensajeBox.style.display = 'none', 4000);
@@ -52,18 +51,22 @@ export default function initPagoForm(container = document.querySelector('.pago-w
       estado_pago: 'pagado'
     };
 
-    // Loguea el payload para depuración
     console.log('Payload de pago a enviar:', payload);
 
     try {
       await axios.post('/matriculas', payload);
       mostrarMensaje('✅ Pago registrado con éxito!');
       pagoForm.reset();
+
+      // ———> Aquí disparamos la carga de la vista de matrícula:
+      const matriculaLink = document.querySelector('[data-form="matricula-form"]');
+      if (matriculaLink) {
+        // Simula el clic que muestra la vista matricula.blade.php
+        matriculaLink.click();
+      }
+
     } catch (err) {
-      // Manejo de errores de validación 422
       if (err.response?.status === 422) {
-        console.error('Errores de validación:', err.response.data.errors);
-        // Muestra el primer mensaje de error
         const firstError = Object.values(err.response.data.errors)[0][0];
         mostrarMensaje(`❌ ${firstError}`);
       } else {
