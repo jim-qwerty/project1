@@ -1,4 +1,3 @@
-// resources/js/forms/docentes/listaDocentes.js
 import '/resources/css/forms/docentes/listaDocentes.css';
 import axios from 'axios';
 import { fetchGrados } from '../utils/loadGradosSecciones.js';
@@ -15,11 +14,9 @@ export default async function initListaProfesores(
   // Crear y posicionar el contenedor de sugerencias
   const sugerencias = document.createElement('div');
   sugerencias.className = 'lp-sugerencias';
-  // Asegurar que el padre tenga position: relative
   const wrapperBuscador = buscador.parentNode;
   wrapperBuscador.style.position = 'relative';
   wrapperBuscador.appendChild(sugerencias);
-  // Posición absoluta justo debajo del input
   sugerencias.style.position = 'absolute';
   sugerencias.style.top = `${buscador.offsetTop + buscador.offsetHeight + 4}px`;
   sugerencias.style.left = `${buscador.offsetLeft}px`;
@@ -65,12 +62,40 @@ export default async function initListaProfesores(
         <td>${profesor.correo_electronico}</td>
         <td>${profesor.celular}</td>
         <td class="estado-radio">
-          <label><input type="radio" name="estado${index}" value="activo" ${profesor.estado==='activo'?'checked':''}>Activo</label>
-          <label><input type="radio" name="estado${index}" value="inactivo" ${profesor.estado==='inactivo'?'checked':''}>Inactivo</label>
+          <label><input type="radio" name="estado${index}" value="activo" ${profesor.estado === 'activo' ? 'checked' : ''}>Activo</label>
+          <label><input type="radio" name="estado${index}" value="inactivo" ${profesor.estado === 'inactivo' ? 'checked' : ''}>Inactivo</label>
         </td>
-        <td><button type="button" class="editar">Editar</button></td>
+        <td><button type="button" class="editar">Actualizar</button></td>
       `;
       cuerpoTabla.appendChild(fila);
+
+      // Agregar funcionalidad al botón "Actualizar"
+      const btnActualizar = fila.querySelector('.editar');
+      btnActualizar.addEventListener('click', async () => {
+        const radios = fila.querySelectorAll('input[type="radio"]');
+        let estadoSeleccionado;
+        radios.forEach(radio => {
+          if (radio.checked) estadoSeleccionado = radio.value;
+        });
+
+        if (estadoSeleccionado === profesor.estado) {
+          alert('No se realizaron cambios en el estado.');
+          return;
+        }
+
+        try {
+          await axios.put(`/docentes/${profesor.id}`, {
+            estado: estadoSeleccionado
+          });
+
+          alert('Estado actualizado correctamente.');
+          profesor.estado = estadoSeleccionado;
+
+        } catch (err) {
+          console.error('Error actualizando estado:', err);
+          alert('Error al actualizar el estado del docente.');
+        }
+      });
     });
   };
 
@@ -99,10 +124,12 @@ export default async function initListaProfesores(
       sugerencias.style.display = 'none';
       return;
     }
+
     const candidatos = profesores.filter(p =>
       p.grado_asignado?.nombre === gradoSel &&
       (`${p.nombres} ${p.apellidos}`).toLowerCase().includes(texto)
     ).slice(0, 5);
+
     sugerencias.innerHTML = '';
     candidatos.forEach(p => {
       const div = document.createElement('div');
@@ -116,9 +143,11 @@ export default async function initListaProfesores(
       });
       sugerencias.appendChild(div);
     });
+
     sugerencias.style.display = candidatos.length ? 'block' : 'none';
   });
 
+  // Cerrar sugerencias si se hace clic fuera
   document.addEventListener('click', e => {
     if (!container.contains(e.target) && e.target !== buscador) {
       sugerencias.style.display = 'none';
@@ -126,5 +155,5 @@ export default async function initListaProfesores(
   });
 }
 
-// Inicialización al cargar el DOM
+// Inicializar al cargar el DOM
 document.addEventListener('DOMContentLoaded', () => initListaProfesores());

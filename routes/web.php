@@ -109,6 +109,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/docentes/filtrar', [DocenteController::class, 'filtrar'])
          ->name('docentes.filtrar');
 
+    Route::put('/docentes/{id}', [DocenteController::class, 'update'])
+     ->name('docentes.update');
+
     // Asistencia de docentes
     Route::post('/asistencia-docentes', [AsistenciaDocenteController::class, 'store'])
          ->name('asistencia-docentes.store');
