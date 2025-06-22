@@ -1,3 +1,5 @@
+// resources/js/forms/notas/listaNotas.js
+
 import '/resources/css/forms/notas/listaNotas.css';
 import { initGradosSecciones, poblarSelect, fetchGrados, fetchSecciones } from '../utils/loadGradosSecciones.js';
 
@@ -9,10 +11,10 @@ export default async function initListaNotas(container = document.querySelector(
   const seccionSelect  = container.querySelector('#seccionSelect');
   const cursoSelect    = container.querySelector('#cursoSelect');
   const bimestreSelect = container.querySelector('#bimestreSelect');
-  const tabla          = container.querySelector('#tablaNotas table');
+  const tablaCont      = container.querySelector('#tablaNotas');
+  const tabla          = tablaCont.querySelector('table');
   const tbody          = tabla.querySelector('tbody');
   const btnReporte     = container.querySelector('#btnReporte');
-  const form           = container.querySelector('#formReporteNotas');
   const csrfToken      = document.querySelector('meta[name="csrf-token"]').content;
 
   // 2) Datos estáticos para cursos y bimestres
@@ -30,16 +32,7 @@ export default async function initListaNotas(container = document.querySelector(
     { id: 'IV',  nombre: 'IV° Bimestre' }
   ];
 
-  // 3) Opciones de fetch genérico
-  const fetchJSON = async url => {
-    const res = await fetch(url, {
-      credentials: 'same-origin',
-      headers: { 'Accept': 'application/json' }
-    });
-    return res.ok ? res.json() : [];
-  };
-
-  // 4) Cargar dinámicamente grados y secciones
+  // 3) Carga dinámica de grados y secciones
   try {
     const [gradosBD, seccionesBD] = await Promise.all([
       fetchGrados(),
@@ -53,11 +46,11 @@ export default async function initListaNotas(container = document.querySelector(
     seccionSelect.innerHTML = '<option value="">Error cargando secciones</option>';
   }
 
-  // 5) Poblamos otros selects
-  poblarSelect(cursoSelect,    cursosEstaticos,   'Todos los cursos');
+  // 4) Poblamos cursos y bimestres
+  poblarSelect(cursoSelect,    cursosEstaticos,    'Todos los cursos');
   poblarSelect(bimestreSelect, bimestresEstaticos, 'Todos los bimestres');
 
-  // 6) Fetch alumnos y notas
+  // 5) Fetch alumnos y notas
   async function fetchAlumnos() {
     const res = await fetch('/alumnos/filtrar', {
       method: 'POST',
@@ -68,8 +61,8 @@ export default async function initListaNotas(container = document.querySelector(
         'X-CSRF-TOKEN': csrfToken
       },
       body: JSON.stringify({
-        grado_id:   parseInt(gradoSelect.value),
-        seccion_id: parseInt(seccionSelect.value)
+        grado_id:   parseInt(gradoSelect.value, 10),
+        seccion_id: parseInt(seccionSelect.value, 10)
       })
     });
     if (!res.ok) throw new Error('Error al cargar alumnos: ' + res.status);
@@ -88,10 +81,10 @@ export default async function initListaNotas(container = document.querySelector(
       headers: { 'Accept': 'application/json' }
     });
     if (!res.ok) throw new Error('Error al cargar notas: ' + res.status);
-    return res.json();
+    return res.json(); // [{alumno_id, competencia1, competencia2, competencia3, nota_final}]
   }
 
-  // 7) Mostrar tabla
+  // 6) Mostrar tabla con numeración
   async function mostrarTabla() {
     tbody.innerHTML = '';
     btnReporte.style.display = 'none';
@@ -106,10 +99,11 @@ export default async function initListaNotas(container = document.querySelector(
         const alumnos = await fetchAlumnos();
         const notas   = await fetchNotas();
 
-        alumnos.forEach(al => {
+        alumnos.forEach((al, index) => {
           const notaObj = notas.find(n => n.alumno_id === al.id) || {};
           const tr = document.createElement('tr');
           tr.innerHTML = `
+            <td>${index + 1}</td>
             <td>${al.nombre_completo}</td>
             <td>${notaObj.competencia1 || ''}</td>
             <td>${notaObj.competencia2 || ''}</td>
@@ -119,21 +113,33 @@ export default async function initListaNotas(container = document.querySelector(
           tbody.appendChild(tr);
         });
 
-        if (alumnos.length) btnReporte.style.display = 'inline-block';
+        if (alumnos.length) {
+          btnReporte.style.display = 'inline-block';
+        }
       } catch (err) {
         console.error('Error mostrarTabla:', err);
       }
     }
   }
 
-  // 8) Listeners de filtros
+  // 7) Listeners de filtros
   [gradoSelect, seccionSelect, cursoSelect, bimestreSelect]
     .forEach(el => el.addEventListener('change', mostrarTabla));
 
-  // 9) Generar reporte
-  form.addEventListener('submit', e => {
-    e.preventDefault();
-    alert('📄 Reporte generado correctamente.');
+  // 8) Generar PDF al hacer click
+  btnReporte.addEventListener('click', () => {
+    // El contenedor que queremos convertir a PDF
+    const elemento = tablaCont;
+
+    const opciones = {
+      margin:       0.5,
+      filename:     'reporte_notas.pdf',
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2 },
+      jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+    };
+
+    html2pdf().set(opciones).from(elemento).save();
   });
 }
 

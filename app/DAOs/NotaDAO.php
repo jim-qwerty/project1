@@ -45,4 +45,14 @@ class NotaDAO implements NotaRepositoryInterface
             ])
             ->get(['alumno_id','competencia1','competencia2','competencia3','nota_final']);
     }
+
+    public function createOrUpdate(array $data): Nota
+{
+    $keys = [
+      'alumno_id' => $data['alumno_id'],
+      'curso_id'  => $data['curso_id'],
+      'bimestre'  => $data['bimestre'],
+    ];
+    return Nota::updateOrCreate($keys, $data);
+}
 }

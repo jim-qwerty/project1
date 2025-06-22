@@ -35,6 +35,7 @@
       <table class="ln-tabla">
         <thead>
           <tr>
+            <th>N°</th>
             <th>Alumno</th>
             <th>Competencia 1</th>
             <th>Competencia 2</th>
@@ -48,8 +49,10 @@
       </table>
     </div>
 
-    <button id="btnReporte" type="submit" class="ln-btn" style="display:none">
+    <button id="btnReporte" type="button" class="ln-btn" style="display:none">
       📄 Generar Reporte
     </button>
   </form>
 </div>
+
+

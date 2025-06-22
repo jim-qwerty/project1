@@ -8,8 +8,15 @@
   <!-- Iconos -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
 
-  <!-- Estilos con Vite -->
-  @vite(['resources/css/styles.css', 'resources/js/main.js'])
+  <!-- CSS + JS de tu app, incluida la vista de notas -->
+  @vite([
+    'resources/css/styles.css',
+    'resources/js/main.js',
+    'resources/js/forms/notas/listaNotas.js'
+  ])
+
+  {{-- html2pdf.js para generar el PDF --}}
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
 </head>
 <body>
   <!-- Header siempre visible -->

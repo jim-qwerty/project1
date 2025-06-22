@@ -13,4 +13,8 @@ interface NotaRepositoryInterface
     public function update(int $id, array $data): bool;
     public function delete(int $id): bool;
     public function getByFilters(array $filters): Collection;
+     /**
+     * Crea o actualiza una nota según su clave única.
+     */
+    public function createOrUpdate(array $data): \App\Models\Nota;
 }

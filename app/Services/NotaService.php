@@ -23,7 +23,9 @@ class NotaService
 
     public function crear(array $datos): Nota
     {
-        return DB::transaction(fn() => $this->repo->create($datos));
+        return DB::transaction(fn() => 
+            $this->repo->createOrUpdate($datos)
+        );
     }
 
     public function actualizar(int $id, array $datos): bool

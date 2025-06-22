@@ -22,10 +22,14 @@ class NotaController extends Controller
     }
 
     public function store(StoreNotaRequest $request)
-    {
-        $this->service->crear($request->validated());
-        return response()->json(['success' => true], 201);
+{
+    $listas = $request->validated()['notas'];
+    foreach ($listas as $datosNota) {
+        $this->service->crear($datosNota);
     }
+    return response()->json(['success' => true], 201);
+}
+
 
     public function show($id)
     {

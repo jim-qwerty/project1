@@ -15,16 +15,18 @@ class StoreNotaRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'alumno_id'     => 'required|integer|exists:alumnos,id',
-            'grado_id'      => 'required|integer|exists:grados,id',
-            'seccion_id'    => 'required|integer|exists:secciones,id',
-            'curso_id'      => 'required|integer|exists:cursos,id',
-            'docente_id'    => 'nullable|integer|exists:docentes,id',
-            'bimestre'      => ['required', Rule::in(['I','II','III','IV'])],
-            'competencia1'  => ['required', Rule::in(['A','B','C'])],
-            'competencia2'  => ['required', Rule::in(['A','B','C'])],
-            'competencia3'  => ['required', Rule::in(['A','B','C'])],
-            'nota_final'    => ['required', Rule::in(['A','B','C'])],
+            'notas'                  => 'required|array|min:1',
+            'notas.*.alumno_id'      => 'required|integer|exists:alumnos,id',
+            'notas.*.grado_id'       => 'required|integer|exists:grados,id',
+            'notas.*.seccion_id'     => 'required|integer|exists:secciones,id',
+            'notas.*.curso_id'       => 'required|integer|exists:cursos,id',
+            'notas.*.docente_id'     => 'nullable|integer|exists:docentes,id',
+            'notas.*.bimestre'       => ['required', Rule::in(['I','II','III','IV'])],
+            'notas.*.competencia1'   => ['required', Rule::in(['A','B','C'])],
+            'notas.*.competencia2'   => ['required', Rule::in(['A','B','C'])],
+            'notas.*.competencia3'   => ['required', Rule::in(['A','B','C'])],
+            'notas.*.nota_final'     => ['required', Rule::in(['A','B','C'])],
         ];
     }
 }
+

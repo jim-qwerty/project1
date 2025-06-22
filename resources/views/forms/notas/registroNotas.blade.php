@@ -1,4 +1,4 @@
-{{-- resources/views/registroNotas.blade.php --}}
+{{-- resources/views/forms/notas/registroNotas.blade.php --}}
 
 <meta name="csrf-token" content="{{ csrf_token() }}">
 
