@@ -2,7 +2,6 @@ pipeline {
   agent any
   options {
     timestamps()
-    ansiColor('xterm')
     disableConcurrentBuilds()
   }
 
@@ -38,7 +37,7 @@ pipeline {
     stage('Preparar entorno') {
       steps {
         sh '''
-          # Copiar .env si no existe (bash dentro del contenedor sí usa #)
+          # Copiar .env si no existe
           [ -f .env ] || cp .env.example .env
 
           # Asegurar carpeta database/ y archivo sqlite
@@ -127,7 +126,8 @@ pipeline {
       echo '❌ Pipeline falló. Revisa logs y junit.'
     }
     always {
-      cleanWs(cleanWhenAborted: true, deleteDirs: true)
+      // Limpieza básica sin plugin extra
+      script { deleteDir() }
     }
   }
 }
