@@ -1,142 +1,139 @@
 pipeline {
   agent any
-
-  environment {
-    APP_ENV          = 'testing'
-    CACHE_DRIVER     = 'array'
-    QUEUE_CONNECTION = 'sync'
-    DB_CONNECTION    = 'sqlite'
-    DB_DATABASE      = 'database/database.sqlite'
+  options {
+    timestamps()
+    ansiColor('xterm')
+    disableConcurrentBuilds()
   }
 
-  options {
-    timeout(time: 20, unit: 'MINUTES')
+  environment {
+    # Modo testing (sin tocar prod)
+    APP_ENV = 'testing'
+    APP_DEBUG = 'false'
+
+    # Base de datos SQLite en archivo (dentro del repo)
+    DB_CONNECTION = 'sqlite'
+    DB_DATABASE   = 'database/database.sqlite'
+
+    # Evita servicios externos durante pruebas
+    CACHE_DRIVER  = 'array'
+    QUEUE_CONNECTION = 'sync'
+    SESSION_DRIVER = 'array'
+
+    # Evita prompts interactivos
+    COMPOSER_NO_INTERACTION = '1'
+    NPM_CONFIG_FUND = 'false'
+    NPM_CONFIG_AUDIT = 'false'
   }
 
   stages {
+
     stage('Checkout') {
       steps {
         checkout scm
+        sh 'php -v || true' // Para log (si php no está en el nodo, no falla)
       }
     }
 
-    // 1) Instalar dependencias PHP con Composer (imagen oficial)
-    stage('Composer install') {
+    stage('Preparar entorno') {
       steps {
         sh '''
-          set -e
-          proxyEnv="-e HTTP_PROXY=$HTTP_PROXY -e HTTPS_PROXY=$HTTPS_PROXY -e NO_PROXY=$NO_PROXY"
+          # Copiar .env si no existe
+          [ -f .env ] || cp .env.example .env
 
-          docker run --rm --user $(id -u):$(id -g) $proxyEnv \
-            -v jenkins_home:/var/jenkins_home \
-            -w "$WORKSPACE" \
-            composer:2 sh -lc "
+          # Asegurar carpeta database/ y archivo sqlite
+          mkdir -p database
+          [ -f database/database.sqlite ] || touch database/database.sqlite
+        '''
+      }
+    }
+
+    stage('Instalar Composer deps') {
+      steps {
+        script {
+          docker.image('composer:2').inside('-u 0:0') {
+            sh '''
               composer --version
-              composer install --no-interaction --prefer-dist --no-progress
-            "
-        '''
-      }
-    }
-
-    // 2) Preparar entorno de testing + SQLite y migraciones
-    stage('Config testing + DB') {
-      steps {
-        sh '''
-          set -e
-          export DEBIAN_FRONTEND=noninteractive
-          proxyEnv="-e HTTP_PROXY=$HTTP_PROXY -e HTTPS_PROXY=$HTTPS_PROXY -e NO_PROXY=$NO_PROXY -e DEBIAN_FRONTEND=$DEBIAN_FRONTEND"
-
-          # Ejecutamos como root para poder instalar extensiones
-          docker run --rm $proxyEnv \
-            -v jenkins_home:/var/jenkins_home \
-            -w "$WORKSPACE" \
-            php:8.2-cli bash -lc '
-              set -eux
-              apt-get update
-              apt-get install -y --no-install-recommends libsqlite3-dev
-
-              # Activar pdo_sqlite
-              docker-php-ext-configure pdo_sqlite
-              docker-php-ext-install pdo_sqlite
-
-              # .env.testing + archivo SQLite
-              cp -n .env.example .env.testing || true
-              mkdir -p database
-              rm -f database/database.sqlite && : > database/database.sqlite
-
-              php artisan key:generate --env=testing --force
-              php artisan migrate      --env=testing --force
-              php artisan db:seed      --env=testing --force || true
-            '
-
-          # Reparar permisos del workspace (evita archivos root)
-          uid=$(id -u); gid=$(id -g)
-          docker run --rm -v jenkins_home:/var/jenkins_home alpine sh -lc "chown -R $uid:$gid '$WORKSPACE'"
-        '''
-      }
-    }
-
-    // 3) Ejecutar tests
-    stage('Tests') {
-      steps {
-        sh '''
-          set +e
-          export DEBIAN_FRONTEND=noninteractive
-          proxyEnv="-e HTTP_PROXY=$HTTP_PROXY -e HTTPS_PROXY=$HTTPS_PROXY -e NO_PROXY=$NO_PROXY -e DEBIAN_FRONTEND=$DEBIAN_FRONTEND"
-
-          docker run --rm $proxyEnv \
-            -v jenkins_home:/var/jenkins_home \
-            -w "$WORKSPACE" \
-            php:8.2-cli bash -lc '
-              set -eux
-              apt-get update
-              apt-get install -y --no-install-recommends libsqlite3-dev
-              docker-php-ext-configure pdo_sqlite
-              docker-php-ext-install pdo_sqlite
-
-              if [ -f phpunit.xml ] || [ -f phpunit.xml.dist ]; then
-                ./vendor/bin/phpunit --log-junit junit.xml --testdox || php artisan test --without-tty
-              else
-                php artisan test --without-tty
-              fi
-            '
-          status=$?
-          set -e
-
-          # Reparar permisos para que Jenkins pueda archivar/limpiar
-          uid=$(id -u); gid=$(id -g)
-          docker run --rm -v jenkins_home:/var/jenkins_home alpine sh -lc "chown -R $uid:$gid '$WORKSPACE'"
-
-          exit $status
-        '''
-      }
-      post {
-        always {
-          // Publica resultados si phpunit generó junit.xml
-          junit allowEmptyResults: true, testResults: 'junit.xml, tests/**/junit*.xml, build/test-results/**/*.xml'
+              composer install \
+                --prefer-dist \
+                --no-progress \
+                --no-scripts
+            '''
+          }
         }
       }
     }
 
-    // 4) (Opcional) build del frontend si existe package.json
-    stage('Build Frontend (opcional)') {
-      when { expression { return fileExists('package.json') } }
+    stage('Instalar Node deps (opcional build)') {
       steps {
-        sh '''
-          set -e
-          proxyEnv="-e HTTP_PROXY=$HTTP_PROXY -e HTTPS_PROXY=$HTTPS_PROXY -e NO_PROXY=$NO_PROXY"
-
-          docker run --rm --user $(id -u):$(id -g) $proxyEnv \
-            -v jenkins_home:/var/jenkins_home \
-            -w "$WORKSPACE" \
-            node:20 bash -lc "
-              set -eux
-              corepack enable || true
+        script {
+          docker.image('node:18').inside('-u 0:0') {
+            sh '''
+              node -v && npm -v
+              # Si no tienes frontend, esto igual validará package.json sin romper
               npm ci || npm install
-              npm run build || npm run dev --if-present
-            "
-        '''
+              # Ejecuta build si existe el script "build"; si no, lo ignora
+              npm run -s build || echo "No hay script build, continúo…"
+            '''
+          }
+        }
       }
+    }
+
+    stage('Migraciones + Tests') {
+      steps {
+        script {
+          /*
+            Usamos una imagen PHP lista para CI con extensiones comunes.
+            La oficial php:8.2-cli a veces no trae sqlite habilitado por defecto.
+            Esta imagen trae pdo_sqlite activo y composer preinstalado.
+          */
+          def phpImage = 'ghcr.io/shivammathur/php:8.2'
+          docker.image(phpImage).inside('-u 0:0') {
+            sh '''
+              php -v
+              php -m | grep -i sqlite || (echo "Falta sqlite en PHP" && exit 1)
+
+              # Generar APP_KEY, limpiar caches
+              php -r "file_exists('.env') || copy('.env.example', '.env');"
+              php artisan key:generate --force
+              php artisan config:clear
+              php artisan cache:clear
+              php artisan route:clear
+
+              # Ejecutar migraciones sobre SQLite
+              php artisan migrate --force
+
+              # Correr pruebas y emitir reporte JUnit para Jenkins
+              mkdir -p build/test-results
+              if php artisan test --log-junit build/test-results/junit.xml; then
+                echo "Tests OK"
+              else
+                echo "Tests con fallos"; exit 1
+              fi
+            '''
+          }
+        }
+      }
+      post {
+        always {
+          junit allowEmptyResults: true, testResults: 'build/test-results/*.xml'
+          archiveArtifacts artifacts: 'build/test-results/*.xml,storage/logs/*.log', allowEmptyArchive: true
+        }
+      }
+    }
+
+  } // stages
+
+  post {
+    success {
+      echo '✅ Pipeline OK'
+    }
+    failure {
+      echo '❌ Pipeline falló. Revisa logs y junit.'
+    }
+    always {
+      cleanWs(cleanWhenAborted: true, deleteDirs: true)
     }
   }
 }
