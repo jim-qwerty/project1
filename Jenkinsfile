@@ -2,7 +2,6 @@ pipeline {
   agent any
 
   options {
-    // Opciones core (no requieren plugins extra)
     timestamps()
     disableConcurrentBuilds()
   }
@@ -62,15 +61,16 @@ pipeline {
     }
 
     stage('Node: ci & build (si aplica)') {
-      when { anyOf { fileExists('package-lock.json'); fileExists('package.json') } }
+      // <- FIX: usar expression{} en lugar de fileExists como condicional
+      when {
+        expression { return fileExists('package-lock.json') || fileExists('package.json') }
+      }
       steps {
         script {
           docker.image('node:18').inside('-u 0:0') {
             sh '''
               node -v && npm -v
-              # Si hay lock, usa ci; si no, instala
-              if [ -f package-lock.json ]; then npm ci; else npm install; fi
-              # Ejecuta build solo si existe el script
+              if [ -f package-lock.json ]; then npm ci; elif [ -f package.json ]; then npm install; fi
               npm run -s build || echo "No hay script build, continúo…"
             '''
           }
@@ -123,9 +123,7 @@ pipeline {
       }
       post {
         always {
-          // Publica resultados (plugin JUnit suele venir por defecto)
           junit allowEmptyResults: true, testResults: 'build/test-results/*.xml'
-          // Guarda logs útiles
           archiveArtifacts artifacts: 'build/test-results/*.xml,storage/logs/*.log', allowEmptyArchive: true
         }
       }
