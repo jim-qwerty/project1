@@ -7,20 +7,20 @@ pipeline {
   }
 
   environment {
-    # Modo testing (sin tocar prod)
+    // Modo testing (sin tocar prod)
     APP_ENV = 'testing'
     APP_DEBUG = 'false'
 
-    # Base de datos SQLite en archivo (dentro del repo)
+    // Base de datos SQLite en archivo (dentro del repo)
     DB_CONNECTION = 'sqlite'
     DB_DATABASE   = 'database/database.sqlite'
 
-    # Evita servicios externos durante pruebas
+    // Evita servicios externos durante pruebas
     CACHE_DRIVER  = 'array'
     QUEUE_CONNECTION = 'sync'
     SESSION_DRIVER = 'array'
 
-    # Evita prompts interactivos
+    // Evita prompts interactivos
     COMPOSER_NO_INTERACTION = '1'
     NPM_CONFIG_FUND = 'false'
     NPM_CONFIG_AUDIT = 'false'
@@ -31,14 +31,14 @@ pipeline {
     stage('Checkout') {
       steps {
         checkout scm
-        sh 'php -v || true' // Para log (si php no está en el nodo, no falla)
+        sh 'php -v || true' // Solo para log; si no hay PHP en el nodo, no falla
       }
     }
 
     stage('Preparar entorno') {
       steps {
         sh '''
-          # Copiar .env si no existe
+          # Copiar .env si no existe (bash dentro del contenedor sí usa #)
           [ -f .env ] || cp .env.example .env
 
           # Asegurar carpeta database/ y archivo sqlite
@@ -70,9 +70,7 @@ pipeline {
           docker.image('node:18').inside('-u 0:0') {
             sh '''
               node -v && npm -v
-              # Si no tienes frontend, esto igual validará package.json sin romper
               npm ci || npm install
-              # Ejecuta build si existe el script "build"; si no, lo ignora
               npm run -s build || echo "No hay script build, continúo…"
             '''
           }
@@ -83,28 +81,24 @@ pipeline {
     stage('Migraciones + Tests') {
       steps {
         script {
-          /*
-            Usamos una imagen PHP lista para CI con extensiones comunes.
-            La oficial php:8.2-cli a veces no trae sqlite habilitado por defecto.
-            Esta imagen trae pdo_sqlite activo y composer preinstalado.
-          */
+          // Imagen con pdo_sqlite habilitado
           def phpImage = 'ghcr.io/shivammathur/php:8.2'
           docker.image(phpImage).inside('-u 0:0') {
             sh '''
               php -v
               php -m | grep -i sqlite || (echo "Falta sqlite en PHP" && exit 1)
 
-              # Generar APP_KEY, limpiar caches
+              # Generar APP_KEY y limpiar caches
               php -r "file_exists('.env') || copy('.env.example', '.env');"
               php artisan key:generate --force
               php artisan config:clear
               php artisan cache:clear
               php artisan route:clear
 
-              # Ejecutar migraciones sobre SQLite
+              # Migraciones sobre SQLite
               php artisan migrate --force
 
-              # Correr pruebas y emitir reporte JUnit para Jenkins
+              # Pruebas con reporte JUnit
               mkdir -p build/test-results
               if php artisan test --log-junit build/test-results/junit.xml; then
                 echo "Tests OK"
