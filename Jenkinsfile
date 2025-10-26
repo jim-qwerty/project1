@@ -1,84 +1,96 @@
 pipeline {
-  agent any
-  options { timestamps() }
+  agent {
+    docker {
+      // Imagen con PHP 8.2 + Composer + extensiones comunes
+      image 'ghcr.io/shivammathur/php:8.2'
+      args  '-u 0' // root para poder instalar paquetes si hace falta
+    }
+  }
+
+  environment {
+    APP_ENV       = 'testing'
+    APP_KEY       = ''                // se generará en el stage
+    CACHE_DRIVER  = 'array'
+    QUEUE_CONNECTION = 'sync'
+
+    // Usaremos SQLite para CI (sin MySQL)
+    DB_CONNECTION = 'sqlite'
+    DB_DATABASE   = 'database/database.sqlite'
+  }
 
   stages {
     stage('Checkout') {
+      steps { checkout scm }
+    }
+
+    stage('Deps PHP') {
       steps {
-        checkout scm
-        sh 'mkdir -p build'
+        sh '''
+          php -v
+          composer --version || EXPECTED=1
+          if [ "$EXPECTED" = "1" ]; then \
+            php -r "copy('https://getcomposer.org/installer','composer-setup.php');"
+            php composer-setup.php --install-dir=/usr/local/bin --filename=composer
+          fi
+          composer install --no-interaction --prefer-dist --no-progress
+        '''
       }
     }
 
-    stage('Backend - Pest (Laravel)') {
-      when { expression { fileExists('composer.json') } }
+    stage('Config testing + DB') {
       steps {
         sh '''
-          composer install --no-interaction --prefer-dist
+          # .env.testing con SQLite
+          cp -n .env.example .env.testing || true
+          # Asegurar archivo SQLite
+          mkdir -p database
+          rm -f database/database.sqlite
+          touch database/database.sqlite
 
-          # .env mínimo para tests (APP_KEY + SQLite en memoria)
-          if [ -f artisan ]; then
-            KEY=$(php -r "echo 'base64:'.base64_encode(random_bytes(32));")
-            cat > .env <<EOF
-APP_ENV=testing
-APP_KEY=$KEY
-APP_DEBUG=true
-APP_URL=http://localhost
-DB_CONNECTION=sqlite
-DB_DATABASE=:memory:
-CACHE_DRIVER=array
-QUEUE_CONNECTION=sync
-SESSION_DRIVER=array
-MAIL_MAILER=array
-EOF
-          fi
+          # Clave de app para tests
+          php artisan key:generate --env=testing --force
 
-          # Ejecuta Pest o PHPUnit y genera reporte JUnit
-          if [ -f vendor/bin/pest ]; then
-            vendor/bin/pest --log-junit build/pest.xml || true
-          elif [ -f vendor/bin/phpunit ]; then
-            vendor/bin/phpunit --log-junit build/phpunit.xml || true
+          # Migraciones + seeds (si existen)
+          php artisan migrate --env=testing --force
+          php artisan db:seed --env=testing --force || true
+        '''
+      }
+    }
+
+    stage('Tests PHP') {
+      steps {
+        sh '''
+          # Usa PHPUnit o "artisan test", lo que tengas configurado
+          if [ -f phpunit.xml ] || [ -f phpunit.xml.dist ]; then
+            ./vendor/bin/phpunit --testdox || php artisan test --without-tty
           else
-            echo "No se encontró Pest ni PHPUnit."
+            php artisan test --without-tty
           fi
         '''
       }
       post {
         always {
-          script {
-            if (fileExists('build/pest.xml')) {
-              junit allowEmptyResults: true, testResults: 'build/pest.xml'
-            } else if (fileExists('build/phpunit.xml')) {
-              junit allowEmptyResults: true, testResults: 'build/phpunit.xml'
-            } else {
-              echo 'No se generó reporte JUnit en backend.'
-            }
-          }
+          junit allowEmptyResults: true, testResults: 'tests/**/junit*.xml, junit*.xml, build/test-results/**/*.xml'
         }
       }
     }
 
-    stage('Frontend - npm & Jest') {
-      when { expression { fileExists('package.json') } }
+    // Opcional: build del frontend si el proyecto lo usa
+    stage('Build Frontend (opcional)') {
+      when { expression { return fileExists('package.json') } }
+      agent { docker { image 'node:20' } }
       steps {
         sh '''
+          corepack enable || true
           npm ci || npm install
-          npx --yes jest-junit || npm i -D jest-junit || true
-          JEST_JUNIT_OUTPUT=./junit.xml npx jest --ci --passWithNoTests \
-            --reporters=default --reporters=jest-junit || true
+          npm run build || npm run dev --if-present
         '''
       }
-      post {
-        always {
-          script {
-            if (fileExists('junit.xml')) {
-              junit allowEmptyResults: true, testResults: 'junit.xml'
-            } else {
-              echo 'No se generó junit.xml en frontend.'
-            }
-          }
-        }
-      }
     }
+  }
+
+  options {
+    // Mantén logs y tiempos razonables
+    timeout(time: 15, unit: 'MINUTES')
   }
 }
